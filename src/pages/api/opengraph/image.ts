@@ -3,7 +3,14 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { Browser } from "puppeteer";
 import type { Browser as BrowserCore } from "puppeteer-core";
 
-const baseUrl = "https://gallery.so";
+let baseUrl = "https://gallery.so";
+
+// can manually set the preview URL via environment variables on vercel for the `opengraph` service
+if (process.env.NEXT_PUBLIC_PREVIEW_URL) {
+  baseUrl = process.env.NEXT_PUBLIC_PREVIEW_URL;
+} else if (process.env.NEXT_PUBLIC_VERCEL_ENV === "preview") {
+  baseUrl = "https://gallery-dev.vercel.app";
+}
 
 const getBrowserInstance = async () => {
   const executablePath = await chromium.executablePath;

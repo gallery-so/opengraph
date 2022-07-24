@@ -49,8 +49,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const fallback =
     typeof req.query.fallback === "string" ? req.query.fallback : null;
 
-  const width = parseInt(req.query.width as string) || 1012;
-  const height = parseInt(req.query.height as string) || 506;
+  // default should mirror https://github.com/gallery-so/gallery/blob/main/src/constants/opengraph.ts
+  const width = parseInt(req.query.width as string) || 1200;
+  const height = parseInt(req.query.height as string) || 628;
   const pixelDensity = parseInt(req.query.pixelDensity as string) || 2;
 
   url.searchParams.set("width", width.toString());

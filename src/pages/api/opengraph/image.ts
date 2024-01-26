@@ -114,6 +114,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         ${hasPrevious ? '<meta property="fc:frame:button:1" content="←">' : ""}
         <meta property="fc:frame:button:${hasPrevious ? 2 : 1}" content="→">
         <meta property="fc:frame:image" content="${apiUrl}">
+        <meta property="fc:frame:post_url" content="${apiUrl}">
         <body>gm</body>
       </html>
       `

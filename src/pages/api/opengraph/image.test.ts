@@ -7,7 +7,7 @@ describe("/pages/api/opengraph/image", () => {
     let html: string;
     beforeAll(async () => {
       response = await axios.post(
-        "http://localhost:3001/api/opengraph/image?path=/opengraph/user/curated",
+        "http://localhost:3001/api/opengraph/image?path=%2Fopengraph%2Fcollection%2F2BLlDN7mVFHs8R1NhD11PTLojF5%2Ffcframe&fallback=https%3A%2F%2Fstorage.googleapis.com%2Fgallery-prod-325303.appspot.com%2Fgallery_full_logo_v2.1.png",
         {
           untrustedData: { buttonIndex: 1 },
         }
@@ -29,7 +29,7 @@ describe("/pages/api/opengraph/image", () => {
 
     it("should increment the position parameter", () => {
       expect(html).toContain(
-        '<meta property="fc:frame:image" content="https://gallery.so/opengraph/user/curated?position=1">'
+        '<meta property="fc:frame:image" content="https://gallery-opengraph.vercel.app/api/opengraph/image?path=%2Fopengraph%2Fcollection%2F2BLlDN7mVFHs8R1NhD11PTLojF5%2Ffcframe&fallback=https%3A%2F%2Fstorage.googleapis.com%2Fgallery-prod-325303.appspot.com%2Fgallery_full_logo_v2.1.png&position=1">'
       );
     });
   });
@@ -39,7 +39,7 @@ describe("/pages/api/opengraph/image", () => {
     let html: string;
     beforeAll(async () => {
       response = await axios.post(
-        "http://localhost:3001/api/opengraph/image?path=/opengraph/user/curated&position=1",
+        "http://localhost:3001/api/opengraph/image?path=%2Fopengraph%2Fcollection%2F2BLlDN7mVFHs8R1NhD11PTLojF5%2Ffcframe&fallback=https%3A%2F%2Fstorage.googleapis.com%2Fgallery-prod-325303.appspot.com%2Fgallery_full_logo_v2.1.png&position=1",
         {
           untrustedData: { buttonIndex: 2 },
         }
@@ -61,7 +61,7 @@ describe("/pages/api/opengraph/image", () => {
 
     it("should increment the position parameter", () => {
       expect(html).toContain(
-        '<meta property="fc:frame:image" content="https://gallery.so/opengraph/user/curated?position=2">'
+        '<meta property="fc:frame:image" content="https://gallery-opengraph.vercel.app/api/opengraph/image?path=%2Fopengraph%2Fcollection%2F2BLlDN7mVFHs8R1NhD11PTLojF5%2Ffcframe&fallback=https%3A%2F%2Fstorage.googleapis.com%2Fgallery-prod-325303.appspot.com%2Fgallery_full_logo_v2.1.png&position=2">'
       );
     });
   });
@@ -71,7 +71,7 @@ describe("/pages/api/opengraph/image", () => {
     let html: string;
     beforeAll(async () => {
       response = await axios.post(
-        "http://localhost:3001/api/opengraph/image?path=/opengraph/user/curated&position=1",
+        "http://localhost:3001/api/opengraph/image?path=%2Fopengraph%2Fcollection%2F2BLlDN7mVFHs8R1NhD11PTLojF5%2Ffcframe&fallback=https%3A%2F%2Fstorage.googleapis.com%2Fgallery-prod-325303.appspot.com%2Fgallery_full_logo_v2.1.png&position=1",
         {
           untrustedData: { buttonIndex: 1 },
         }
@@ -95,7 +95,7 @@ describe("/pages/api/opengraph/image", () => {
 
     it("should not include a position parameter", () => {
       expect(html).toContain(
-        '<meta property="fc:frame:image" content="https://gallery.so/opengraph/user/curated">'
+        '<meta property="fc:frame:image" content="https://gallery-opengraph.vercel.app/api/opengraph/image?path=%2Fopengraph%2Fcollection%2F2BLlDN7mVFHs8R1NhD11PTLojF5%2Ffcframe&fallback=https%3A%2F%2Fstorage.googleapis.com%2Fgallery-prod-325303.appspot.com%2Fgallery_full_logo_v2.1.png">'
       );
     });
   });

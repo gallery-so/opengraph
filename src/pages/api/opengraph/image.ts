@@ -13,8 +13,6 @@ if (process.env.NEXT_PUBLIC_PREVIEW_URL) {
   baseUrl = "https://gallery-dev.vercel.app";
 }
 
-baseUrl = "https://gallery-git-robin-fcframes-gallery-so.vercel.app";
-
 const getBrowserInstance = async () => {
   const executablePath = await chromium.executablePath(
     "https://storage.googleapis.com/gallery-prod-325303.appspot.com/dev/chromium-v117.0.0-pack.tar"

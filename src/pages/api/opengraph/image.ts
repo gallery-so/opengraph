@@ -129,11 +129,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const height = parseInt(req.query.height as string) || 630;
   const pixelDensity = parseInt(req.query.pixelDensity as string) || 2;
 
-  console.log("position", req.query.position);
-
   url.searchParams.set("width", width.toString());
   url.searchParams.set("height", height.toString());
-  url.searchParams.set("position", req.query.position as string);
+  if (typeof req.query.position === "string") {
+    url.searchParams.set("position", req.query.position);
+  }
 
   let browser: Browser | BrowserCore | null = null;
 

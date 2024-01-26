@@ -182,6 +182,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     console.error("error while generating opengraph image", error);
 
     if (fallback) {
+      res.setHeader(
+        "Cache-Control",
+        `s-maxage=5, max-age=5, stale-while-revalidate=${60 * 60 * 24}`
+      );
       res.redirect(fallback);
       return;
     }

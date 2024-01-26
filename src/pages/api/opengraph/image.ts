@@ -73,7 +73,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const { position } = req.query;
     console.log("body", req.body);
-    const buttonIndex = req.body.untrustedData?.buttonIndex;
+    const buttonIndex = req.body.untrustedData?.buttonIndex ?? req.body.option;
 
     console.log({ position, buttonIndex });
 

@@ -12,6 +12,8 @@ if (process.env.NEXT_PUBLIC_PREVIEW_URL) {
   baseUrl = "https://gallery-dev.vercel.app";
 }
 
+// baseUrl = "https://gallery-git-robin-fcframes-gallery-so.vercel.app";
+
 const getBrowserInstance = async () => {
   const executablePath = await chromium.executablePath;
 
@@ -124,6 +126,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   let browser: Browser | BrowserCore | null = null;
 
   try {
+    console.log(url);
     browser = await getBrowserInstance();
     const page = await browser.newPage();
     await page.setViewport({

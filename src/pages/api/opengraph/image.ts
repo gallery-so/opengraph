@@ -17,7 +17,7 @@ baseUrl = "https://gallery-git-robin-fcframes-gallery-so.vercel.app";
 
 const getBrowserInstance = async () => {
   const executablePath = await chromium.executablePath(
-    "https://storage.googleapis.com/gallery-prod-325303.appspot.com/dev/chromium-v119.0.2-pack.tar"
+    "https://storage.googleapis.com/gallery-prod-325303.appspot.com/dev/chromium-v117.0.0-pack.tar"
   );
 
   if (!executablePath) {

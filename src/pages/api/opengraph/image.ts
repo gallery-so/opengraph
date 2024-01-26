@@ -159,10 +159,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
     console.log(9);
 
-    const imageBuffer = await element.screenshot({ type: "jpg" });
+    const imageBuffer = await element.screenshot({ type: "jpeg" });
     console.log(10);
 
-    res.setHeader("Content-Type", "image/jpg");
+    res.setHeader("Content-Type", "image/jpeg");
     console.log(11);
     res.send(imageBuffer);
   } catch (error: unknown) {

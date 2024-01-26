@@ -5,12 +5,15 @@ import puppeteer from "puppeteer-core";
 import type { Browser as BrowserCore } from "puppeteer-core";
 
 let baseUrl = "https://gallery.so";
+let apiBaseUrl = "https://gallery-opengraph.vercel.app";
 
 // can manually set the preview URL via environment variables on vercel for the `opengraph` service
 if (process.env.NEXT_PUBLIC_PREVIEW_URL) {
   baseUrl = process.env.NEXT_PUBLIC_PREVIEW_URL;
+  apiBaseUrl = "https://gallery-opengraph-preview.vercel.app";
 } else if (process.env.NEXT_PUBLIC_VERCEL_ENV === "preview") {
   baseUrl = "https://gallery-dev.vercel.app";
+  apiBaseUrl = "https://gallery-opengraph-preview.vercel.app";
 }
 
 const getBrowserInstance = async () => {
@@ -45,6 +48,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const url = new URL(path, baseUrl);
+
   if (!url.toString().startsWith(baseUrl)) {
     res.status(400).json({ error: { code: "INVALID_PATH" } });
     return;
@@ -64,8 +68,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   );
 
   if (req.method === "POST") {
+    const apiUrl = new URL(req.url ?? "", apiBaseUrl);
+    console.log({ apiUrl });
+
     const { position } = req.query;
-    const buttonIndex = req.body.untrustedData?.buttonIndex;
+    console.log("body", req.body);
+    const buttonIndex = req.body.untrustedData?.buttonIndex ?? req.body.option;
 
     console.log({ position, buttonIndex });
 
@@ -75,7 +83,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     // they've clicked `next` since it'll be the only available option
     if (!position) {
       // set the position for the next token
-      url.searchParams.set("position", "1");
+      apiUrl.searchParams.set("position", "1");
       // for all other tokens, parse which button was clicked. button index of 1 means previous, 2 means next.
     } else if (buttonIndex) {
       if (Number(position) === 1) {
@@ -83,18 +91,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         // by deleting the position param so that they won't see a `prev` arrow
         if (Number(buttonIndex) === 1) {
           hasPrevious = false;
-          url.searchParams.delete("position");
+          apiUrl.searchParams.delete("position");
         }
       } else {
         // if we're further along in the collection, clicking `prev` should decrement the position
         if (Number(buttonIndex) === 1) {
-          url.searchParams.set("position", `${Number(position) - 1}`);
+          apiUrl.searchParams.set("position", `${Number(position) - 1}`);
         }
       }
 
       // if the user clicks `next`, we should always increment the position
       if (Number(buttonIndex) === 2) {
-        url.searchParams.set("position", `${Number(position) + 1}`);
+        apiUrl.searchParams.set("position", `${Number(position) + 1}`);
       }
     }
 
@@ -106,7 +114,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         <meta property="fc:frame" content="vNext">
         ${hasPrevious ? '<meta property="fc:frame:button:1" content="←">' : ""}
         <meta property="fc:frame:button:${hasPrevious ? 2 : 1}" content="→">
-        <meta property="fc:frame:image" content="${url}">
+        <meta property="fc:frame:image" content="${apiUrl}">
+        <meta property="fc:frame:post_url" content="${apiUrl}">
         <body>gm</body>
       </html>
       `
@@ -124,6 +133,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   url.searchParams.set("width", width.toString());
   url.searchParams.set("height", height.toString());
+  if (typeof req.query.position === "string") {
+    url.searchParams.set("position", req.query.position);
+  }
 
   let browser: Browser | BrowserCore | null = null;
 

@@ -46,12 +46,76 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return;
   }
 
+  // s-maxage:
+  //   images are considered "fresh" for 8 hours
+  // stale-while-revalidate:
+  //   allow serving stale images for up to 24 hours, with cache refresh in background
+  //
+  // anything outside this window will cause the browser to wait to regenerate the image
+  // so we might consider increasing the stale-while-revalidate if we are okay with the
+  // first request serving a very stale image
+  res.setHeader(
+    "Cache-Control",
+    `s-maxage=${60 * 60 * 8}, stale-while-revalidate=${60 * 60 * 24}`
+  );
+
+  if (req.method === "POST") {
+    const { position } = req.query;
+    const buttonIndex = req.body.untrustedData?.buttonIndex;
+
+    console.log({ position, buttonIndex });
+
+    let hasPrevious = true;
+
+    // when user interacts with initial frame, no position param exists. we can therefore assume
+    // they've clicked `next` since it'll be the only available option
+    if (!position) {
+      // set the position for the next token
+      url.searchParams.set("position", "1");
+      // for all other tokens, parse which button was clicked. button index of 1 means previous, 2 means next.
+    } else if (buttonIndex) {
+      if (Number(position) === 1) {
+        // if we're on the second token and the user clicks `prev`, we should bump the user back to the first token
+        // by deleting the position param so that they won't see a `prev` arrow
+        if (Number(buttonIndex) === 1) {
+          hasPrevious = false;
+          url.searchParams.delete("position");
+        }
+      } else {
+        // if we're further along in the collection, clicking `prev` should decrement the position
+        if (Number(buttonIndex) === 1) {
+          url.searchParams.set("position", `${Number(position) - 1}`);
+        }
+      }
+
+      // if the user clicks `next`, we should always increment the position
+      if (Number(buttonIndex) === 2) {
+        url.searchParams.set("position", `${Number(position) + 1}`);
+      }
+    }
+
+    res.setHeader("Content-Type", "text/html");
+    res.status(200).send(
+      // conditionally set the previous button and its button index
+      `
+      <html>
+        <meta property="fc:frame" content="vNext">
+        ${hasPrevious ? '<meta property="fc:frame:button:1" content="←">' : ""}
+        <meta property="fc:frame:button:${hasPrevious ? 2 : 1}" content="→">
+        <meta property="fc:frame:image" content="${url}">
+        <body>gm</body>
+      </html>
+      `
+    );
+    return;
+  }
+
   const fallback =
     typeof req.query.fallback === "string" ? req.query.fallback : null;
 
   // default should mirror https://github.com/gallery-so/gallery/blob/main/src/constants/opengraph.ts
   const width = parseInt(req.query.width as string) || 1200;
-  const height = parseInt(req.query.height as string) || 628;
+  const height = parseInt(req.query.height as string) || 630;
   const pixelDensity = parseInt(req.query.pixelDensity as string) || 2;
 
   url.searchParams.set("width", width.toString());
@@ -80,19 +144,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     const imageBuffer = await element.screenshot({ type: "png" });
-
-    // s-maxage:
-    //   images are considered "fresh" for 8 hours
-    // stale-while-revalidate:
-    //   allow serving stale images for up to 24 hours, with cache refresh in background
-    //
-    // anything outside this window will cause the browser to wait to regenerate the image
-    // so we might consider increasing the stale-while-revalidate if we are okay with the
-    // first request serving a very stale image
-    res.setHeader(
-      "Cache-Control",
-      `s-maxage=${60 * 60 * 8}, stale-while-revalidate=${60 * 60 * 24}`
-    );
 
     res.setHeader("Content-Type", "image/png");
     res.send(imageBuffer);

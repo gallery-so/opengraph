@@ -1,6 +1,7 @@
-import chromium from "chrome-aws-lambda";
+import chromium from "@sparticuz/chromium-min";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Browser } from "puppeteer";
+import puppeteer from "puppeteer-core";
 import type { Browser as BrowserCore } from "puppeteer-core";
 
 let baseUrl = "https://gallery.so";
@@ -13,7 +14,9 @@ if (process.env.NEXT_PUBLIC_PREVIEW_URL) {
 }
 
 const getBrowserInstance = async () => {
-  const executablePath = await chromium.executablePath;
+  const executablePath = await chromium.executablePath(
+    "https://storage.googleapis.com/gallery-prod-325303.appspot.com/dev/chromium-v117.0.0-pack.tar"
+  );
 
   if (!executablePath) {
     // running locally
@@ -25,8 +28,9 @@ const getBrowserInstance = async () => {
     });
   }
 
-  return chromium.puppeteer.launch({
+  return puppeteer.launch({
     executablePath,
+    defaultViewport: chromium.defaultViewport,
     args: chromium.args,
     headless: chromium.headless,
     ignoreHTTPSErrors: true,
@@ -124,28 +128,42 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   let browser: Browser | BrowserCore | null = null;
 
   try {
-    browser = await getBrowserInstance();
+    console.log(url);
+    browser = (await getBrowserInstance()) as Browser;
+    console.log(1);
     const page = await browser.newPage();
+    console.log(2);
     await page.setViewport({
       width: 1280,
       height: 720,
       deviceScaleFactor: pixelDensity,
     });
+    console.log(3);
     page.setDefaultNavigationTimeout(1000 * 10);
+    console.log(4);
 
     await page.goto(url.toString());
+    console.log(5);
     await page.waitForNetworkIdle();
+    console.log(6);
 
-    await page.waitForSelector("#opengraph-image", { timeout: 500 });
+    console.log("waiting for selector", url.toString());
+
+    await page.waitForSelector("#opengraph-image", { timeout: 10000 });
+    console.log(7);
     const element = await page.$("#opengraph-image");
+    console.log(8);
 
     if (!element) {
       throw new Error("No #opengraph-image element found at path");
     }
+    console.log(9);
 
-    const imageBuffer = await element.screenshot({ type: "png" });
+    const imageBuffer = await element.screenshot({ type: "jpeg" });
+    console.log(10);
 
-    res.setHeader("Content-Type", "image/png");
+    res.setHeader("Content-Type", "image/jpeg");
+    console.log(11);
     res.send(imageBuffer);
   } catch (error: unknown) {
     // TODO: log this to some error tracking service?

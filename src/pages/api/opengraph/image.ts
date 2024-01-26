@@ -149,7 +149,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     await page.waitForNetworkIdle();
     console.log(6);
 
-    await page.waitForSelector("#opengraph-image", { timeout: 500 });
+    console.log("waiting for selector", url.toString());
+
+    await page.waitForSelector("#opengraph-image", { timeout: 10000 });
     console.log(7);
     const element = await page.$("#opengraph-image");
     console.log(8);

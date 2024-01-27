@@ -1,4 +1,4 @@
-import { NextRequest, NextApiResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { ImageResponse } from '@vercel/og';
 import { fetchWithJustQueryText } from '../fetch';
 import { postIdQuery } from '../queries/postIdOpengraphQuery';
@@ -16,8 +16,12 @@ if (process.env.NEXT_PUBLIC_PREVIEW_URL) {
   apiBaseUrl = "https://gallery-opengraph-preview.vercel.app";
 }
 
-const handler = async (req: NextRequest, res: NextApiResponse) => {
-   const { searchParams } = req.nextUrl;
+export const config = {
+  runtime: 'edge',
+};
+
+const handler = async (request: NextRequest, res: NextResponse) => {
+  const { searchParams } = new URL(request.url);
 /*
    if (!path) {
      res.status(400).json({ error: { code: "MISSING_PATH" } });

@@ -1,4 +1,9 @@
-export const fetchWithJustQueryText = async ({ queryText, variables }) => {
+export const fetchWithJustQueryText = async ({ queryText, variables }: {
+  queryText: string;
+  variables: {
+    postId? : string;
+  }
+}) => {
    const response = await fetch('https://api.gallery.so/glry/graphql/query', {
      method: 'POST',
      headers: {

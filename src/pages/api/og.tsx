@@ -1,6 +1,6 @@
 import { ImageResponse } from '@vercel/og';
-import { fetchWithJustQueryText } from '../fetch';
-import { postIdQuery } from '../queries/postIdOpengraphQuery';
+import { fetchWithJustQueryText } from '../../fetch';
+import { postIdQuery } from '../../queries/postIdOpengraphQuery';
 import { NextRequest } from 'next/server';
 
 
@@ -27,18 +27,16 @@ type UrlSet = {
 };
 
 const ABCDiatypeRegular = fetch(
-  new URL('../assets/fonts/ABCDiatype-Regular.ttf', import.meta.url)
+  new URL('../../assets/fonts/ABCDiatype-Regular.ttf', import.meta.url)
 ).then((res) => res.arrayBuffer());
 
 const ABCDiatypeBold = fetch(
-  new URL('../assets/fonts/ABCDiatype-Bold.ttf', import.meta.url)
+  new URL('../../assets/fonts/ABCDiatype-Bold.ttf', import.meta.url)
 ).then((res) => res.arrayBuffer());
 
 const alpinaLight = fetch(
-  new URL('../assets/fonts/GT-Alpina-Standard-Light.ttf', import.meta.url)
+  new URL('../../assets/fonts/GT-Alpina-Standard-Light.ttf', import.meta.url)
 ).then((res) => res.arrayBuffer());
-
-
 
 export const config = {
   runtime: 'edge',
@@ -54,12 +52,12 @@ export default async function handler(request: NextRequest){
     
     const queryResponse = await fetchWithJustQueryText({
       queryText: postIdQuery,
-      variables: { postId: postId },
+      variables: { postId: postId ?? '' },
     });
   
     if (!postId || !queryResponse?.data?.post) {
       return new ImageResponse((
-         <>Visit gallery.so</>
+         <div>Visit gallery.so</div>
       ), {
         width: 1200,
         height: 630,

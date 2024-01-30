@@ -1,8 +1,11 @@
 import { ImageResponse } from '@vercel/og';
-import { fetchWithJustQueryText } from '../../fetch';
-import { postIdQuery } from '../../queries/postIdOpengraphQuery';
+import { fetchWithJustQueryText } from '../../../../fetch';
+import { postIdQuery } from '../../../../queries/postIdOpengraphQuery';
 import { NextRequest } from 'next/server';
 
+export const config = {
+  runtime: 'edge',
+};
 
 let baseUrl = "https://gallery.so";
 let apiBaseUrl = "https://gallery-opengraph.vercel.app";
@@ -27,25 +30,29 @@ type UrlSet = {
 };
 
 const ABCDiatypeRegular = fetch(
-  new URL('../../assets/fonts/ABCDiatype-Regular.ttf', import.meta.url)
+  new URL('../../../../assets/fonts/ABCDiatype-Regular.ttf', import.meta.url)
 ).then((res) => res.arrayBuffer());
 
 const ABCDiatypeBold = fetch(
-  new URL('../../assets/fonts/ABCDiatype-Bold.ttf', import.meta.url)
+  new URL('../../../../assets/fonts/ABCDiatype-Bold.ttf', import.meta.url)
 ).then((res) => res.arrayBuffer());
 
 const alpinaLight = fetch(
-  new URL('../../assets/fonts/GT-Alpina-Standard-Light.ttf', import.meta.url)
+  new URL('../../../../assets/fonts/GT-Alpina-Standard-Light.ttf', import.meta.url)
 ).then((res) => res.arrayBuffer());
 
-export const config = {
-  runtime: 'edge',
-};
-
 export default async function handler(request: NextRequest){
+   console.log("check")
+  
   try {
-    const { searchParams } = request.nextUrl;
-    const postId = searchParams.get('postId');
+    const path = request.nextUrl;
+    const url = new URL(path, baseUrl);
+    console.log("path", path.href)
+    //const fallback = extractFallbackUrl(path);
+    //console.log("fallback", fallback);
+    const postId = url.searchParams.get("postId");
+    //const fallback = url.searchParams.get("fallback");
+    //console.log("fallbackUrl: ", fallback);
     let postImageUrl =
     'https://assets.gallery.so/https%3A%2F%2Fstorage.googleapis.com%2Fprod-token-content%2F4-292cd-KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr-image?auto=compress%2Cformat&fit=max&glryts=1705844681&w=1024&s=9076d07060aeb7ac31297a0381bd0ed3';
 
@@ -68,7 +75,7 @@ export default async function handler(request: NextRequest){
     const author = post.author;
     const firstLetter = author?.username?.substring(0, 1).toUpperCase() ?? '';
 
-    let profileImageUrl = null;
+    let profileImageUrl = "";
     const { token: profileToken, profileImage } = post?.author?.profileImage ?? {};
   
     if (profileImage && profileImage.previewURLs?.medium) {
@@ -82,6 +89,8 @@ export default async function handler(request: NextRequest){
     if (!profileToken) {
       return null;
     }
+    
+    console.log("CHECK 11111111")
     
     if (
       media &&
@@ -99,9 +108,9 @@ export default async function handler(request: NextRequest){
         };
       }
     }
-  
-    profileImageUrl = previewUrls?.small;
-  
+    
+    profileImageUrl = previewUrls?.small ?? "";
+    
     const postToken = post.tokens?.[0];
     if (!postToken) {
       return null;
@@ -131,8 +140,8 @@ export default async function handler(request: NextRequest){
     
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
     const ABCDiatypeBoldFontData = await ABCDiatypeBold;
-    const alpinaLightFontData = await alpinaLight;  
-  
+    const alpinaLightFontData = await alpinaLight;
+    
     return new ImageResponse((
       <div
       style={{
@@ -298,8 +307,9 @@ export default async function handler(request: NextRequest){
           ],
         }
     )
-  } catch(e){
-    return null;
+    
+  } catch(e) {
+    console.log("----------->error: ", e);
   }
+    
  };
- 

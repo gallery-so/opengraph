@@ -5,6 +5,7 @@ export const fetchWithJustQueryText = async ({ queryText, variables }: {
     username?: string
     tokenId?: string;
     galleryId?: string;
+    collectionId?: string;
   }
 }) => {
    const response = await fetch('https://api.gallery.so/glry/graphql/query', {

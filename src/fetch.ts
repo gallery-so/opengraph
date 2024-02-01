@@ -22,14 +22,13 @@ export const fetchWithJustQueryText = async ({ queryText, variables }: {
    return response;
  };
  
- 
 type UrlSet = {
   small: string | null;
   medium: string | null;
   large: string | null;
 };
- 
- export const getPreviewUrls = (media) => {
+
+ export const getPreviewUrls = (media: any) => {
   let previewUrls: UrlSet | null = null;
   if (!media) {
     return previewUrls;

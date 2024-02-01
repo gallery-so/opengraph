@@ -1,4 +1,4 @@
-export const galleryIdOpengraphQuery =  `query GalleryIdOpengraphQuery($galleryId: DBID!) {
+export const galleryIdOpengraphQuery = `query GalleryIdOpengraphQuery($galleryId: DBID!) {
    gallery: galleryById(id: $galleryId) {
      ... on ErrGalleryNotFound {
        __typename

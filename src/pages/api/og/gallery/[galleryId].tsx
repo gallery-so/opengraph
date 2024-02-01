@@ -5,7 +5,13 @@ import { NextRequest } from "next/server";
 import {
   WIDTH_OPENGRAPH_IMAGE,
   HEIGHT_OPENGRAPH_IMAGE,
-} from "../post/[postId]";
+  fallbackUrl,
+} from "../../../../constants/opengraph";
+import {
+  ABCDiatypeRegular,
+  ABCDiatypeBold,
+  alpinaLight,
+} from "../../../../utils/opengraph";
 
 export const config = {
   runtime: "edge",
@@ -22,21 +28,6 @@ if (process.env.NEXT_PUBLIC_PREVIEW_URL) {
   baseUrl = "https://gallery-dev.vercel.app";
   apiBaseUrl = "https://gallery-opengraph-preview.vercel.app";
 }
-
-const ABCDiatypeRegular = fetch(
-  new URL("../../../../assets/fonts/ABCDiatype-Regular.ttf", import.meta.url),
-).then((res) => res.arrayBuffer());
-
-const ABCDiatypeBold = fetch(
-  new URL("../../../../assets/fonts/ABCDiatype-Bold.ttf", import.meta.url),
-).then((res) => res.arrayBuffer());
-
-const alpinaLight = fetch(
-  new URL(
-    "../../../../assets/fonts/GT-Alpina-Standard-Light.ttf",
-    import.meta.url,
-  ),
-).then((res) => res.arrayBuffer());
 
 export default async function handler(request: NextRequest) {
   try {
@@ -55,10 +46,24 @@ export default async function handler(request: NextRequest) {
 
     const { gallery } = queryResponse.data;
     if (!gallery) {
-      return new ImageResponse(<div>Visit gallery.so</div>, {
-        width: 1200,
-        height: 630,
-      });
+      return new ImageResponse(
+        (
+          <img
+            src={fallbackUrl}
+            style={{
+              width: 1200,
+              height: 630,
+              display: "block",
+              objectFit: "contain",
+            }}
+            alt="post"
+          />
+        ),
+        {
+          width: WIDTH_OPENGRAPH_IMAGE,
+          height: HEIGHT_OPENGRAPH_IMAGE,
+        },
+      );
     }
     const description = gallery.description ?? "";
     const title = gallery.name ?? "";
@@ -74,7 +79,6 @@ export default async function handler(request: NextRequest) {
       })
       .map((result) => result?.large)
       .slice(0, 4);
-    console.log("imageUrls", imageUrls);
 
     if (!galleryId || !queryResponse?.data?.gallery) {
       return new ImageResponse(<div>Visit gallery.so</div>, {

@@ -5,7 +5,13 @@ import { NextRequest } from "next/server";
 import {
   WIDTH_OPENGRAPH_IMAGE,
   HEIGHT_OPENGRAPH_IMAGE,
-} from "../../post/[postId]";
+  fallbackUrl,
+} from "../../../../../constants/opengraph";
+import {
+  ABCDiatypeRegular,
+  ABCDiatypeBold,
+  alpinaLight,
+} from "../../../../../utils/opengraph";
 
 export const config = {
   runtime: "edge",
@@ -23,50 +29,37 @@ if (process.env.NEXT_PUBLIC_PREVIEW_URL) {
   apiBaseUrl = "https://gallery-opengraph-preview.vercel.app";
 }
 
-const ABCDiatypeRegular = fetch(
-  new URL("../../../../../assets/fonts/ABCDiatype-Regular.ttf", import.meta.url),
-).then((res) => res.arrayBuffer());
-
-const ABCDiatypeBold = fetch(
-  new URL("../../../../../assets/fonts/ABCDiatype-Bold.ttf", import.meta.url),
-).then((res) => res.arrayBuffer());
-
-const alpinaLight = fetch(
-  new URL(
-    "../../../../../assets/fonts/GT-Alpina-Standard-Light.ttf",
-    import.meta.url,
-  ),
-).then((res) => res.arrayBuffer());
-
 const getTokensToDisplay = (tokenData, position) => {
-   const tokens = tokenData.map(({ token }) => {
+  const tokens = tokenData
+    .map(({ token }) => {
       if (token) {
-         const urls = getPreviewUrls(token.definition.media)
-         return {
-            src: urls?.large ?? '',
-            name: token.definition.name,
-            communityName: token.definition.community?.name,
-         };
+        const urls = getPreviewUrls(token.definition.media);
+        return {
+          src: urls?.large ?? "",
+          name: token.definition.name,
+          communityName: token.definition.community?.name,
+        };
       }
-   }).slice(0, 5);
-   
-   if (!position) {
-      return tokens.slice(0, 2);
-    }
-    
-   const mainPosition = Number(position as string) % tokens.length;
-    if (mainPosition === 0) {
-      return [tokens[tokens.length - 1], ...tokens.slice(0, 2)];
-    }
+    })
+    .slice(0, 5);
 
-    const start = mainPosition - 1;
-    const end = mainPosition + 2;
-    let result = tokens.slice(start, end);
-    if (end > tokens.length) {
-      result = [...result, tokens[0]!];
-    }
-    return result;
-}
+  if (!position) {
+    return tokens.slice(0, 2);
+  }
+
+  const mainPosition = Number(position as string) % tokens.length;
+  if (mainPosition === 0) {
+    return [tokens[tokens.length - 1], ...tokens.slice(0, 2)];
+  }
+
+  const start = mainPosition - 1;
+  const end = mainPosition + 2;
+  let result = tokens.slice(start, end);
+  if (end > tokens.length) {
+    result = [...result, tokens[0]!];
+  }
+  return result;
+};
 
 export default async function handler(request: NextRequest) {
   try {
@@ -78,39 +71,51 @@ export default async function handler(request: NextRequest) {
       queryText: fcframeCollectionIdOpengraphQuery,
       variables: { collectionId: collectionId ?? "" },
     });
-console.log("queryResponse", queryResponse)
 
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
     const ABCDiatypeBoldFontData = await ABCDiatypeBold;
     const alpinaLightFontData = await alpinaLight;
 
     const { collection } = queryResponse.data;
-    if (!collection) {
-      return new ImageResponse(<div>Visit gallery.so</div>, {
-        width: 1200,
-        height: 630,
-      });
+
+    if (
+      !collectionId ||
+      queryResponse?.data?.__typename === "ErrCollectionNotFound" ||
+      queryResponse?.data?.__typename === "ErrInvalidInput" ||
+      !collection
+    ) {
+      return new ImageResponse(
+        (
+          <img
+            src={fallbackUrl}
+            style={{
+              width: 1200,
+              height: 630,
+              display: "block",
+              objectFit: "contain",
+            }}
+            alt="post"
+          />
+        ),
+        {
+          width: WIDTH_OPENGRAPH_IMAGE,
+          height: HEIGHT_OPENGRAPH_IMAGE,
+        },
+      );
     }
-    
+
     const position = "0";
-    
-   
-   const tokensToDisplay = getTokensToDisplay(collection.tokens, position);
-   
-   const shouldHaveLeftToken = tokensToDisplay ? tokensToDisplay.length === 3 : false;
-   const leftToken = shouldHaveLeftToken ? tokensToDisplay?.[0] : null;
-   const centerToken = tokensToDisplay?.[shouldHaveLeftToken ? 1 : 0];
-   const rightToken = tokensToDisplay?.[shouldHaveLeftToken ? 2 : 1];
 
+    const tokensToDisplay = getTokensToDisplay(collection.tokens, position);
 
-   if (!collectionId || !queryResponse?.data?.collection) {
-      return new ImageResponse(<div>Visit gallery.so</div>, {
-        width: 1200,
-        height: 630,
-      });
-   }
+    const shouldHaveLeftToken = tokensToDisplay
+      ? tokensToDisplay.length === 3
+      : false;
+    const leftToken = shouldHaveLeftToken ? tokensToDisplay?.[0] : null;
+    const centerToken = tokensToDisplay?.[shouldHaveLeftToken ? 1 : 0];
+    const rightToken = tokensToDisplay?.[shouldHaveLeftToken ? 2 : 1];
 
-   return new ImageResponse(
+    return new ImageResponse(
       (
         <div
           style={{
@@ -124,72 +129,21 @@ console.log("queryResponse", queryResponse)
             alignItems: "center",
           }}
         >
-          <div style={{
+          <div
+            style={{
               display: "flex",
               backgroundColor: "#ffffff",
               position: "relative",
               marginLeft: "-25%",
-                  filter: "blur(6px)",
-                  opacity: 0.26,
-            }}>
-              {leftToken ? (
-                <div style={{ display: "flex", flexDirection: "column"}}>
-                  <img
-                width="500"
-                src={leftToken?.src}
-                style={{
-                  maxWidth: "500px",
-                  maxHeight: "500px",
-                  display: "block",
-                  objectFit: "contain",
-                }}
-                alt="post"
-              />
-              <div style={{display: "flex", flexDirection: "column", justifyContent: "flex-start"}}>
-                  <p
-                style={{
-                  fontFamily: "'ABCDiatype-Regular'",
-                  fontSize: '14px',
-                  fontWeight: 400,
-                  lineHeight: '20px',
-                  margin: 0,
-                }}
-              >
-                {leftToken?.name}
-              </p>
-                  <p
-                style={{
-                  fontFamily: "'ABCDiatype-Bold'",
-                  fontSize: '14px',
-                  fontWeight: 400,
-                  lineHeight: '20px',
-                  margin: 0,
-                }}
-              >
-                {leftToken?.communityName}
-              </p>
-                </div>
-                </div>
-              ) : null} 
-          </div>
-          
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              
-              position: "absolute",
-              width: "100%",
-  
-              gap: "8px",
-              height: "100%",
+              filter: "blur(6px)",
+              opacity: 0.26,
             }}
           >
-            <img
+            {leftToken ? (
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <img
                   width="500"
-                  src={centerToken?.src}
+                  src={leftToken?.src}
                   style={{
                     maxWidth: "500px",
                     maxHeight: "500px",
@@ -198,80 +152,152 @@ console.log("queryResponse", queryResponse)
                   }}
                   alt="post"
                 />
-            <div style={{display: "flex", flexDirection: "column", justifyContent: "flex-start"}}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "flex-start",
+                  }}
+                >
                   <p
+                    style={{
+                      fontFamily: "'ABCDiatype-Regular'",
+                      fontSize: "14px",
+                      fontWeight: 400,
+                      lineHeight: "20px",
+                      margin: 0,
+                    }}
+                  >
+                    {leftToken?.name}
+                  </p>
+                  <p
+                    style={{
+                      fontFamily: "'ABCDiatype-Bold'",
+                      fontSize: "14px",
+                      fontWeight: 400,
+                      lineHeight: "20px",
+                      margin: 0,
+                    }}
+                  >
+                    {leftToken?.communityName}
+                  </p>
+                </div>
+              </div>
+            ) : null}
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+
+              position: "absolute",
+              width: "100%",
+
+              gap: "8px",
+              height: "100%",
+            }}
+          >
+            <img
+              width="500"
+              src={centerToken?.src}
+              style={{
+                maxWidth: "500px",
+                maxHeight: "500px",
+                display: "block",
+                objectFit: "contain",
+              }}
+              alt="post"
+            />
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "flex-start",
+              }}
+            >
+              <p
                 style={{
                   fontFamily: "'ABCDiatype-Regular'",
-                  fontSize: '14px',
+                  fontSize: "14px",
                   fontWeight: 400,
-                  lineHeight: '20px',
+                  lineHeight: "20px",
                   margin: 0,
                 }}
               >
                 {centerToken?.name}
               </p>
-                  <p
+              <p
                 style={{
                   fontFamily: "'ABCDiatype-Bold'",
-                  fontSize: '14px',
+                  fontSize: "14px",
                   fontWeight: 400,
-                  lineHeight: '20px',
+                  lineHeight: "20px",
                   margin: 0,
                 }}
               >
                 {centerToken?.communityName}
               </p>
-                </div>
-                
+            </div>
           </div>
-          
-          <div style={{
+
+          <div
+            style={{
               display: "flex",
               backgroundColor: "#ffffff",
               position: "relative",
               marginRight: "-25%",
-                  filter: "blur(6px)",
-                  opacity: 0.26,
-            }}>
-              {rightToken ? (
-                <div style={{ display: "flex", flexDirection: "column"}}>
-                  <img
-                width="500"
-                src={rightToken?.src}
-                style={{
-                  maxWidth: "500px",
-                  maxHeight: "500px",
-                  display: "block",
-                  objectFit: "contain",
-                }}
-                alt="post"
-              />
-              <div style={{display: "flex", flexDirection: "column", justifyContent: "flex-start"}}>
+              filter: "blur(6px)",
+              opacity: 0.26,
+            }}
+          >
+            {rightToken ? (
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <img
+                  width="500"
+                  src={rightToken?.src}
+                  style={{
+                    maxWidth: "500px",
+                    maxHeight: "500px",
+                    display: "block",
+                    objectFit: "contain",
+                  }}
+                  alt="post"
+                />
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "flex-start",
+                  }}
+                >
                   <p
-                style={{
-                  fontFamily: "'ABCDiatype-Regular'",
-                  fontSize: '14px',
-                  fontWeight: 400,
-                  lineHeight: '20px',
-                  margin: 0,
-                }}
-              >
-                {rightToken?.name}
-              </p>
+                    style={{
+                      fontFamily: "'ABCDiatype-Regular'",
+                      fontSize: "14px",
+                      fontWeight: 400,
+                      lineHeight: "20px",
+                      margin: 0,
+                    }}
+                  >
+                    {rightToken?.name}
+                  </p>
                   <p
-                style={{
-                  fontFamily: "'ABCDiatype-Bold'",
-                  fontSize: '14px',
-                  fontWeight: 400,
-                  lineHeight: '20px',
-                  margin: 0,
-                }}
-              >
-                {rightToken?.communityName}
-              </p>
+                    style={{
+                      fontFamily: "'ABCDiatype-Bold'",
+                      fontSize: "14px",
+                      fontWeight: 400,
+                      lineHeight: "20px",
+                      margin: 0,
+                    }}
+                  >
+                    {rightToken?.communityName}
+                  </p>
                 </div>
-                </div>
-              ) : null} 
+              </div>
+            ) : null}
           </div>
         </div>
       ),

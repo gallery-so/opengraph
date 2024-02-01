@@ -1,5 +1,16 @@
 import { ImageResponse } from "@vercel/og";
-import { fetchWithJustQueryText } from "../../../../fetch";
+import { fetchWithJustQueryText, getPreviewUrls } from "../../../../fetch";
+import {
+  WIDTH_OPENGRAPH_IMAGE,
+  HEIGHT_OPENGRAPH_IMAGE,
+  fallbackUrl,
+} from "../../../../constants/opengraph";
+import {
+  ABCDiatypeRegular,
+  ABCDiatypeBold,
+  alpinaLight,
+} from "../../../../utils/opengraph";
+
 import { postIdQuery } from "../../../../queries/postIdOpengraphQuery";
 import { NextRequest } from "next/server";
 
@@ -10,9 +21,6 @@ export const config = {
 let baseUrl = "https://gallery.so";
 let apiBaseUrl = "https://gallery-opengraph.vercel.app";
 
-export const WIDTH_OPENGRAPH_IMAGE = 1200;
-export const HEIGHT_OPENGRAPH_IMAGE = 628;
-
 // can manually set the preview URL via environment variables on vercel for the `opengraph` service
 if (process.env.NEXT_PUBLIC_PREVIEW_URL) {
   baseUrl = process.env.NEXT_PUBLIC_PREVIEW_URL;
@@ -22,49 +30,36 @@ if (process.env.NEXT_PUBLIC_PREVIEW_URL) {
   apiBaseUrl = "https://gallery-opengraph-preview.vercel.app";
 }
 
-type UrlSet = {
-  small: string | null;
-  medium: string | null;
-  large: string | null;
-};
-
-const ABCDiatypeRegular = fetch(
-  new URL("../../../../assets/fonts/ABCDiatype-Regular.ttf", import.meta.url),
-).then((res) => res.arrayBuffer());
-
-const ABCDiatypeBold = fetch(
-  new URL("../../../../assets/fonts/ABCDiatype-Bold.ttf", import.meta.url),
-).then((res) => res.arrayBuffer());
-
-const alpinaLight = fetch(
-  new URL(
-    "../../../../assets/fonts/GT-Alpina-Standard-Light.ttf",
-    import.meta.url,
-  ),
-).then((res) => res.arrayBuffer());
-
 export default async function handler(request: NextRequest) {
   try {
     const path = request.nextUrl;
     const url = new URL(path, baseUrl);
-    //const fallback = extractFallbackUrl(path);
-    //console.log("fallback", fallback);
     const postId = url.searchParams.get("postId");
-    //const fallback = url.searchParams.get("fallback");
-    //console.log("fallbackUrl: ", fallback);
-    let postImageUrl =
-      "https://assets.gallery.so/https%3A%2F%2Fstorage.googleapis.com%2Fprod-token-content%2F4-292cd-KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr-image?auto=compress%2Cformat&fit=max&glryts=1705844681&w=1024&s=9076d07060aeb7ac31297a0381bd0ed3";
 
     const queryResponse = await fetchWithJustQueryText({
       queryText: postIdQuery,
       variables: { postId: postId ?? "" },
     });
 
-    if (!postId || !queryResponse?.data?.post) {
-      return new ImageResponse(<div>Visit gallery.so</div>, {
-        width: 1200,
-        height: 630,
-      });
+    if (!postId || queryResponse?.data?.post.__typename === "ErrPostNotFound") {
+      return new ImageResponse(
+        (
+          <img
+            src={fallbackUrl}
+            style={{
+              width: 1200,
+              height: 630,
+              display: "block",
+              objectFit: "contain",
+            }}
+            alt="post"
+          />
+        ),
+        {
+          width: WIDTH_OPENGRAPH_IMAGE,
+          height: HEIGHT_OPENGRAPH_IMAGE,
+        },
+      );
     }
 
     const post = queryResponse.data.post;
@@ -79,71 +74,46 @@ export default async function handler(request: NextRequest) {
       profileImageUrl = profileImage.previewURLs.medium;
     }
 
-    console.log("profile token author", post?.author);
-    console.log("profile token", profileToken);
-
-    const media = profileToken?.definition?.media;
-
-    let previewUrls: UrlSet | null = null;
-
-    if (
-      media &&
-      "previewURLs" in media &&
-      media.previewURLs &&
-      (media.previewURLs.small ||
-        media.previewURLs.medium ||
-        media.previewURLs.large)
-    ) {
-      previewUrls = media.previewURLs;
-    } else if (media && "fallbackMedia" in media) {
-      if (media.fallbackMedia?.mediaURL) {
-        previewUrls = {
-          small: media.fallbackMedia.mediaURL,
-          medium: media.fallbackMedia.mediaURL,
-          large: media.fallbackMedia.mediaURL,
-        };
-      }
+    const resultProfileImage = getPreviewUrls(profileToken.definition.media);
+    if (!profileImageUrl) {
+      profileImageUrl = resultProfileImage?.large ?? "";
     }
 
-    console.log("previewUrls", previewUrls);
     if (!profileImageUrl) {
-      profileImageUrl = previewUrls?.small ?? "";
+      profileImageUrl = resultProfileImage?.small ?? "";
     }
 
     const postToken = post.tokens?.[0];
     if (!postToken) {
-      return null;
+      return new ImageResponse(
+        (
+          <img
+            src={fallbackUrl}
+            style={{
+              width: 1200,
+              height: 630,
+              display: "block",
+              objectFit: "contain",
+            }}
+            alt="post"
+          />
+        ),
+        {
+          width: WIDTH_OPENGRAPH_IMAGE,
+          height: HEIGHT_OPENGRAPH_IMAGE,
+        },
+      );
     }
 
-    const postMedia = postToken?.definition?.media;
-    let postPreviewUrls: UrlSet | null = null;
-
-    if (
-      postMedia &&
-      "previewURLs" in postMedia &&
-      postMedia.previewURLs &&
-      (postMedia.previewURLs.small ||
-        postMedia.previewURLs.medium ||
-        postMedia.previewURLs.large)
-    ) {
-      postPreviewUrls = postMedia.previewURLs;
-    } else if (postMedia && "fallbackMedia" in postMedia) {
-      if (postMedia.fallbackMedia?.mediaURL) {
-        postPreviewUrls = {
-          small: postMedia.fallbackMedia.mediaURL,
-          medium: postMedia.fallbackMedia.mediaURL,
-          large: postMedia.fallbackMedia.mediaURL,
-        };
-      }
+    let postImageUrl = "";
+    const resultPostImage = getPreviewUrls(postToken.definition.media);
+    if (!postImageUrl && resultPostImage?.large) {
+      postImageUrl = resultPostImage.large;
     }
-
-    postImageUrl = postPreviewUrls?.large ?? "";
 
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
     const ABCDiatypeBoldFontData = await ABCDiatypeBold;
     const alpinaLightFontData = await alpinaLight;
-
-    console.log("profileImage", profileImageUrl);
 
     return new ImageResponse(
       (
@@ -251,7 +221,6 @@ export default async function handler(request: NextRequest) {
               <div
                 style={{
                   display: "flex",
-                  lineHeight: "32px",
                 }}
               >
                 <p
@@ -313,5 +282,23 @@ export default async function handler(request: NextRequest) {
     );
   } catch (e) {
     console.log("----------->error: ", e);
+    return new ImageResponse(
+      (
+        <img
+          src={fallbackUrl}
+          style={{
+            width: WIDTH_OPENGRAPH_IMAGE,
+            height: HEIGHT_OPENGRAPH_IMAGE,
+            display: "block",
+            objectFit: "contain",
+          }}
+          alt="post"
+        />
+      ),
+      {
+        width: WIDTH_OPENGRAPH_IMAGE,
+        height: HEIGHT_OPENGRAPH_IMAGE,
+      },
+    );
   }
 }

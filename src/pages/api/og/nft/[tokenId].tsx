@@ -2,11 +2,16 @@ import { ImageResponse } from "@vercel/og";
 import { fetchWithJustQueryText, getPreviewUrls } from "../../../../fetch";
 import { tokenIdOpengraphQuery } from "../../../../queries/tokenIdOpengraphQuery";
 import { NextRequest } from "next/server";
-import { openBracket } from "../../../../assets/svg/OpenBracket";
 import {
   WIDTH_OPENGRAPH_IMAGE,
   HEIGHT_OPENGRAPH_IMAGE,
-} from "../post/[postId]";
+  fallbackUrl,
+} from "../../../../constants/opengraph";
+import {
+  ABCDiatypeRegular,
+  ABCDiatypeBold,
+  alpinaLight,
+} from "../../../../utils/opengraph";
 
 export const config = {
   runtime: "edge",
@@ -24,21 +29,6 @@ if (process.env.NEXT_PUBLIC_PREVIEW_URL) {
   apiBaseUrl = "https://gallery-opengraph-preview.vercel.app";
 }
 
-const ABCDiatypeRegular = fetch(
-  new URL("../../../../assets/fonts/ABCDiatype-Regular.ttf", import.meta.url),
-).then((res) => res.arrayBuffer());
-
-const ABCDiatypeBold = fetch(
-  new URL("../../../../assets/fonts/ABCDiatype-Bold.ttf", import.meta.url),
-).then((res) => res.arrayBuffer());
-
-const alpinaLight = fetch(
-  new URL(
-    "../../../../assets/fonts/GT-Alpina-Standard-Light.ttf",
-    import.meta.url,
-  ),
-).then((res) => res.arrayBuffer());
-
 export default async function handler(request: NextRequest) {
   try {
     const path = request.nextUrl;
@@ -55,28 +45,54 @@ export default async function handler(request: NextRequest) {
     const alpinaLightFontData = await alpinaLight;
 
     const { token } = queryResponse.data;
-    if (!token) {
-      return new ImageResponse(<div>Visit gallery.so</div>, {
-        width: 1200,
-        height: 630,
-      });
+    if (!tokenId || !token) {
+      return new ImageResponse(
+        (
+          <img
+            src={fallbackUrl}
+            style={{
+              width: 1200,
+              height: 630,
+              display: "block",
+              objectFit: "contain",
+            }}
+            alt="post"
+          />
+        ),
+        {
+          width: WIDTH_OPENGRAPH_IMAGE,
+          height: HEIGHT_OPENGRAPH_IMAGE,
+        },
+      );
     }
 
     const result = getPreviewUrls(token.definition.media);
 
-    if (!tokenId || !queryResponse?.data?.token) {
-      return new ImageResponse(<div>Visit gallery.so</div>, {
-        width: 1200,
-        height: 630,
-      });
+    if (!result?.large) {
+      return new ImageResponse(
+        (
+          <img
+            src={fallbackUrl}
+            style={{
+              width: 1200,
+              height: 630,
+              display: "block",
+              objectFit: "contain",
+            }}
+            alt="post"
+          />
+        ),
+        {
+          width: WIDTH_OPENGRAPH_IMAGE,
+          height: HEIGHT_OPENGRAPH_IMAGE,
+        },
+      );
     }
 
     const tokenImageUrl = result?.large ?? "";
     const title = token.definition.name;
-    console.log("token.definition.name", title);
 
     const collectorsNoteText = "“" + token.collectorsNote + " ”";
-
     const description = token.definition.description ?? "";
 
     return new ImageResponse(

@@ -2,7 +2,6 @@ import { ImageResponse } from '@vercel/og';
 import { fetchWithJustQueryText, getPreviewUrls } from '../../../../fetch';
 import { usernameOpengraphQuery } from '../../../../queries/usernameOpengraphQuery';
 import { NextRequest } from 'next/server';
-import { openBracket } from '../../../../assets/svg/OpenBracket';
 import { WIDTH_OPENGRAPH_IMAGE, HEIGHT_OPENGRAPH_IMAGE } from '../post/[postId]';
 
 export const config = {

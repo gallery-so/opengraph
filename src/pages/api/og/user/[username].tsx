@@ -148,14 +148,14 @@ export default async function handler(request: NextRequest){
           display: "flex",
           flexDirection: "column",
           marginLeft: 25,
-         }}>
+      }}>
         <p
-                style={{
-                  fontFamily: "'GT Alpina'",
-                  fontSize: "32px",
-                  fontWeight: 400,
-                  lineHeight: "36px",
-                  letterSpacing: "0px",
+          style={{
+            fontFamily: "'GT Alpina'",
+            fontSize: "32px",
+            fontWeight: 400,
+            lineHeight: "36px",
+                letterSpacing: "0px",
                   margin: 0,
                 }}
               >

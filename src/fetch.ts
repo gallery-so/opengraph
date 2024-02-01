@@ -2,6 +2,9 @@ export const fetchWithJustQueryText = async ({ queryText, variables }: {
   queryText: string;
   variables: {
     postId? : string;
+    username?: string
+    tokenId?: string;
+    galleryId?: string;
   }
 }) => {
    const response = await fetch('https://api.gallery.so/glry/graphql/query', {
@@ -18,3 +21,34 @@ export const fetchWithJustQueryText = async ({ queryText, variables }: {
    return response;
  };
  
+ 
+type UrlSet = {
+  small: string | null;
+  medium: string | null;
+  large: string | null;
+};
+ 
+ export const getPreviewUrls = (media) => {
+  let previewUrls: UrlSet | null = null;
+  if (!media) {
+    return previewUrls;
+  }
+
+  if (
+    media &&
+    'previewURLs' in media &&
+    media.previewURLs &&
+    (media.previewURLs.small || media.previewURLs.medium || media.previewURLs.large)
+  ) {
+    previewUrls = media.previewURLs;
+  } else if (media && 'fallbackMedia' in media) {
+    if (media.fallbackMedia?.mediaURL) {
+      previewUrls = {
+        small: media.fallbackMedia.mediaURL,
+        medium: media.fallbackMedia.mediaURL,
+        large: media.fallbackMedia.mediaURL,
+      };
+    }
+  }
+  return previewUrls;
+}

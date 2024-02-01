@@ -42,12 +42,11 @@ const alpinaLight = fetch(
 ).then((res) => res.arrayBuffer());
 
 export default async function handler(request: NextRequest){
-   console.log("check")
+  
   
   try {
     const path = request.nextUrl;
     const url = new URL(path, baseUrl);
-    console.log("path", path.href)
     //const fallback = extractFallbackUrl(path);
     //console.log("fallback", fallback);
     const postId = url.searchParams.get("postId");
@@ -61,7 +60,7 @@ export default async function handler(request: NextRequest){
       queryText: postIdQuery,
       variables: { postId: postId ?? '' },
     });
-  
+   
     if (!postId || !queryResponse?.data?.post) {
       return new ImageResponse((
          <div>Visit gallery.so</div>
@@ -85,13 +84,7 @@ export default async function handler(request: NextRequest){
     const media = profileToken?.definition?.media;
   
     let previewUrls: UrlSet | null = null;
-  
-    if (!profileToken) {
-      return null;
-    }
-    
-    console.log("CHECK 11111111")
-    
+
     if (
       media &&
       'previewURLs' in media &&
@@ -99,7 +92,7 @@ export default async function handler(request: NextRequest){
       (media.previewURLs.small || media.previewURLs.medium || media.previewURLs.large)
     ) {
       previewUrls = media.previewURLs;
-    } else if ('fallbackMedia' in media) {
+    } else if (media && 'fallbackMedia' in media) {
       if (media.fallbackMedia?.mediaURL) {
         previewUrls = {
           small: media.fallbackMedia.mediaURL,
@@ -109,9 +102,12 @@ export default async function handler(request: NextRequest){
       }
     }
     
+    
+    
     profileImageUrl = previewUrls?.small ?? "";
     
     const postToken = post.tokens?.[0];
+    console.log("post token", postToken)
     if (!postToken) {
       return null;
     }
@@ -126,21 +122,27 @@ export default async function handler(request: NextRequest){
       (postMedia.previewURLs.small || postMedia.previewURLs.medium || postMedia.previewURLs.large)
     ) {
       postPreviewUrls = postMedia.previewURLs;
-    } else if ('fallbackMedia' in media) {
-      if (media.fallbackMedia?.mediaURL) {
+    } else if (postMedia && 'fallbackMedia' in postMedia) {
+      if (postMedia.fallbackMedia?.mediaURL) {
         postPreviewUrls = {
-          small: media.fallbackMedia.mediaURL,
-          medium: media.fallbackMedia.mediaURL,
-          large: media.fallbackMedia.mediaURL,
+          small: postMedia.fallbackMedia.mediaURL,
+          medium: postMedia.fallbackMedia.mediaURL,
+          large: postMedia.fallbackMedia.mediaURL,
         };
       }
     }
+    
+    console.log("CHECK 2222222")
   
     postImageUrl = postPreviewUrls?.large ?? '';  
     
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
     const ABCDiatypeBoldFontData = await ABCDiatypeBold;
     const alpinaLightFontData = await alpinaLight;
+    
+    console.log("postUrl", postImageUrl)
+    console.log("profileImage", profileImageUrl)
+    
     
     return new ImageResponse((
       <div
@@ -264,7 +266,7 @@ export default async function handler(request: NextRequest){
                   margin: 0,
                 }}
               >
-                {post?.caption}
+                {post?.caption ?? "View this post on gallery.so"}
               </p>
             </div>
         </div>

@@ -1,7 +1,7 @@
 import { ImageResponse } from "@vercel/og";
 import { fetchWithJustQueryText, getPreviewUrls } from "../../../../../fetch";
 import { fcframeCollectionIdOpengraphQuery } from "../../../../../queries/fcframeCollectionIdOpengraphQuery";
-import { NextRequest } from "next/server";
+import { NextApiRequest } from "next";
 import {
   WIDTH_OPENGRAPH_IMAGE,
   HEIGHT_OPENGRAPH_IMAGE,
@@ -61,9 +61,69 @@ const getTokensToDisplay = (tokenData, position) => {
   return result;
 };
 
-export default async function handler(request: NextRequest) {
+const handler = async (req: NextApiRequest) => {
+  if (req.method === "POST") {
+    const urlPath = req.url ?? '';
+
+    const url = new URL(urlPath, apiBaseUrl);
+    const position = url.searchParams.get("position");
+    const apiUrl = new URL(req.url ?? "", apiBaseUrl);
+    console.log("href:     ", apiUrl.href);
+
+    console.log("body", req.body);
+    const buttonIndex = req.body.untrustedData?.buttonIndex ?? req.body.option;
+
+    console.log({ position, buttonIndex });
+
+    let hasPrevious = true;
+
+    // when user interacts with initial frame, no position param exists. we can therefore assume
+    // they've clicked `next` since it'll be the only available option
+    if (!position) {
+      // set the position for the next token
+      apiUrl.searchParams.set("position", "1");
+      // for all other tokens, parse which button was clicked. button index of 1 means previous, 2 means next.
+    } else if (buttonIndex) {
+      if (Number(position) === 1) {
+        // if we're on the second token and the user clicks `prev`, we should bump the user back to the first token
+        // by deleting the position param so that they won't see a `prev` arrow
+        if (Number(buttonIndex) === 1) {
+          hasPrevious = false;
+          apiUrl.searchParams.delete("position");
+        }
+      } else {
+        // if we're further along in the collection, clicking `prev` should decrement the position
+        if (Number(buttonIndex) === 1) {
+          apiUrl.searchParams.set("position", `${Number(position) - 1}`);
+        }
+      }
+
+      // if the user clicks `next`, we should always increment the position
+      if (Number(buttonIndex) === 2) {
+        apiUrl.searchParams.set("position", `${Number(position) + 1}`);
+      }
+    }
+
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "text/html");
+
+    return new Response(      `
+      <html>
+        <meta property="fc:frame" content="vNext">
+        ${hasPrevious ? '<meta property="fc:frame:button:1" content="←">' : ""}
+        <meta property="fc:frame:button:${hasPrevious ? 2 : 1}" content="→">
+        <meta property="fc:frame:image" content="${apiUrl}">
+        <meta property="fc:frame:post_url" content="${apiUrl}">
+        <body>gm</body>
+      </html>
+    `, {
+      status: 200,
+      headers: myHeaders,
+    });
+  }
+
   try {
-    const path = request.nextUrl;
+    const path = req.url ?? '';
     const url = new URL(path, baseUrl);
     const collectionId = url.searchParams.get("collectionId");
     const position = url.searchParams.get("position");
@@ -330,3 +390,6 @@ export default async function handler(request: NextRequest) {
     console.log("error: ", e);
   }
 }
+
+
+export default handler;

@@ -33,9 +33,7 @@ const handler = async (req: NextApiRequest) => {
     const url = new URL(urlPath, apiBaseUrl);
     const position = url.searchParams.get("position");
     const apiUrl = new URL(req.url ?? "", apiBaseUrl);
-    console.log({ apiUrl });
 
- //   const { position } = req.query;
     console.log("body", req.body);
     const buttonIndex = req.body.untrustedData?.buttonIndex ?? req.body.option;
 

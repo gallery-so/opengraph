@@ -1,7 +1,8 @@
 import { ImageResponse } from "@vercel/og";
 import { fetchWithJustQueryText, getPreviewUrls } from "../../../../fetch";
 import { collectionIdIdOpengraphQuery } from "../../../../queries/collectionIdOpengraphQuery";
-import { NextRequest } from "next/server";
+import { NextApiRequest } from "next";
+
 import {
   WIDTH_OPENGRAPH_IMAGE,
   HEIGHT_OPENGRAPH_IMAGE,
@@ -17,34 +18,92 @@ export const config = {
   runtime: "edge",
 };
 
-let baseUrl = "https://gallery.so";
 let apiBaseUrl = "https://gallery-opengraph.vercel.app";
 
-// can manually set the preview URL via environment variables on vercel for the `opengraph` service
 if (process.env.NEXT_PUBLIC_PREVIEW_URL) {
-  baseUrl = process.env.NEXT_PUBLIC_PREVIEW_URL;
   apiBaseUrl = "https://gallery-opengraph-preview.vercel.app";
 } else if (process.env.NEXT_PUBLIC_VERCEL_ENV === "preview") {
-  baseUrl = "https://gallery-dev.vercel.app";
   apiBaseUrl = "https://gallery-opengraph-preview.vercel.app";
 }
 
-export default async function handler(request: NextRequest) {
-  try {
-    const path = request.nextUrl;
-    const url = new URL(path, baseUrl);
-    const collectionId = url.searchParams.get("collectionId");
+export default async function handler(
+  req: NextApiRequest,
+) {
+  if (req.method === "POST") {
+    const path = req.url ?? '';
 
+    const url = new URL(path, apiBaseUrl);
+    const position = url.searchParams.get("position");
+    const apiUrl = new URL(req.url ?? "", apiBaseUrl);
+    console.log({ apiUrl });
+
+ //   const { position } = req.query;
+    console.log("body", req.body);
+    const buttonIndex = req.body.untrustedData?.buttonIndex ?? req.body.option;
+
+    console.log({ position, buttonIndex });
+
+    let hasPrevious = true;
+
+    // when user interacts with initial frame, no position param exists. we can therefore assume
+    // they've clicked `next` since it'll be the only available option
+    if (!position) {
+      // set the position for the next token
+      apiUrl.searchParams.set("position", "1");
+      // for all other tokens, parse which button was clicked. button index of 1 means previous, 2 means next.
+    } else if (buttonIndex) {
+      if (Number(position) === 1) {
+        // if we're on the second token and the user clicks `prev`, we should bump the user back to the first token
+        // by deleting the position param so that they won't see a `prev` arrow
+        if (Number(buttonIndex) === 1) {
+          hasPrevious = false;
+          apiUrl.searchParams.delete("position");
+        }
+      } else {
+        // if we're further along in the collection, clicking `prev` should decrement the position
+        if (Number(buttonIndex) === 1) {
+          apiUrl.searchParams.set("position", `${Number(position) - 1}`);
+        }
+      }
+
+      // if the user clicks `next`, we should always increment the position
+      if (Number(buttonIndex) === 2) {
+        apiUrl.searchParams.set("position", `${Number(position) + 1}`);
+      }
+    }
+
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "text/html");
+
+    return new Response(      `
+      <html>
+        <meta property="fc:frame" content="vNext">
+        ${hasPrevious ? '<meta property="fc:frame:button:1" content="←">' : ""}
+        <meta property="fc:frame:button:${hasPrevious ? 2 : 1}" content="→">
+        <meta property="fc:frame:image" content="${apiUrl}">
+        <meta property="fc:frame:post_url" content="${apiUrl}">
+        <body>gm</body>
+      </html>
+    `, {
+      status: 200,
+      headers: myHeaders,
+    });
+  }
+  try {
+    const path = req.url ?? '';
+    
+    const url = new URL(path, apiBaseUrl);
+    const collectionId = url.searchParams.get("collectionId");
+    
+    const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
+    const ABCDiatypeBoldFontData = await ABCDiatypeBold;
+    const alpinaLightFontData = await alpinaLight;
+    
     const queryResponse = await fetchWithJustQueryText({
       queryText: collectionIdIdOpengraphQuery,
       variables: { collectionId: collectionId ?? "" },
     });
-
-
-    const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
-    const ABCDiatypeBoldFontData = await ABCDiatypeBold;
-    const alpinaLightFontData = await alpinaLight;
-
+    
     const { collection } = queryResponse.data;
     if (!collection) {
       return new ImageResponse(
@@ -52,8 +111,8 @@ export default async function handler(request: NextRequest) {
           <img
             src={fallbackUrl}
             style={{
-              width: 1200,
-              height: 630,
+              width: WIDTH_OPENGRAPH_IMAGE,
+              height: HEIGHT_OPENGRAPH_IMAGE,
               display: "block",
               objectFit: "contain",
             }}
@@ -66,31 +125,29 @@ export default async function handler(request: NextRequest) {
         },
       );
     }
+    
     const description = collection.collectorsNote ?? "";
     const title = collection.name ?? "";
 
-
-
-    const imageUrls = collection.tokens?.map((element) => {
-          return element?.token
-            ? getPreviewUrls(element.token.definition.media)
-            : null;
+    const imageUrls = collection.tokens
+      ?.map((element) => {
+        return element?.token ? getPreviewUrls(element.token.definition.media) : null;
       })
       .map((result) => result?.large ?? "")
       .slice(0, 4);
 
-    if (!collectionId || !queryResponse?.data?.collection) {
+    if (!collectionId || !queryResponse?.data?.collection || !imageUrls) {
       return new ImageResponse(
         (
           <img
             src={fallbackUrl}
             style={{
-              width: 1200,
-              height: 630,
+              width: WIDTH_OPENGRAPH_IMAGE,
+              height: HEIGHT_OPENGRAPH_IMAGE,
               display: "block",
               objectFit: "contain",
             }}
-            alt="post"
+            alt="fallback"
           />
         ),
         {
@@ -116,8 +173,9 @@ export default async function handler(request: NextRequest) {
             style={{
               display: "flex",
               justifyContent: "center",
+              gap: 25,
               alignItems: "center",
-              height: "87%",
+              height: "100%%",
             }}
           >
             <svg
@@ -133,7 +191,7 @@ export default async function handler(request: NextRequest) {
                 fill="#141414"
               />
             </svg>
-            {imageUrls.map((url) => {
+            {imageUrls?.map((url) => {
               return url ? (
                 <img
                   key={url ? url : "2"}
@@ -145,7 +203,7 @@ export default async function handler(request: NextRequest) {
                     display: "block",
                     objectFit: "contain",
                   }}
-                  alt="post"
+                  alt="collection token"
                 />
               ) : null;
             })}
@@ -167,7 +225,9 @@ export default async function handler(request: NextRequest) {
             style={{
               display: "flex",
               flexDirection: "column",
-              marginLeft: 25,
+              position: "absolute",
+              bottom: "24px",
+              left: "24px",
             }}
           >
             <p
@@ -219,9 +279,27 @@ export default async function handler(request: NextRequest) {
             weight: 500,
           },
         ],
-      },
+      }
     );
   } catch (e) {
-    console.log("error: ", e);
+    console.error("error: ", e);
+    return new ImageResponse(
+      (
+        <img
+          src={fallbackUrl}
+          style={{
+            width: WIDTH_OPENGRAPH_IMAGE,
+            height: HEIGHT_OPENGRAPH_IMAGE,
+            display: "block",
+            objectFit: "contain",
+          }}
+          alt="post"
+        />
+      ),
+      {
+        width: WIDTH_OPENGRAPH_IMAGE,
+        height: HEIGHT_OPENGRAPH_IMAGE,
+      },
+    );
   }
 }

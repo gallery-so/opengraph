@@ -32,6 +32,7 @@ if (process.env.NEXT_PUBLIC_PREVIEW_URL) {
 
 export default async function handler(request: NextRequest) {
   try {
+    console.log("request", request);
     const path = request.nextUrl;
     const url = new URL(path, baseUrl);
     const username = url.searchParams.get("username");
@@ -117,17 +118,15 @@ export default async function handler(request: NextRequest) {
             flexDirection: "column",
             width: "100%",
             height: "100%",
-            minHeight: 200,
             backgroundColor: "#ffffff",
           }}
         >
           <div
             style={{
               display: "flex",
-              gap: 25,
               justifyContent: "center",
               alignItems: "center",
-              height: "87%",
+              height: "100%",
             }}
           >
             <svg
@@ -145,18 +144,21 @@ export default async function handler(request: NextRequest) {
             </svg>
             {imageUrls.map((url) => {
               return url ? (
-                <img
+                <div
+                  style={{ display: "flex", maxWidth: "190px" }}
                   key={url ? url : "2"}
-                  width="370"
-                  src={url}
-                  style={{
-                    maxWidth: "190px",
-                    maxHeight: "190px",
-                    display: "block",
-                    objectFit: "contain",
-                  }}
-                  alt="post"
-                />
+                >
+                  <img
+                    src={url}
+                    style={{
+                      maxWidth: "190px",
+                      maxHeight: "190px",
+                      display: "block",
+                      objectFit: "contain",
+                    }}
+                    alt="post"
+                  />
+                </div>
               ) : null;
             })}
             <svg
@@ -177,7 +179,9 @@ export default async function handler(request: NextRequest) {
             style={{
               display: "flex",
               flexDirection: "column",
-              marginLeft: 25,
+              position: "absolute",
+              bottom: "24px",
+              left: "24px",
             }}
           >
             <p

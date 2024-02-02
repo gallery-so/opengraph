@@ -105,13 +105,11 @@ export default async function handler(request: NextRequest) {
               gap: 25,
               justifyContent: "center",
               alignItems: "center",
-              height: "87%",
+              height: "100%",
             }}
           >
             <svg
-              style={{ width: "36px", height: "121px" }}
-              width="40"
-              height="121"
+              style={{ width: "35px", height: "121px" }}
               viewBox="0 0 36 121"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -139,9 +137,7 @@ export default async function handler(request: NextRequest) {
               ) : null;
             })}
             <svg
-              style={{ width: "36px", height: "121px" }}
-              width="20"
-              height="194"
+              style={{ width: "35px", height: "121px" }}
               viewBox="0 0 36 121"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -156,16 +152,18 @@ export default async function handler(request: NextRequest) {
             style={{
               display: "flex",
               flexDirection: "column",
-              marginLeft: 25,
+              position: "absolute",
+              bottom: "24px",
+              left: "24px",
             }}
           >
             <p
               style={{
-                fontFamily: "'GT Alpina'",
+                fontFamily: "'GT Alpina', serif",
                 fontSize: "32px",
                 fontWeight: 400,
                 lineHeight: "36px",
-                letterSpacing: "0px",
+                letterSpacing: "-0.01em",
                 margin: 0,
               }}
             >

@@ -66,6 +66,7 @@ export default async function handler(request: NextRequest) {
     const path = request.nextUrl;
     const url = new URL(path, baseUrl);
     const collectionId = url.searchParams.get("collectionId");
+    const position = url.searchParams.get("position");
 
     const queryResponse = await fetchWithJustQueryText({
       queryText: fcframeCollectionIdOpengraphQuery,
@@ -104,13 +105,9 @@ export default async function handler(request: NextRequest) {
       );
     }
 
-    const position = "0";
-
     const tokensToDisplay = getTokensToDisplay(collection.tokens, position);
 
-    const shouldHaveLeftToken = tokensToDisplay
-      ? tokensToDisplay.length === 3
-      : false;
+    const shouldHaveLeftToken = tokensToDisplay.length === 3;
     const leftToken = shouldHaveLeftToken ? tokensToDisplay?.[0] : null;
     const centerToken = tokensToDisplay?.[shouldHaveLeftToken ? 1 : 0];
     const rightToken = tokensToDisplay?.[shouldHaveLeftToken ? 2 : 1];
@@ -132,7 +129,6 @@ export default async function handler(request: NextRequest) {
           <div
             style={{
               display: "flex",
-              backgroundColor: "#ffffff",
               position: "relative",
               marginLeft: "-25%",
               filter: "blur(6px)",
@@ -157,6 +153,7 @@ export default async function handler(request: NextRequest) {
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "flex-start",
+                    filter: "blur(2px)",
                   }}
                 >
                   <p
@@ -196,10 +193,14 @@ export default async function handler(request: NextRequest) {
               position: "absolute",
               width: "100%",
 
-              gap: "8px",
               height: "100%",
             }}
           >
+            <div style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "8px",
+            }}>
             <img
               width="500"
               src={centerToken?.src}
@@ -222,7 +223,7 @@ export default async function handler(request: NextRequest) {
                 style={{
                   fontFamily: "'ABCDiatype-Regular'",
                   fontSize: "14px",
-                  fontWeight: 400,
+                  fontWeight: "light",
                   lineHeight: "20px",
                   margin: 0,
                 }}
@@ -240,13 +241,13 @@ export default async function handler(request: NextRequest) {
               >
                 {centerToken?.communityName}
               </p>
-            </div>
+            </div></div>
+
           </div>
 
           <div
             style={{
               display: "flex",
-              backgroundColor: "#ffffff",
               position: "relative",
               marginRight: "-25%",
               filter: "blur(6px)",
@@ -271,6 +272,7 @@ export default async function handler(request: NextRequest) {
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "flex-start",
+                    filter: "blur(2px)",
                   }}
                 >
                   <p

@@ -11,6 +11,7 @@ import {
   ABCDiatypeRegular,
   ABCDiatypeBold,
   alpinaLight,
+  alpinaLightItalic,
 } from "../../../../utils/opengraph";
 
 export const config = {
@@ -43,6 +44,7 @@ export default async function handler(request: NextRequest) {
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
     const ABCDiatypeBoldFontData = await ABCDiatypeBold;
     const alpinaLightFontData = await alpinaLight;
+    const alpinaLightItalicFontData = await alpinaLightItalic;
 
     const { token } = queryResponse.data;
     if (!tokenId || !token) {
@@ -110,27 +112,40 @@ export default async function handler(request: NextRequest) {
           <div
             style={{
               display: "flex",
-              gap: 25,
               justifyContent: "center",
               alignItems: "center",
-              height: "87%",
+              height: "100%",
             }}
           >
             <img
               src={tokenImageUrl}
               style={{
                 maxWidth: "265px",
+                maxHeight: "265px",
                 display: "block",
                 objectFit: "contain",
               }}
               alt="post"
             />
+            <p
+              style={{
+                fontFamily: "'GT Alpina Italic'",
+                fontSize: "24px",
+                fontWeight: 400,
+                lineHeight: "24px",
+                margin: 0,
+              }}
+            >
+              {collectorsNoteText}
+            </p>
           </div>
           <div
             style={{
               display: "flex",
               flexDirection: "column",
-              marginLeft: 25,
+              position: "absolute",
+              bottom: "24px",
+              left: "24px",
             }}
           >
             <p
@@ -178,6 +193,12 @@ export default async function handler(request: NextRequest) {
           {
             name: "GT Alpina",
             data: alpinaLightFontData,
+            style: "normal",
+            weight: 500,
+          },
+          {
+            name: "GT Alpina Italic",
+            data: alpinaLightItalicFontData,
             style: "normal",
             weight: 500,
           },

@@ -26,13 +26,11 @@ if (process.env.NEXT_PUBLIC_PREVIEW_URL) {
   apiBaseUrl = "https://gallery-opengraph-preview.vercel.app";
 }
 
-export default async function handler(
-  req: NextApiRequest,
-) {
+const handler = async (req: NextApiRequest) => {
   if (req.method === "POST") {
-    const path = req.url ?? '';
+    const urlPath = req.url ?? '';
 
-    const url = new URL(path, apiBaseUrl);
+    const url = new URL(urlPath, apiBaseUrl);
     const position = url.searchParams.get("position");
     const apiUrl = new URL(req.url ?? "", apiBaseUrl);
     console.log({ apiUrl });
@@ -89,6 +87,8 @@ export default async function handler(
       headers: myHeaders,
     });
   }
+
+  // Handle GET request
   try {
     const path = req.url ?? '';
     
@@ -303,3 +303,5 @@ export default async function handler(
     );
   }
 }
+
+export default handler;

@@ -12,3 +12,11 @@ export const alpinaLight = fetch(
     import.meta.url,
   ).toString(),
 ).then((res) => res.arrayBuffer());
+
+export const alpinaLightItalic = fetch(
+  new URL(
+   "../assets/fonts/GT-Alpina-Standard-Light-Italic.ttf",
+    import.meta.url,
+  ).toString(),
+).then((res) => res.arrayBuffer());
+

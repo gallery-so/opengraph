@@ -155,15 +155,15 @@ export const postIdQuery = `
                 }
               }
             }
-          }
-          ... on EnsProfileImage {
-            __typename
-            profileImage {
+            ... on EnsProfileImage {
               __typename
-              previewURLs {
-                medium
-              }
-            }
+              profileImage {
+                __typename
+                  previewURLs {
+                    medium
+                  }
+                }
+             }
           }
         }
         caption

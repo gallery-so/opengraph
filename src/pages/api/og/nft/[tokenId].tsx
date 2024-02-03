@@ -1,18 +1,18 @@
 import { ImageResponse } from "@vercel/og";
-import { fetchWithJustQueryText, getPreviewUrls } from "../../../../fetch";
+import { fetchGraphql, getPreviewUrls } from "../../../../fetch";
 import { tokenIdOpengraphQuery } from "../../../../queries/tokenIdOpengraphQuery";
 import { NextApiRequest } from "next";
 import {
   WIDTH_OPENGRAPH_IMAGE,
   HEIGHT_OPENGRAPH_IMAGE,
   fallbackUrl,
-} from "../../../../constants/opengraph";
+} from "../../../../utils/fallback";
 import {
   ABCDiatypeRegular,
   ABCDiatypeBold,
   alpinaLight,
   alpinaLightItalic,
-} from "../../../../utils/opengraph";
+} from "../../../../utils/fonts";
 
 export const config = {
   runtime: "edge",
@@ -89,7 +89,7 @@ const handler = async (req: NextApiRequest) => {
       {
         status: 200,
         headers: myHeaders,
-      },
+      }
     );
   }
 
@@ -99,7 +99,7 @@ const handler = async (req: NextApiRequest) => {
     const url = new URL(path, baseUrl);
     const tokenId = url.searchParams.get("tokenId");
 
-    const queryResponse = await fetchWithJustQueryText({
+    const queryResponse = await fetchGraphql({
       queryText: tokenIdOpengraphQuery,
       variables: { tokenId: tokenId ?? "" },
     });
@@ -127,7 +127,7 @@ const handler = async (req: NextApiRequest) => {
         {
           width: WIDTH_OPENGRAPH_IMAGE,
           height: HEIGHT_OPENGRAPH_IMAGE,
-        },
+        }
       );
     }
 
@@ -150,7 +150,7 @@ const handler = async (req: NextApiRequest) => {
         {
           width: WIDTH_OPENGRAPH_IMAGE,
           height: HEIGHT_OPENGRAPH_IMAGE,
-        },
+        }
       );
     }
 
@@ -266,7 +266,7 @@ const handler = async (req: NextApiRequest) => {
             weight: 500,
           },
         ],
-      },
+      }
     );
   } catch (e) {
     console.log("error: ", e);
@@ -285,7 +285,7 @@ const handler = async (req: NextApiRequest) => {
       {
         width: WIDTH_OPENGRAPH_IMAGE,
         height: HEIGHT_OPENGRAPH_IMAGE,
-      },
+      }
     );
   }
 };

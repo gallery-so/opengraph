@@ -1,3 +1,8 @@
+/**
+ * NOTE: THIS FILE AND ROUTE SHOULD WILL BE DEPRECATED IN FAVOR OF NEW /OG/ ROUTES
+ * NO MORE MANUAL CHROMIUM-BASED PREVIEW GENERATION
+ */
+
 import chromium from "@sparticuz/chromium-min";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Browser } from "puppeteer";

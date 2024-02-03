@@ -1,18 +1,18 @@
 import { ImageResponse } from "@vercel/og";
-import { fetchWithJustQueryText, getPreviewUrls } from "../../../../fetch";
+import { fetchGraphql, getPreviewUrls } from "../../../../fetch";
 import { collectionIdIdOpengraphQuery } from "../../../../queries/collectionIdOpengraphQuery";
 import { NextApiRequest } from "next";
 
 import {
-  WIDTH_OPENGRAPH_IMAGE,
-  HEIGHT_OPENGRAPH_IMAGE,
-  fallbackUrl,
-} from "../../../../constants/opengraph";
-import {
   ABCDiatypeRegular,
   ABCDiatypeBold,
   alpinaLight,
-} from "../../../../utils/opengraph";
+} from "../../../../utils/fonts";
+import {
+  HEIGHT_OPENGRAPH_IMAGE,
+  WIDTH_OPENGRAPH_IMAGE,
+  fallbackImageResponse,
+} from "../../../../utils/fallback";
 
 export const config = {
   runtime: "edge",
@@ -28,7 +28,7 @@ if (process.env.NEXT_PUBLIC_PREVIEW_URL) {
 
 const handler = async (req: NextApiRequest) => {
   if (req.method === "POST") {
-    const urlPath = req.url ?? '';
+    const urlPath = req.url ?? "";
 
     const url = new URL(urlPath, apiBaseUrl);
     const position = url.searchParams.get("position");
@@ -71,7 +71,8 @@ const handler = async (req: NextApiRequest) => {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "text/html");
 
-    return new Response(      `
+    return new Response(
+      `
       <html>
         <meta property="fc:frame" content="vNext">
         ${hasPrevious ? '<meta property="fc:frame:button:1" content="←">' : ""}
@@ -80,79 +81,50 @@ const handler = async (req: NextApiRequest) => {
         <meta property="fc:frame:post_url" content="${apiUrl}">
         <body>gm</body>
       </html>
-    `, {
-      status: 200,
-      headers: myHeaders,
-    });
+    `,
+      {
+        status: 200,
+        headers: myHeaders,
+      }
+    );
   }
 
   // Handle GET request
   try {
-    const path = req.url ?? '';
-    
+    const path = req.url ?? "";
+
     const url = new URL(path, apiBaseUrl);
     const collectionId = url.searchParams.get("collectionId");
-    
+
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
     const ABCDiatypeBoldFontData = await ABCDiatypeBold;
     const alpinaLightFontData = await alpinaLight;
-    
-    const queryResponse = await fetchWithJustQueryText({
+
+    const queryResponse = await fetchGraphql({
       queryText: collectionIdIdOpengraphQuery,
       variables: { collectionId: collectionId ?? "" },
     });
-    
+
     const { collection } = queryResponse.data;
+    console.log(queryResponse);
     if (!collection) {
-      return new ImageResponse(
-        (
-          <img
-            src={fallbackUrl}
-            style={{
-              width: WIDTH_OPENGRAPH_IMAGE,
-              height: HEIGHT_OPENGRAPH_IMAGE,
-              display: "block",
-              objectFit: "contain",
-            }}
-            alt="post"
-          />
-        ),
-        {
-          width: WIDTH_OPENGRAPH_IMAGE,
-          height: HEIGHT_OPENGRAPH_IMAGE,
-        },
-      );
+      return fallbackImageResponse;
     }
-    
+
     const description = collection.collectorsNote ?? "";
     const title = collection.name ?? "";
 
     const imageUrls = collection.tokens
       ?.map((element) => {
-        return element?.token ? getPreviewUrls(element.token.definition.media) : null;
+        return element?.token
+          ? getPreviewUrls(element.token.definition.media)
+          : null;
       })
       .map((result) => result?.large ?? "")
       .slice(0, 4);
 
     if (!collectionId || !queryResponse?.data?.collection || !imageUrls) {
-      return new ImageResponse(
-        (
-          <img
-            src={fallbackUrl}
-            style={{
-              width: WIDTH_OPENGRAPH_IMAGE,
-              height: HEIGHT_OPENGRAPH_IMAGE,
-              display: "block",
-              objectFit: "contain",
-            }}
-            alt="fallback"
-          />
-        ),
-        {
-          width: WIDTH_OPENGRAPH_IMAGE,
-          height: HEIGHT_OPENGRAPH_IMAGE,
-        },
-      );
+      return fallbackImageResponse;
     }
 
     return new ImageResponse(
@@ -281,25 +253,8 @@ const handler = async (req: NextApiRequest) => {
     );
   } catch (e) {
     console.error("error: ", e);
-    return new ImageResponse(
-      (
-        <img
-          src={fallbackUrl}
-          style={{
-            width: WIDTH_OPENGRAPH_IMAGE,
-            height: HEIGHT_OPENGRAPH_IMAGE,
-            display: "block",
-            objectFit: "contain",
-          }}
-          alt="post"
-        />
-      ),
-      {
-        width: WIDTH_OPENGRAPH_IMAGE,
-        height: HEIGHT_OPENGRAPH_IMAGE,
-      },
-    );
+    return fallbackImageResponse;
   }
-}
+};
 
 export default handler;

@@ -1,34 +1,31 @@
-export const fetchWithJustQueryText = async ({ queryText, variables }: {
+export const fetchGraphql = async ({
+  queryText,
+  variables,
+}: {
   queryText: string;
-  variables: {
-    postId? : string;
-    username?: string
-    tokenId?: string;
-    galleryId?: string;
-    collectionId?: string;
-  }
+  variables: Record<string, string>;
 }) => {
-   const response = await fetch('https://api.gallery.so/glry/graphql/query', {
-     method: 'POST',
-     headers: {
-       'Content-Type': 'application/json',
-     },
-     body: JSON.stringify({
-       query: queryText,
-       variables,
-     }),
-   }).then((response) => response.json());
- 
-   return response;
- };
- 
+  const response = await fetch("https://api.gallery.so/glry/graphql/query", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      query: queryText,
+      variables,
+    }),
+  }).then((response) => response.json());
+
+  return response;
+};
+
 type UrlSet = {
   small: string | null;
   medium: string | null;
   large: string | null;
 };
 
- export const getPreviewUrls = (media: any) => {
+export const getPreviewUrls = (media: any) => {
   let previewUrls: UrlSet | null = null;
   if (!media) {
     return previewUrls;
@@ -36,12 +33,14 @@ type UrlSet = {
 
   if (
     media &&
-    'previewURLs' in media &&
+    "previewURLs" in media &&
     media.previewURLs &&
-    (media.previewURLs.small || media.previewURLs.medium || media.previewURLs.large)
+    (media.previewURLs.small ||
+      media.previewURLs.medium ||
+      media.previewURLs.large)
   ) {
     previewUrls = media.previewURLs;
-  } else if (media && 'fallbackMedia' in media) {
+  } else if (media && "fallbackMedia" in media) {
     if (media.fallbackMedia?.mediaURL) {
       previewUrls = {
         small: media.fallbackMedia.mediaURL,
@@ -51,4 +50,4 @@ type UrlSet = {
     }
   }
   return previewUrls;
-}
+};

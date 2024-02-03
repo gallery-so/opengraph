@@ -1,15 +1,15 @@
 import { ImageResponse } from "@vercel/og";
-import { fetchWithJustQueryText, getPreviewUrls } from "../../../../fetch";
+import { fetchGraphql, getPreviewUrls } from "../../../../fetch";
 import {
   WIDTH_OPENGRAPH_IMAGE,
   HEIGHT_OPENGRAPH_IMAGE,
   fallbackUrl,
-} from "../../../../constants/opengraph";
+} from "../../../../utils/fallback";
 import {
   ABCDiatypeRegular,
   ABCDiatypeBold,
   alpinaLight,
-} from "../../../../utils/opengraph";
+} from "../../../../utils/fonts";
 
 import { postIdQuery } from "../../../../queries/postIdOpengraphQuery";
 import { NextApiRequest } from "next";
@@ -31,7 +31,7 @@ if (process.env.NEXT_PUBLIC_PREVIEW_URL) {
 }
 
 const handler = async (req: NextApiRequest) => {
-  console.log("req.url", req.url)
+  console.log("req.url", req.url);
   if (req.method === "POST") {
     const urlPath = req.url ?? "";
 
@@ -90,7 +90,7 @@ const handler = async (req: NextApiRequest) => {
       {
         status: 200,
         headers: myHeaders,
-      },
+      }
     );
   }
 
@@ -100,13 +100,16 @@ const handler = async (req: NextApiRequest) => {
     const url = new URL(path, baseUrl);
     const postId = url.searchParams.get("postId");
 
-    const queryResponse = await fetchWithJustQueryText({
+    const queryResponse = await fetchGraphql({
       queryText: postIdQuery,
       variables: { postId: postId ?? "" },
     });
 
     console.log("queryResponse", queryResponse);
-    if (!postId || queryResponse?.data?.post?.__typename === "ErrPostNotFound") {
+    if (
+      !postId ||
+      queryResponse?.data?.post?.__typename === "ErrPostNotFound"
+    ) {
       return new ImageResponse(
         (
           <img
@@ -123,7 +126,7 @@ const handler = async (req: NextApiRequest) => {
         {
           width: WIDTH_OPENGRAPH_IMAGE,
           height: HEIGHT_OPENGRAPH_IMAGE,
-        },
+        }
       );
     }
 
@@ -166,7 +169,7 @@ const handler = async (req: NextApiRequest) => {
         {
           width: WIDTH_OPENGRAPH_IMAGE,
           height: HEIGHT_OPENGRAPH_IMAGE,
-        },
+        }
       );
     }
 
@@ -343,7 +346,7 @@ const handler = async (req: NextApiRequest) => {
             weight: 500,
           },
         ],
-      },
+      }
     );
   } catch (e) {
     console.log("error: ", e);
@@ -363,9 +366,9 @@ const handler = async (req: NextApiRequest) => {
       {
         width: WIDTH_OPENGRAPH_IMAGE,
         height: HEIGHT_OPENGRAPH_IMAGE,
-      },
+      }
     );
   }
-}
+};
 
 export default handler;

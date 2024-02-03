@@ -23,7 +23,7 @@ if (process.env.NEXT_PUBLIC_PREVIEW_URL) {
 
 const getBrowserInstance = async () => {
   const executablePath = await chromium.executablePath(
-    'https://storage.googleapis.com/gallery-prod-325303.appspot.com/dev/chromium-v117.0.0-pack.tar',
+    'https://storage.googleapis.com/gallery-prod-325303.appspot.com/dev/chromium-v117.0.0-pack.tar'
   );
 
   if (!executablePath) {
@@ -120,7 +120,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         <meta property="fc:frame:post_url" content="${apiUrl}">
         <body>gm</body>
       </html>
-      `,
+      `
     );
     return;
   }
@@ -185,7 +185,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (fallback) {
       res.setHeader(
         'Cache-Control',
-        `s-maxage=5, max-age=5, stale-while-revalidate=${60 * 60 * 24}`,
+        `s-maxage=5, max-age=5, stale-while-revalidate=${60 * 60 * 24}`
       );
       res.redirect(fallback);
       return;

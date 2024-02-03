@@ -1,17 +1,17 @@
 /* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from '@vercel/og';
 import { fetchGraphql } from '../../../../../fetch';
-import { fcframeCollectionIdOpengraphQuery } from '../../../../../queries/fcframeCollectionIdOpengraphQuery';
 import { NextApiRequest } from 'next';
-import { ABCDiatypeRegular, ABCDiatypeBold, alpinaLight } from '../../../../../utils/fonts';
 import {
   HEIGHT_OPENGRAPH_IMAGE,
   WIDTH_OPENGRAPH_IMAGE,
   fallbackImageResponse,
 } from '../../../../../utils/fallback';
+import { ABCDiatypeRegular, ABCDiatypeBold, alpinaLight } from '../../../../../utils/fonts';
 import { framePostHandler } from '../../../../../utils/framePostHandler';
 import { getPreviewTokens } from '../../../../../utils/getPreviewTokens';
 import React from 'react';
+import { fcframeUsernameOpengraphQuery } from '../../../../../queries/fcframeUsernameOpengraphQuery';
 
 export const config = {
   runtime: 'edge',
@@ -26,23 +26,23 @@ const handler = async (req: NextApiRequest) => {
   // handle GET, which should return the raw image for the frame
   try {
     const url = new URL(req.url ?? '');
-    const collectionId = url.searchParams.get('collectionId');
+    const username = url.searchParams.get('username');
     const position = url.searchParams.get('position');
 
-    if (!collectionId || typeof collectionId !== 'string') {
+    if (!username || typeof username !== 'string') {
       return fallbackImageResponse;
     }
 
-    console.log('fetching collection', collectionId);
+    console.log('fetching user', username);
 
     const queryResponse = await fetchGraphql({
-      queryText: fcframeCollectionIdOpengraphQuery,
-      variables: { collectionId },
+      queryText: fcframeUsernameOpengraphQuery,
+      variables: { username },
     });
 
-    const { collection } = queryResponse.data;
+    const { user } = queryResponse.data;
 
-    if (!collection || collection?.__typename !== 'Collection') {
+    if (!user || user?.__typename !== 'GalleryUser') {
       return fallbackImageResponse;
     }
 
@@ -50,7 +50,14 @@ const handler = async (req: NextApiRequest) => {
     const ABCDiatypeBoldFontData = await ABCDiatypeBold;
     const alpinaLightFontData = await alpinaLight;
 
-    const tokensToDisplay = getPreviewTokens(collection.tokens, position);
+    const tokens = user.galleries
+      ?.filter((gallery) =>
+        gallery?.collections?.some((collection) => collection?.tokens?.length),
+      )?.[0]
+      .collections?.filter((collection) => !collection?.hidden)
+      .flatMap((collection) => collection?.tokens);
+
+    const tokensToDisplay = getPreviewTokens(tokens, position);
 
     const shouldHaveLeftToken = tokensToDisplay.length === 3;
     const leftToken = shouldHaveLeftToken ? tokensToDisplay[0] : null;

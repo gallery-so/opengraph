@@ -1,40 +1,36 @@
-import { ImageResponse } from "@vercel/og";
-import { fetchWithJustQueryText, getPreviewUrls } from "../../../../fetch";
-import { collectionIdIdOpengraphQuery } from "../../../../queries/collectionIdOpengraphQuery";
-import { NextApiRequest } from "next";
+import { ImageResponse } from '@vercel/og';
+import { fetchGraphql, getPreviewUrls } from '../../../../fetch';
+import { collectionIdIdOpengraphQuery } from '../../../../queries/collectionIdOpengraphQuery';
+import { NextApiRequest } from 'next';
 
+import { ABCDiatypeRegular, ABCDiatypeBold, alpinaLight } from '../../../../utils/fonts';
 import {
-  WIDTH_OPENGRAPH_IMAGE,
   HEIGHT_OPENGRAPH_IMAGE,
-  fallbackUrl,
-} from "../../../../constants/opengraph";
-import {
-  ABCDiatypeRegular,
-  ABCDiatypeBold,
-  alpinaLight,
-} from "../../../../utils/opengraph";
+  WIDTH_OPENGRAPH_IMAGE,
+  fallbackImageResponse,
+} from '../../../../utils/fallback';
 
 export const config = {
-  runtime: "edge",
+  runtime: 'edge',
 };
 
-let apiBaseUrl = "https://gallery-opengraph.vercel.app";
+let apiBaseUrl = 'https://gallery-opengraph.vercel.app';
 
 if (process.env.NEXT_PUBLIC_PREVIEW_URL) {
-  apiBaseUrl = "https://gallery-opengraph-preview.vercel.app";
-} else if (process.env.NEXT_PUBLIC_VERCEL_ENV === "preview") {
-  apiBaseUrl = "https://gallery-opengraph-preview.vercel.app";
+  apiBaseUrl = 'https://gallery-opengraph-preview.vercel.app';
+} else if (process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview') {
+  apiBaseUrl = 'https://gallery-opengraph-preview.vercel.app';
 }
 
 const handler = async (req: NextApiRequest) => {
-  if (req.method === "POST") {
+  if (req.method === 'POST') {
     const urlPath = req.url ?? '';
 
     const url = new URL(urlPath, apiBaseUrl);
-    const position = url.searchParams.get("position");
-    const apiUrl = new URL(req.url ?? "", apiBaseUrl);
+    const position = url.searchParams.get('position');
+    const apiUrl = new URL(req.url ?? '', apiBaseUrl);
 
-    console.log("body", req.body);
+    console.log('body', req.body);
     const buttonIndex = req.body.untrustedData?.buttonIndex ?? req.body.option;
 
     console.log({ position, buttonIndex });
@@ -45,7 +41,7 @@ const handler = async (req: NextApiRequest) => {
     // they've clicked `next` since it'll be the only available option
     if (!position) {
       // set the position for the next token
-      apiUrl.searchParams.set("position", "1");
+      apiUrl.searchParams.set('position', '1');
       // for all other tokens, parse which button was clicked. button index of 1 means previous, 2 means next.
     } else if (buttonIndex) {
       if (Number(position) === 1) {
@@ -53,131 +49,101 @@ const handler = async (req: NextApiRequest) => {
         // by deleting the position param so that they won't see a `prev` arrow
         if (Number(buttonIndex) === 1) {
           hasPrevious = false;
-          apiUrl.searchParams.delete("position");
+          apiUrl.searchParams.delete('position');
         }
       } else {
         // if we're further along in the collection, clicking `prev` should decrement the position
         if (Number(buttonIndex) === 1) {
-          apiUrl.searchParams.set("position", `${Number(position) - 1}`);
+          apiUrl.searchParams.set('position', `${Number(position) - 1}`);
         }
       }
 
       // if the user clicks `next`, we should always increment the position
       if (Number(buttonIndex) === 2) {
-        apiUrl.searchParams.set("position", `${Number(position) + 1}`);
+        apiUrl.searchParams.set('position', `${Number(position) + 1}`);
       }
     }
 
     const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "text/html");
+    myHeaders.append('Content-Type', 'text/html');
 
-    return new Response(      `
+    return new Response(
+      `
       <html>
         <meta property="fc:frame" content="vNext">
-        ${hasPrevious ? '<meta property="fc:frame:button:1" content="←">' : ""}
+        ${hasPrevious ? '<meta property="fc:frame:button:1" content="←">' : ''}
         <meta property="fc:frame:button:${hasPrevious ? 2 : 1}" content="→">
         <meta property="fc:frame:image" content="${apiUrl}">
         <meta property="fc:frame:post_url" content="${apiUrl}">
         <body>gm</body>
       </html>
-    `, {
-      status: 200,
-      headers: myHeaders,
-    });
+    `,
+      {
+        status: 200,
+        headers: myHeaders,
+      },
+    );
   }
 
   // Handle GET request
   try {
     const path = req.url ?? '';
-    
+
     const url = new URL(path, apiBaseUrl);
-    const collectionId = url.searchParams.get("collectionId");
-    
+    const collectionId = url.searchParams.get('collectionId');
+
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
     const ABCDiatypeBoldFontData = await ABCDiatypeBold;
     const alpinaLightFontData = await alpinaLight;
-    
-    const queryResponse = await fetchWithJustQueryText({
+
+    const queryResponse = await fetchGraphql({
       queryText: collectionIdIdOpengraphQuery,
-      variables: { collectionId: collectionId ?? "" },
+      variables: { collectionId: collectionId ?? '' },
     });
-    
+
     const { collection } = queryResponse.data;
+    console.log(queryResponse);
     if (!collection) {
-      return new ImageResponse(
-        (
-          <img
-            src={fallbackUrl}
-            style={{
-              width: WIDTH_OPENGRAPH_IMAGE,
-              height: HEIGHT_OPENGRAPH_IMAGE,
-              display: "block",
-              objectFit: "contain",
-            }}
-            alt="post"
-          />
-        ),
-        {
-          width: WIDTH_OPENGRAPH_IMAGE,
-          height: HEIGHT_OPENGRAPH_IMAGE,
-        },
-      );
+      return fallbackImageResponse;
     }
-    
-    const description = collection.collectorsNote ?? "";
-    const title = collection.name ?? "";
+
+    const description = collection.collectorsNote ?? '';
+    const title = collection.name ?? '';
 
     const imageUrls = collection.tokens
       ?.map((element) => {
         return element?.token ? getPreviewUrls(element.token.definition.media) : null;
       })
-      .map((result) => result?.large ?? "")
+      .map((result) => result?.large ?? '')
       .slice(0, 4);
 
     if (!collectionId || !queryResponse?.data?.collection || !imageUrls) {
-      return new ImageResponse(
-        (
-          <img
-            src={fallbackUrl}
-            style={{
-              width: WIDTH_OPENGRAPH_IMAGE,
-              height: HEIGHT_OPENGRAPH_IMAGE,
-              display: "block",
-              objectFit: "contain",
-            }}
-            alt="fallback"
-          />
-        ),
-        {
-          width: WIDTH_OPENGRAPH_IMAGE,
-          height: HEIGHT_OPENGRAPH_IMAGE,
-        },
-      );
+      return fallbackImageResponse;
     }
 
     return new ImageResponse(
       (
         <div
           style={{
-            display: "flex",
-            flexDirection: "column",
-            width: "100%",
-            height: "100%",
+            display: 'flex',
+            flexDirection: 'column',
+            width: '100%',
+            height: '100%',
             minHeight: 200,
-            backgroundColor: "#ffffff",
+            backgroundColor: '#ffffff',
           }}
         >
           <div
             style={{
-              display: "flex",
-              justifyContent: "center",
+              display: 'flex',
+              justifyContent: 'center',
               gap: 25,
-              alignItems: "center",
-              height: "100%%",
+              alignItems: 'center',
+              height: '100%%',
             }}
           >
             <svg
-              style={{ width: "36px", height: "121px" }}
+              style={{ width: '36px', height: '121px' }}
               width="40"
               height="121"
               viewBox="0 0 36 121"
@@ -192,21 +158,21 @@ const handler = async (req: NextApiRequest) => {
             {imageUrls?.map((url) => {
               return url ? (
                 <img
-                  key={url ? url : "2"}
+                  key={url ? url : '2'}
                   width="370"
                   src={url}
                   style={{
-                    maxWidth: "190px",
-                    maxHeight: "190px",
-                    display: "block",
-                    objectFit: "contain",
+                    maxWidth: '190px',
+                    maxHeight: '190px',
+                    display: 'block',
+                    objectFit: 'contain',
                   }}
                   alt="collection token"
                 />
               ) : null;
             })}
             <svg
-              style={{ width: "36px", height: "121px" }}
+              style={{ width: '36px', height: '121px' }}
               width="20"
               height="194"
               viewBox="0 0 36 121"
@@ -221,20 +187,20 @@ const handler = async (req: NextApiRequest) => {
           </div>
           <div
             style={{
-              display: "flex",
-              flexDirection: "column",
-              position: "absolute",
-              bottom: "24px",
-              left: "24px",
+              display: 'flex',
+              flexDirection: 'column',
+              position: 'absolute',
+              bottom: '24px',
+              left: '24px',
             }}
           >
             <p
               style={{
                 fontFamily: "'GT Alpina'",
-                fontSize: "32px",
+                fontSize: '32px',
                 fontWeight: 400,
-                lineHeight: "36px",
-                letterSpacing: "0px",
+                lineHeight: '36px',
+                letterSpacing: '0px',
                 margin: 0,
               }}
             >
@@ -244,9 +210,9 @@ const handler = async (req: NextApiRequest) => {
               <p
                 style={{
                   fontFamily: "'ABCDiatype-Regular'",
-                  fontSize: "18px",
+                  fontSize: '18px',
                   fontWeight: 400,
-                  lineHeight: "24px",
+                  lineHeight: '24px',
                   margin: 0,
                 }}
               >
@@ -261,45 +227,28 @@ const handler = async (req: NextApiRequest) => {
         height: HEIGHT_OPENGRAPH_IMAGE,
         fonts: [
           {
-            name: "ABCDiatype-Regular",
+            name: 'ABCDiatype-Regular',
             data: ABCDiatypeRegularFontData,
             weight: 400,
           },
           {
-            name: "ABCDiatype-Bold",
+            name: 'ABCDiatype-Bold',
             data: ABCDiatypeBoldFontData,
             weight: 700,
           },
           {
-            name: "GT Alpina",
+            name: 'GT Alpina',
             data: alpinaLightFontData,
-            style: "normal",
+            style: 'normal',
             weight: 500,
           },
         ],
-      }
-    );
-  } catch (e) {
-    console.error("error: ", e);
-    return new ImageResponse(
-      (
-        <img
-          src={fallbackUrl}
-          style={{
-            width: WIDTH_OPENGRAPH_IMAGE,
-            height: HEIGHT_OPENGRAPH_IMAGE,
-            display: "block",
-            objectFit: "contain",
-          }}
-          alt="post"
-        />
-      ),
-      {
-        width: WIDTH_OPENGRAPH_IMAGE,
-        height: HEIGHT_OPENGRAPH_IMAGE,
       },
     );
+  } catch (e) {
+    console.error('error: ', e);
+    return fallbackImageResponse;
   }
-}
+};
 
 export default handler;

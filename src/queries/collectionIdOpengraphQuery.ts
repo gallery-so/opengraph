@@ -45,4 +45,4 @@ export const collectionIdIdOpengraphQuery = `query CollectionIdOpengraphQuery($c
         }
     }
 }
-`
+`;

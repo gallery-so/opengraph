@@ -30,18 +30,16 @@ if (process.env.NEXT_PUBLIC_PREVIEW_URL) {
 }
 
 const getTokensToDisplay = (tokenData, position) => {
-  const tokens = tokenData
-    .map(({ token }) => {
-      if (token) {
-        const urls = getPreviewUrls(token.definition.media);
-        return {
-          src: urls?.large ?? "",
-          name: token.definition.name,
-          communityName: token.definition.community?.name,
-        };
-      }
-    })
-    .slice(0, 5);
+  const tokens = tokenData.map(({ token }) => {
+    if (token) {
+      const urls = getPreviewUrls(token.definition.media);
+      return {
+        src: urls?.large ?? "",
+        name: token.definition.name,
+        communityName: token.definition.community?.name,
+      };
+    }
+  });
 
   if (!position) {
     return tokens.slice(0, 2);
@@ -63,12 +61,11 @@ const getTokensToDisplay = (tokenData, position) => {
 
 const handler = async (req: NextApiRequest) => {
   if (req.method === "POST") {
-    const urlPath = req.url ?? '';
+    const urlPath = req.url ?? "";
 
     const url = new URL(urlPath, apiBaseUrl);
     const position = url.searchParams.get("position");
     const apiUrl = new URL(req.url ?? "", apiBaseUrl);
-    console.log("href:     ", apiUrl.href);
 
     console.log("body", req.body);
     const buttonIndex = req.body.untrustedData?.buttonIndex ?? req.body.option;
@@ -107,7 +104,8 @@ const handler = async (req: NextApiRequest) => {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "text/html");
 
-    return new Response(      `
+    return new Response(
+      `
       <html>
         <meta property="fc:frame" content="vNext">
         ${hasPrevious ? '<meta property="fc:frame:button:1" content="←">' : ""}
@@ -116,14 +114,16 @@ const handler = async (req: NextApiRequest) => {
         <meta property="fc:frame:post_url" content="${apiUrl}">
         <body>gm</body>
       </html>
-    `, {
-      status: 200,
-      headers: myHeaders,
-    });
+    `,
+      {
+        status: 200,
+        headers: myHeaders,
+      },
+    );
   }
 
   try {
-    const path = req.url ?? '';
+    const path = req.url ?? "";
     const url = new URL(path, baseUrl);
     const collectionId = url.searchParams.get("collectionId");
     const position = url.searchParams.get("position");
@@ -256,53 +256,55 @@ const handler = async (req: NextApiRequest) => {
               height: "100%",
             }}
           >
-            <div style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "8px",
-            }}>
-            <img
-              width="500"
-              src={centerToken?.src}
-              style={{
-                maxWidth: "500px",
-                maxHeight: "500px",
-                display: "block",
-                objectFit: "contain",
-              }}
-              alt="post"
-            />
             <div
               style={{
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "flex-start",
+                gap: "8px",
               }}
             >
-              <p
+              <img
+                width="500"
+                src={centerToken?.src}
                 style={{
-                  fontFamily: "'ABCDiatype-Regular'",
-                  fontSize: "14px",
-                  fontWeight: "light",
-                  lineHeight: "20px",
-                  margin: 0,
+                  maxWidth: "500px",
+                  maxHeight: "500px",
+                  display: "block",
+                  objectFit: "contain",
+                }}
+                alt="post"
+              />
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "flex-start",
                 }}
               >
-                {centerToken?.name}
-              </p>
-              <p
-                style={{
-                  fontFamily: "'ABCDiatype-Bold'",
-                  fontSize: "14px",
-                  fontWeight: 400,
-                  lineHeight: "20px",
-                  margin: 0,
-                }}
-              >
-                {centerToken?.communityName}
-              </p>
-            </div></div>
-
+                <p
+                  style={{
+                    fontFamily: "'ABCDiatype-Regular'",
+                    fontSize: "14px",
+                    fontWeight: "light",
+                    lineHeight: "20px",
+                    margin: 0,
+                  }}
+                >
+                  {centerToken?.name}
+                </p>
+                <p
+                  style={{
+                    fontFamily: "'ABCDiatype-Bold'",
+                    fontSize: "14px",
+                    fontWeight: 400,
+                    lineHeight: "20px",
+                    margin: 0,
+                  }}
+                >
+                  {centerToken?.communityName}
+                </p>
+              </div>
+            </div>
           </div>
 
           <div
@@ -389,7 +391,6 @@ const handler = async (req: NextApiRequest) => {
   } catch (e) {
     console.log("error: ", e);
   }
-}
-
+};
 
 export default handler;

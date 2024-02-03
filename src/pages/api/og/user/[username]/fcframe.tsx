@@ -52,7 +52,7 @@ const handler = async (req: NextApiRequest) => {
 
     const tokens = user.galleries
       ?.filter((gallery) =>
-        gallery?.collections?.some((collection) => collection?.tokens?.length)
+        gallery?.collections?.some((collection) => collection?.tokens?.length),
       )?.[0]
       .collections?.filter((collection) => !collection?.hidden)
       .flatMap((collection) => collection?.tokens);
@@ -278,7 +278,7 @@ const handler = async (req: NextApiRequest) => {
             weight: 500,
           },
         ],
-      }
+      },
     );
   } catch (e) {
     console.log('error: ', e);

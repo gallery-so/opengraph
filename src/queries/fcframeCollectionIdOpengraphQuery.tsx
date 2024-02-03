@@ -45,4 +45,4 @@ query fcframeCollectionIdOpengraphQuery($collectionId: DBID!) {
     }
   }
 }
-`
+`;

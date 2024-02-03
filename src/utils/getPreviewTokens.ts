@@ -1,7 +1,7 @@
 // this function will determine which subset of 3 tokens we should choose to display
 // out of a broader collection of tokens. these tokens will generally be laid out in
 
-import { getPreviewUrls } from "../fetch";
+import { getPreviewUrls } from '../fetch';
 
 // order of `left`, `current`, `right`
 export const getPreviewTokens = (allTokens: any[], position: string | null) => {
@@ -9,7 +9,7 @@ export const getPreviewTokens = (allTokens: any[], position: string | null) => {
     if (token) {
       const urls = getPreviewUrls(token.definition.media);
       return {
-        src: urls?.large ?? "",
+        src: urls?.large ?? '',
         name: token.definition.name,
         communityName: token.definition.community?.name,
       };
@@ -42,8 +42,7 @@ export const getPreviewTokens = (allTokens: any[], position: string | null) => {
   const current = tokens[mainPosition];
   // `right` may overflow beyond the length of the set if `current` is the last element.
   // in this case, `right` should simply be the first element to represent wrap-around.
-  const right =
-    mainPosition + 1 >= tokens.length ? tokens[0] : tokens[mainPosition + 1];
+  const right = mainPosition + 1 >= tokens.length ? tokens[0] : tokens[mainPosition + 1];
 
   return [left, current, right];
 };

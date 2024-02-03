@@ -1,4 +1,4 @@
-export const tokenIdOpengraphQuery =  `query TokenIdOpengraphQuery($tokenId: DBID!) {
+export const tokenIdOpengraphQuery = `query TokenIdOpengraphQuery($tokenId: DBID!) {
    token: tokenById(id: $tokenId) {
      ... on ErrTokenNotFound {
        __typename
@@ -38,4 +38,4 @@ export const tokenIdOpengraphQuery =  `query TokenIdOpengraphQuery($tokenId: DBI
      }
    }
  }
-`
+`;

@@ -1,58 +1,54 @@
 /* eslint-disable @next/next/no-img-element */
-import { ImageResponse } from "@vercel/og";
-import { fetchGraphql } from "../../../../../fetch";
-import { fcframeCollectionIdOpengraphQuery } from "../../../../../queries/fcframeCollectionIdOpengraphQuery";
-import { NextApiRequest } from "next";
-import {
-  ABCDiatypeRegular,
-  ABCDiatypeBold,
-  alpinaLight,
-} from "../../../../../utils/fonts";
+import { ImageResponse } from '@vercel/og';
+import { fetchGraphql } from '../../../../../fetch';
+import { fcframeCollectionIdOpengraphQuery } from '../../../../../queries/fcframeCollectionIdOpengraphQuery';
+import { NextApiRequest } from 'next';
+import { ABCDiatypeRegular, ABCDiatypeBold, alpinaLight } from '../../../../../utils/fonts';
 import {
   HEIGHT_OPENGRAPH_IMAGE,
   WIDTH_OPENGRAPH_IMAGE,
   fallbackImageResponse,
-} from "../../../../../utils/fallback";
-import { framePostHandler } from "../../../../../utils/framePostHandler";
-import { getPreviewTokens } from "../../../../../utils/getPreviewTokens";
-import React from "react";
+} from '../../../../../utils/fallback';
+import { framePostHandler } from '../../../../../utils/framePostHandler';
+import { getPreviewTokens } from '../../../../../utils/getPreviewTokens';
+import React from 'react';
 
 export const config = {
-  runtime: "edge",
+  runtime: 'edge',
 };
 
 const handler = async (req: NextApiRequest) => {
   // handle POST, where we should return `fcframe` og tags to render the next frame with appropriate buttons
-  if (req.method === "POST") {
+  if (req.method === 'POST') {
     return framePostHandler(req);
   }
 
   // handle GET, which should return the raw image for the frame
   try {
-    const url = new URL(req.url ?? "");
-    const collectionId = url.searchParams.get("collectionId");
-    const position = url.searchParams.get("position");
+    const url = new URL(req.url ?? '');
+    const collectionId = url.searchParams.get('collectionId');
+    const position = url.searchParams.get('position');
 
-    if (!collectionId || typeof collectionId !== "string") {
+    if (!collectionId || typeof collectionId !== 'string') {
       return fallbackImageResponse;
     }
 
-    console.log("fetching collection", collectionId);
+    console.log('fetching collection', collectionId);
 
     const queryResponse = await fetchGraphql({
       queryText: fcframeCollectionIdOpengraphQuery,
       variables: { collectionId },
     });
 
+    const { collection } = queryResponse.data;
+
+    if (!collection || collection?.__typename !== 'Collection') {
+      return fallbackImageResponse;
+    }
+
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
     const ABCDiatypeBoldFontData = await ABCDiatypeBold;
     const alpinaLightFontData = await alpinaLight;
-
-    const { collection } = queryResponse.data;
-
-    if (!collection || collection?.__typename !== "Collection") {
-      return fallbackImageResponse;
-    }
 
     const tokensToDisplay = getPreviewTokens(collection.tokens, position);
 
@@ -65,52 +61,52 @@ const handler = async (req: NextApiRequest) => {
       (
         <div
           style={{
-            display: "flex",
-            flexDirection: "row",
-            width: "100%",
-            height: "100%",
+            display: 'flex',
+            flexDirection: 'row',
+            width: '100%',
+            height: '100%',
             minHeight: 200,
-            backgroundColor: "#ffffff",
-            justifyContent: "space-between",
-            alignItems: "center",
+            backgroundColor: '#ffffff',
+            justifyContent: 'space-between',
+            alignItems: 'center',
           }}
         >
           <div
             style={{
-              display: "flex",
-              position: "relative",
-              marginLeft: "-25%",
-              filter: "blur(6px)",
+              display: 'flex',
+              position: 'relative',
+              marginLeft: '-25%',
+              filter: 'blur(6px)',
               opacity: 0.26,
             }}
           >
             {leftToken ? (
-              <div style={{ display: "flex", flexDirection: "column" }}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <img
                   width="500"
                   src={leftToken?.src}
                   style={{
-                    maxWidth: "500px",
-                    maxHeight: "500px",
-                    display: "block",
-                    objectFit: "contain",
+                    maxWidth: '500px',
+                    maxHeight: '500px',
+                    display: 'block',
+                    objectFit: 'contain',
                   }}
                   alt="post"
                 />
                 <div
                   style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "flex-start",
-                    filter: "blur(2px)",
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-start',
+                    filter: 'blur(2px)',
                   }}
                 >
                   <p
                     style={{
                       fontFamily: "'ABCDiatype-Regular'",
-                      fontSize: "14px",
+                      fontSize: '14px',
                       fontWeight: 400,
-                      lineHeight: "20px",
+                      lineHeight: '20px',
                       margin: 0,
                     }}
                   >
@@ -119,9 +115,9 @@ const handler = async (req: NextApiRequest) => {
                   <p
                     style={{
                       fontFamily: "'ABCDiatype-Bold'",
-                      fontSize: "14px",
+                      fontSize: '14px',
                       fontWeight: 400,
-                      lineHeight: "20px",
+                      lineHeight: '20px',
                       margin: 0,
                     }}
                   >
@@ -134,48 +130,48 @@ const handler = async (req: NextApiRequest) => {
 
           <div
             style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
 
-              position: "absolute",
-              width: "100%",
+              position: 'absolute',
+              width: '100%',
 
-              height: "100%",
+              height: '100%',
             }}
           >
             <div
               style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "8px",
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
               }}
             >
               <img
                 width="500"
                 src={centerToken?.src}
                 style={{
-                  maxWidth: "500px",
-                  maxHeight: "500px",
-                  display: "block",
-                  objectFit: "contain",
+                  maxWidth: '500px',
+                  maxHeight: '500px',
+                  display: 'block',
+                  objectFit: 'contain',
                 }}
                 alt="post"
               />
               <div
                 style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "flex-start",
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-start',
                 }}
               >
                 <p
                   style={{
                     fontFamily: "'ABCDiatype-Regular'",
-                    fontSize: "14px",
-                    fontWeight: "light",
-                    lineHeight: "20px",
+                    fontSize: '14px',
+                    fontWeight: 'light',
+                    lineHeight: '20px',
                     margin: 0,
                   }}
                 >
@@ -184,9 +180,9 @@ const handler = async (req: NextApiRequest) => {
                 <p
                   style={{
                     fontFamily: "'ABCDiatype-Bold'",
-                    fontSize: "14px",
+                    fontSize: '14px',
                     fontWeight: 400,
-                    lineHeight: "20px",
+                    lineHeight: '20px',
                     margin: 0,
                   }}
                 >
@@ -198,40 +194,40 @@ const handler = async (req: NextApiRequest) => {
 
           <div
             style={{
-              display: "flex",
-              position: "relative",
-              marginRight: "-25%",
-              filter: "blur(6px)",
+              display: 'flex',
+              position: 'relative',
+              marginRight: '-25%',
+              filter: 'blur(6px)',
               opacity: 0.26,
             }}
           >
             {rightToken ? (
-              <div style={{ display: "flex", flexDirection: "column" }}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <img
                   width="500"
                   src={rightToken?.src}
                   style={{
-                    maxWidth: "500px",
-                    maxHeight: "500px",
-                    display: "block",
-                    objectFit: "contain",
+                    maxWidth: '500px',
+                    maxHeight: '500px',
+                    display: 'block',
+                    objectFit: 'contain',
                   }}
                   alt="post"
                 />
                 <div
                   style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "flex-start",
-                    filter: "blur(2px)",
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-start',
+                    filter: 'blur(2px)',
                   }}
                 >
                   <p
                     style={{
                       fontFamily: "'ABCDiatype-Regular'",
-                      fontSize: "14px",
+                      fontSize: '14px',
                       fontWeight: 400,
-                      lineHeight: "20px",
+                      lineHeight: '20px',
                       margin: 0,
                     }}
                   >
@@ -240,9 +236,9 @@ const handler = async (req: NextApiRequest) => {
                   <p
                     style={{
                       fontFamily: "'ABCDiatype-Bold'",
-                      fontSize: "14px",
+                      fontSize: '14px',
                       fontWeight: 400,
-                      lineHeight: "20px",
+                      lineHeight: '20px',
                       margin: 0,
                     }}
                   >
@@ -259,26 +255,26 @@ const handler = async (req: NextApiRequest) => {
         height: HEIGHT_OPENGRAPH_IMAGE,
         fonts: [
           {
-            name: "ABCDiatype-Regular",
+            name: 'ABCDiatype-Regular',
             data: ABCDiatypeRegularFontData,
             weight: 400,
           },
           {
-            name: "ABCDiatype-Bold",
+            name: 'ABCDiatype-Bold',
             data: ABCDiatypeBoldFontData,
             weight: 700,
           },
           {
-            name: "GT Alpina",
+            name: 'GT Alpina',
             data: alpinaLightFontData,
-            style: "normal",
+            style: 'normal',
             weight: 500,
           },
         ],
-      }
+      },
     );
   } catch (e) {
-    console.log("error: ", e);
+    console.log('error: ', e);
     return fallbackImageResponse;
   }
 };

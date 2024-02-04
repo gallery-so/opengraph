@@ -91,7 +91,7 @@ const handler = async (req: NextApiRequest) => {
       {
         status: 200,
         headers: myHeaders,
-      },
+      }
     );
   }
 
@@ -129,7 +129,7 @@ const handler = async (req: NextApiRequest) => {
         {
           width: WIDTH_OPENGRAPH_IMAGE,
           height: HEIGHT_OPENGRAPH_IMAGE,
-        },
+        }
       );
     }
 
@@ -152,14 +152,14 @@ const handler = async (req: NextApiRequest) => {
         {
           width: WIDTH_OPENGRAPH_IMAGE,
           height: HEIGHT_OPENGRAPH_IMAGE,
-        },
+        }
       );
     }
 
     const tokenImageUrl = result?.large ?? '';
     const title = token.definition.name;
 
-    const collectorsNoteText = '“' + token.collectorsNote + ' ”';
+    const collectorsNoteText = token.collectorsNote;
     const description = token.definition.description ?? '';
 
     return new ImageResponse(
@@ -192,17 +192,19 @@ const handler = async (req: NextApiRequest) => {
               }}
               alt="post"
             />
-            <p
-              style={{
-                fontFamily: "'GT Alpina Italic'",
-                fontSize: '24px',
-                fontWeight: 400,
-                lineHeight: '24px',
-                margin: 0,
-              }}
-            >
-              {collectorsNoteText}
-            </p>
+            {collectorsNoteText && (
+              <p
+                style={{
+                  fontFamily: "'GT Alpina Italic'",
+                  fontSize: '24px',
+                  fontWeight: 400,
+                  lineHeight: '24px',
+                  margin: 0,
+                }}
+              >
+                “{collectorsNoteText}”
+              </p>
+            )}
           </div>
           <div
             style={{
@@ -268,7 +270,7 @@ const handler = async (req: NextApiRequest) => {
             weight: 500,
           },
         ],
-      },
+      }
     );
   } catch (e) {
     console.log('error: ', e);
@@ -287,7 +289,7 @@ const handler = async (req: NextApiRequest) => {
       {
         width: WIDTH_OPENGRAPH_IMAGE,
         height: HEIGHT_OPENGRAPH_IMAGE,
-      },
+      }
     );
   }
 };

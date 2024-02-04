@@ -9,10 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@sparticuz/chromium-min": "^117",
     "@vercel/og": "^0.6.2",
     "next": "13",
-    "puppeteer-core": "^21.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -24,7 +22,6 @@
     "eslint": "8.10.0",
     "eslint-config-next": "13",
     "jest": "^29.7.0",
-    "puppeteer": "^21.3.0",
     "ts-jest": "^29.1.2",
     "typescript": "4.6.2"
   }

@@ -12,6 +12,10 @@ export const fcframeGalleryIdOpengraphQuery = `query fcframeGalleryIdOpengraphQu
                     token {
                         dbid
                         definition {
+                            name
+                            community {
+                                name
+                            }
                             media {
                                 ... on AudioMedia {
                                     __typename

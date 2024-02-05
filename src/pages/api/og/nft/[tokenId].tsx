@@ -66,8 +66,8 @@ const handler = async (req: NextApiRequest) => {
             <img
               src={tokenImageUrl}
               style={{
-                maxWidth: '265px',
-                maxHeight: '265px',
+                maxWidth: '330px',
+                height: '265px',
                 display: 'block',
                 objectFit: 'contain',
               }}

@@ -75,7 +75,7 @@ const handler = async (req: NextApiRequest) => {
           style={{
             height: '100%',
             width: '100%',
-            gap: 25,
+            gap: 60,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -96,7 +96,7 @@ const handler = async (req: NextApiRequest) => {
           <div
             style={{
               display: 'flex',
-              gap: 25,
+              gap: 67,
               alignItems: 'center',
               justifyContent: 'center',
             }}
@@ -104,8 +104,8 @@ const handler = async (req: NextApiRequest) => {
             <img
               src={postImageUrl}
               style={{
-                maxWidth: '370px',
-                maxHeight: '370px',
+                maxWidth: '450px',
+                height: '370px',
                 display: 'block',
                 objectFit: 'contain',
               }}
@@ -183,8 +183,8 @@ const handler = async (req: NextApiRequest) => {
                     lineHeight: '32px',
                     overflow: 'hidden',
                     wordBreak: 'break-word',
-                    maxWidth: '400px',
-                    minWidth: '240px',
+                    maxWidth: '350px',
+                    minWidth: '200px',
                     margin: 0,
                   }}
                 >

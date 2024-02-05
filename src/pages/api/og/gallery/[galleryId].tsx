@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from '@vercel/og';
-import { fetchGraphql, getPreviewUrls } from '../../../../fetch';
+import { fetchGraphql, getPreviewUrl } from '../../../../fetch';
 import { galleryIdOpengraphQuery } from '../../../../queries/galleryIdOpengraphQuery';
 import { NextApiRequest } from 'next';
 import {
@@ -39,15 +39,13 @@ const handler = async (req: NextApiRequest) => {
 
     const description = gallery.description ?? '';
     const title = gallery.name ?? '';
-
     const imageUrls = gallery?.collections
-      ?.filter((collection) => !collection?.hidden)?.[0]
+      ?.filter((collection) => !collection?.hidden && collection.tokens?.length)?.[0]
       ?.tokens?.map((element) => {
         if (element?.token) {
-          return element?.token ? getPreviewUrls(element.token.definition.media) : null;
+          return element?.token ? getPreviewUrl(element.token.definition.media) : null;
         }
       })
-      .map((result) => result?.large)
       .slice(0, 4);
 
     return new ImageResponse(

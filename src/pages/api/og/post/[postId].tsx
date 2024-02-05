@@ -1,70 +1,42 @@
+/* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from '@vercel/og';
-import { fetchGraphql, getPreviewUrls } from '../../../../fetch';
+import { fetchGraphql, getPreviewUrl } from '../../../../fetch';
 import {
   WIDTH_OPENGRAPH_IMAGE,
   HEIGHT_OPENGRAPH_IMAGE,
-  fallbackUrl,
+  fallbackImageResponse,
 } from '../../../../utils/fallback';
 import { ABCDiatypeRegular, ABCDiatypeBold, alpinaLight } from '../../../../utils/fonts';
 
 import { postIdQuery } from '../../../../queries/postIdOpengraphQuery';
 import { NextApiRequest } from 'next';
+import React from 'react';
 
 export const config = {
   runtime: 'edge',
 };
 
-let baseUrl = 'https://gallery.so';
-let apiBaseUrl = 'https://gallery-opengraph.vercel.app';
-
-// can manually set the preview URL via environment variables on vercel for the `opengraph` service
-if (process.env.NEXT_PUBLIC_PREVIEW_URL) {
-  baseUrl = process.env.NEXT_PUBLIC_PREVIEW_URL;
-  apiBaseUrl = 'https://gallery-opengraph-preview.vercel.app';
-} else if (process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview') {
-  baseUrl = 'https://gallery-dev.vercel.app';
-  apiBaseUrl = 'https://gallery-opengraph-preview.vercel.app';
-}
-
 const handler = async (req: NextApiRequest) => {
-  console.log('req.url', req.url);
-
   try {
     const url = new URL(req.url ?? '');
     const postId = url.searchParams.get('postId');
 
-    console.log({ postId });
+    if (!postId || typeof postId !== 'string') {
+      return fallbackImageResponse;
+    }
 
     const queryResponse = await fetchGraphql({
       queryText: postIdQuery,
-      variables: { postId: postId ?? '' },
+      variables: { postId: postId },
     });
 
     console.log({ queryResponse });
+    const { post } = queryResponse.data;
 
-    console.log('queryResponse', queryResponse);
-    if (!postId || queryResponse?.data?.post?.__typename === 'ErrPostNotFound') {
-      return new ImageResponse(
-        (
-          <img
-            src={fallbackUrl}
-            style={{
-              width: 1200,
-              height: 630,
-              display: 'block',
-              objectFit: 'contain',
-            }}
-            alt="post"
-          />
-        ),
-        {
-          width: WIDTH_OPENGRAPH_IMAGE,
-          height: HEIGHT_OPENGRAPH_IMAGE,
-        }
-      );
+    if (!post || post.__typename === 'ErrPostNotFound') {
+      return fallbackImageResponse;
     }
 
-    const post = queryResponse.data.post;
     const author = post.author;
     const firstLetter = author?.username?.substring(0, 1).toUpperCase() ?? '';
 
@@ -75,37 +47,21 @@ const handler = async (req: NextApiRequest) => {
       profileImageUrl = profileImage.previewURLs.medium;
     }
 
-    if (!profileImageUrl && profileToken?.definition?.media) {
-      const resultProfileImage = getPreviewUrls(profileToken.definition.media);
-      profileImageUrl = resultProfileImage?.large || resultProfileImage?.small || '';
+    const { media: profileMedia } = profileToken?.definition;
+
+    if (!profileImageUrl && profileMedia) {
+      profileImageUrl = getPreviewUrl(profileMedia);
     }
 
     const postToken = post.tokens?.[0];
     if (!postToken) {
-      return new ImageResponse(
-        (
-          <img
-            src={fallbackUrl}
-            style={{
-              width: 1200,
-              height: 630,
-              display: 'block',
-              objectFit: 'contain',
-            }}
-            alt="post"
-          />
-        ),
-        {
-          width: WIDTH_OPENGRAPH_IMAGE,
-          height: HEIGHT_OPENGRAPH_IMAGE,
-        }
-      );
+      return fallbackImageResponse;
     }
 
     let postImageUrl = '';
-    const resultPostImage = getPreviewUrls(postToken.definition.media);
-    if (!postImageUrl && resultPostImage?.large) {
-      postImageUrl = resultPostImage.large;
+    const { media: postMedia } = postToken?.definition;
+    if (!postImageUrl && postMedia) {
+      postImageUrl =  getPreviewUrl(postMedia);
     }
 
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
@@ -226,23 +182,19 @@ const handler = async (req: NextApiRequest) => {
                     fontSize: '25px',
                     fontWeight: 400,
                     lineHeight: '32px',
-                    display: '-webkit-box',
-                    WebkitBoxOrient: 'vertical',
-                    WebkitLineClamp: 5,
-                    wordBreak: 'break-all',
-                    maxWidth: '350px',
+                    overflow: 'hidden',
+                    wordBreak: 'break-word',
+                    maxWidth: '360px',
                     margin: 0,
                   }}
                 >
-                  {post?.caption ?? 'View this post on gallery.so'}
+                  {post?.caption.slice(0, 140) ?? 'View this post on gallery.so'}
                 </p>
               </div>
             </div>
           </div>
           <svg
             style={{ width: '56.74px', height: '196px' }}
-            width="20"
-            height="194"
             viewBox="0 0 36 121"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -279,24 +231,7 @@ const handler = async (req: NextApiRequest) => {
     );
   } catch (e) {
     console.log('error: ', e);
-    return new ImageResponse(
-      (
-        <img
-          src={fallbackUrl}
-          style={{
-            width: WIDTH_OPENGRAPH_IMAGE,
-            height: HEIGHT_OPENGRAPH_IMAGE,
-            display: 'block',
-            objectFit: 'contain',
-          }}
-          alt="post"
-        />
-      ),
-      {
-        width: WIDTH_OPENGRAPH_IMAGE,
-        height: HEIGHT_OPENGRAPH_IMAGE,
-      }
-    );
+    return fallbackImageResponse;
   }
 };
 

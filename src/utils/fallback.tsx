@@ -4,7 +4,7 @@ import { ImageResponse } from '@vercel/og';
 export const WIDTH_OPENGRAPH_IMAGE = 1200;
 export const HEIGHT_OPENGRAPH_IMAGE = 630;
 
-export const fallbackUrl =
+const fallbackUrl =
   'https://storage.googleapis.com/gallery-prod-325303.appspot.com/gallery_full_logo_v2.1.png';
 
 export const fallbackImageResponse = new ImageResponse(
@@ -16,9 +16,8 @@ export const fallbackImageResponse = new ImageResponse(
         width: WIDTH_OPENGRAPH_IMAGE,
         height: HEIGHT_OPENGRAPH_IMAGE,
         display: 'block',
-        objectFit: 'contain',
       }}
-      alt="post"
+      alt="fallback"
     />
   ),
   {

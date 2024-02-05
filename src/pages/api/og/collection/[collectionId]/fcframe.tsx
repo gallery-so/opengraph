@@ -42,13 +42,9 @@ const handler = async (req: NextApiRequest) => {
 
     const { collection } = queryResponse.data;
 
-    if (!collection || collection?.__typename !== 'Collection') {
+    if (collection?.__typename !== 'Collection') {
       return fallbackImageResponse;
     }
-
-    const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
-    const ABCDiatypeBoldFontData = await ABCDiatypeBold;
-    const alpinaLightFontData = await alpinaLight;
 
     const tokensToDisplay = getPreviewTokens(collection.tokens, position);
 
@@ -56,6 +52,10 @@ const handler = async (req: NextApiRequest) => {
     const leftToken = shouldHaveLeftToken ? tokensToDisplay[0] : null;
     const centerToken = tokensToDisplay[shouldHaveLeftToken ? 1 : 0];
     const rightToken = tokensToDisplay[shouldHaveLeftToken ? 2 : 1];
+
+    const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
+    const ABCDiatypeBoldFontData = await ABCDiatypeBold;
+    const alpinaLightFontData = await alpinaLight;
 
     return new ImageResponse(
       (
@@ -91,7 +91,7 @@ const handler = async (req: NextApiRequest) => {
                     display: 'block',
                     objectFit: 'contain',
                   }}
-                  alt="post"
+                  alt="left token"
                 />
                 <div
                   style={{
@@ -157,7 +157,7 @@ const handler = async (req: NextApiRequest) => {
                   display: 'block',
                   objectFit: 'contain',
                 }}
-                alt="post"
+                alt="center token"
               />
               <div
                 style={{
@@ -212,7 +212,7 @@ const handler = async (req: NextApiRequest) => {
                     display: 'block',
                     objectFit: 'contain',
                   }}
-                  alt="post"
+                  alt="right token"
                 />
                 <div
                   style={{

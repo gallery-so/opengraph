@@ -62,7 +62,7 @@ const handler = async (req: NextApiRequest) => {
     let postImageUrl = '';
     const { media: postMedia } = postToken?.definition;
     if (!postImageUrl && postMedia) {
-      postImageUrl =  getPreviewUrl(postMedia);
+      postImageUrl = getPreviewUrl(postMedia);
     }
 
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
@@ -84,8 +84,6 @@ const handler = async (req: NextApiRequest) => {
         >
           <svg
             style={{ width: '56.74px', height: '196px' }}
-            width="40"
-            height="121"
             viewBox="0 0 36 121"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -104,12 +102,12 @@ const handler = async (req: NextApiRequest) => {
             }}
           >
             <img
-              width="370"
               src={postImageUrl}
               style={{
                 maxWidth: '370px',
                 maxHeight: '370px',
                 display: 'block',
+                objectFit: 'contain',
               }}
               alt="post"
             />
@@ -228,7 +226,7 @@ const handler = async (req: NextApiRequest) => {
             weight: 500,
           },
         ],
-      }
+      },
     );
   } catch (e) {
     console.log('error: ', e);

@@ -17,9 +17,7 @@ export const fcframeCollectionIdOpengraphQuery = `
               community {
                 name
               }
-              media {
-                ${mediaQuerySubstring}
-              }
+              ${mediaQuerySubstring}
             }
           }
         }

@@ -12,9 +12,7 @@ export const tokenIdOpengraphQuery = `query TokenIdOpengraphQuery($tokenId: DBID
        definition {
          name
          description
-         media {
-           ${mediaQuerySubstring}
-         }
+         ${mediaQuerySubstring}
        }
      }
    }

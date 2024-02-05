@@ -20,9 +20,7 @@ export const usernameOpengraphQuery = `
               token {
                 dbid
                 definition {
-                  media {
-                    ${mediaQuerySubstring}
-                  }
+                  ${mediaQuerySubstring}
                 }
               }
             }

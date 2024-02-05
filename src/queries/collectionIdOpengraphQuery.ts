@@ -18,9 +18,7 @@ export const collectionIdIdOpengraphQuery = `
           token {
             dbid
             definition {
-              media {
-                ${mediaQuerySubstring}
-              }
+              ${mediaQuerySubstring}
             }
           }
         }

@@ -15,9 +15,7 @@ export const postIdQuery = `
               token {
                 dbid
                 definition {
-                  media {
-                    ${mediaQuerySubstring}
-                  }
+                  ${mediaQuerySubstring}
                 }
               }
             }
@@ -36,9 +34,7 @@ export const postIdQuery = `
         tokens {
           dbid
           definition {
-            media {
-              ${mediaQuerySubstring}
-            }
+            ${mediaQuerySubstring}
           }
         }
       }

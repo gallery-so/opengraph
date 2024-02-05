@@ -1,17 +1,16 @@
-/* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from '@vercel/og';
-import { fetchGraphql } from '../../../../../fetch';
 import { NextApiRequest } from 'next';
+import React from 'react';
+import { fetchGraphql } from '../../../../../fetch';
+import { fcframeGalleryIdOpengraphQuery } from '../../../../../queries/fcframeGalleryIdOpengraphQuery';
 import {
-  HEIGHT_OPENGRAPH_IMAGE,
-  WIDTH_OPENGRAPH_IMAGE,
   fallbackImageResponse,
+  WIDTH_OPENGRAPH_IMAGE,
+  HEIGHT_OPENGRAPH_IMAGE,
 } from '../../../../../utils/fallback';
 import { ABCDiatypeRegular, ABCDiatypeBold, alpinaLight } from '../../../../../utils/fonts';
 import { framePostHandler } from '../../../../../utils/framePostHandler';
 import { getPreviewTokens } from '../../../../../utils/getPreviewTokens';
-import React from 'react';
-import { fcframeUsernameOpengraphQuery } from '../../../../../queries/fcframeUsernameOpengraphQuery';
 
 export const config = {
   runtime: 'edge',
@@ -26,23 +25,23 @@ const handler = async (req: NextApiRequest) => {
   // handle GET, which should return the raw image for the frame
   try {
     const url = new URL(req.url ?? '');
-    const username = url.searchParams.get('username');
+    const galleryId = url.searchParams.get('galleryId');
     const position = url.searchParams.get('position');
 
-    if (!username || typeof username !== 'string') {
+    if (!galleryId || typeof galleryId !== 'string') {
       return fallbackImageResponse;
     }
 
-    console.log('fetching user', username);
+    console.log('fetching gallery', galleryId);
 
     const queryResponse = await fetchGraphql({
-      queryText: fcframeUsernameOpengraphQuery,
-      variables: { username },
+      queryText: fcframeGalleryIdOpengraphQuery,
+      variables: { galleryId },
     });
 
-    const { user } = queryResponse.data;
+    const { gallery } = queryResponse.data;
 
-    if (!user || user?.__typename !== 'GalleryUser') {
+    if (!gallery || gallery?.__typename !== 'Gallery') {
       return fallbackImageResponse;
     }
 
@@ -50,11 +49,8 @@ const handler = async (req: NextApiRequest) => {
     const ABCDiatypeBoldFontData = await ABCDiatypeBold;
     const alpinaLightFontData = await alpinaLight;
 
-    const tokens = user.galleries
-      ?.filter((gallery) =>
-        gallery?.collections?.some((collection) => collection?.tokens?.length)
-      )?.[0]
-      .collections?.filter((collection) => !collection?.hidden)
+    const tokens = gallery.collections
+      .filter((collection) => !collection?.hidden)
       .flatMap((collection) => collection?.tokens);
 
     const tokensToDisplay = getPreviewTokens(tokens, position);

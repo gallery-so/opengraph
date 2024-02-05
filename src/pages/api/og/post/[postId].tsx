@@ -24,6 +24,7 @@ const handler = async (req: NextApiRequest) => {
     if (!postId || typeof postId !== 'string') {
       return fallbackImageResponse;
     }
+    console.log({ postId });
 
     const queryResponse = await fetchGraphql({
       queryText: postIdQuery,
@@ -33,7 +34,7 @@ const handler = async (req: NextApiRequest) => {
     console.log({ queryResponse });
     const { post } = queryResponse.data;
 
-    if (!post || post.__typename === 'ErrPostNotFound') {
+    if (post?.__typename === 'ErrPostNotFound') {
       return fallbackImageResponse;
     }
 

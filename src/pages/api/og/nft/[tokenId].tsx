@@ -8,11 +8,7 @@ import {
   HEIGHT_OPENGRAPH_IMAGE,
   fallbackImageResponse,
 } from '../../../../utils/fallback';
-import {
-  ABCDiatypeRegular,
-  alpinaLight,
-  alpinaLightItalic,
-} from '../../../../utils/fonts';
+import { ABCDiatypeRegular, alpinaLight, alpinaLightItalic } from '../../../../utils/fonts';
 import React from 'react';
 
 export const config = {
@@ -23,7 +19,7 @@ const handler = async (req: NextApiRequest) => {
   try {
     const url = new URL(req.url ?? '');
     const tokenId = url.searchParams.get('tokenId');
-    
+
     if (!tokenId || typeof tokenId !== 'string') {
       return fallbackImageResponse;
     }
@@ -46,7 +42,7 @@ const handler = async (req: NextApiRequest) => {
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
     const alpinaLightFontData = await alpinaLight;
     const alpinaLightItalicFontData = await alpinaLightItalic;
-    
+
     return new ImageResponse(
       (
         <div
@@ -150,7 +146,7 @@ const handler = async (req: NextApiRequest) => {
             weight: 500,
           },
         ],
-      }
+      },
     );
   } catch (e) {
     console.log('error: ', e);

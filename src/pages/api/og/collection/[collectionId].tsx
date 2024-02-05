@@ -1,125 +1,54 @@
+/* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from '@vercel/og';
-import { fetchGraphql, getPreviewUrls } from '../../../../fetch';
+import { fetchGraphql, getPreviewUrl } from '../../../../fetch';
 import { collectionIdIdOpengraphQuery } from '../../../../queries/collectionIdOpengraphQuery';
 import { NextApiRequest } from 'next';
 
-import { ABCDiatypeRegular, ABCDiatypeBold, alpinaLight } from '../../../../utils/fonts';
+import { ABCDiatypeRegular, alpinaLight } from '../../../../utils/fonts';
 import {
   HEIGHT_OPENGRAPH_IMAGE,
   WIDTH_OPENGRAPH_IMAGE,
   fallbackImageResponse,
 } from '../../../../utils/fallback';
+import React from 'react';
 
 export const config = {
   runtime: 'edge',
 };
 
-let apiBaseUrl = 'https://gallery-opengraph.vercel.app';
-
-if (process.env.NEXT_PUBLIC_PREVIEW_URL) {
-  apiBaseUrl = 'https://gallery-opengraph-preview.vercel.app';
-} else if (process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview') {
-  apiBaseUrl = 'https://gallery-opengraph-preview.vercel.app';
-}
-
 const handler = async (req: NextApiRequest) => {
-  if (req.method === 'POST') {
-    const urlPath = req.url ?? '';
-
-    const url = new URL(urlPath, apiBaseUrl);
-    const position = url.searchParams.get('position');
-    const apiUrl = new URL(req.url ?? '', apiBaseUrl);
-
-    console.log('body', req.body);
-    const buttonIndex = req.body.untrustedData?.buttonIndex ?? req.body.option;
-
-    console.log({ position, buttonIndex });
-
-    let hasPrevious = true;
-
-    // when user interacts with initial frame, no position param exists. we can therefore assume
-    // they've clicked `next` since it'll be the only available option
-    if (!position) {
-      // set the position for the next token
-      apiUrl.searchParams.set('position', '1');
-      // for all other tokens, parse which button was clicked. button index of 1 means previous, 2 means next.
-    } else if (buttonIndex) {
-      if (Number(position) === 1) {
-        // if we're on the second token and the user clicks `prev`, we should bump the user back to the first token
-        // by deleting the position param so that they won't see a `prev` arrow
-        if (Number(buttonIndex) === 1) {
-          hasPrevious = false;
-          apiUrl.searchParams.delete('position');
-        }
-      } else {
-        // if we're further along in the collection, clicking `prev` should decrement the position
-        if (Number(buttonIndex) === 1) {
-          apiUrl.searchParams.set('position', `${Number(position) - 1}`);
-        }
-      }
-
-      // if the user clicks `next`, we should always increment the position
-      if (Number(buttonIndex) === 2) {
-        apiUrl.searchParams.set('position', `${Number(position) + 1}`);
-      }
-    }
-
-    const myHeaders = new Headers();
-    myHeaders.append('Content-Type', 'text/html');
-
-    return new Response(
-      `
-      <html>
-        <meta property="fc:frame" content="vNext">
-        ${hasPrevious ? '<meta property="fc:frame:button:1" content="←">' : ''}
-        <meta property="fc:frame:button:${hasPrevious ? 2 : 1}" content="→">
-        <meta property="fc:frame:image" content="${apiUrl}">
-        <meta property="fc:frame:post_url" content="${apiUrl}">
-        <body>gm</body>
-      </html>
-    `,
-      {
-        status: 200,
-        headers: myHeaders,
-      },
-    );
-  }
-
-  // Handle GET request
   try {
-    const path = req.url ?? '';
-
-    const url = new URL(path, apiBaseUrl);
+    const url = new URL(req.url ?? '');
     const collectionId = url.searchParams.get('collectionId');
 
-    const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
-    const ABCDiatypeBoldFontData = await ABCDiatypeBold;
-    const alpinaLightFontData = await alpinaLight;
+    if (!collectionId || typeof collectionId !== 'string') {
+      return fallbackImageResponse;
+    }
 
     const queryResponse = await fetchGraphql({
       queryText: collectionIdIdOpengraphQuery,
-      variables: { collectionId: collectionId ?? '' },
+      variables: { collectionId: collectionId },
     });
 
     const { collection } = queryResponse.data;
-    console.log(queryResponse);
-    if (!collection) {
+    if (collection?.__typename !== 'Collection') {
       return fallbackImageResponse;
     }
 
     const description = collection.collectorsNote ?? '';
     const title = collection.name ?? '';
-
     const imageUrls = collection.tokens
       ?.map((element) => {
-        return element?.token ? getPreviewUrls(element.token.definition.media) : null;
+        return element?.token ? getPreviewUrl(element?.token?.definition?.media) : null;
       })
-      .map((result) => result?.large ?? '')
       .slice(0, 4);
 
-    if (!collectionId || !queryResponse?.data?.collection || !imageUrls) {
+    if (!imageUrls) {
       return fallbackImageResponse;
     }
+
+    const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
+    const alpinaLightFontData = await alpinaLight;
 
     return new ImageResponse(
       (
@@ -144,8 +73,6 @@ const handler = async (req: NextApiRequest) => {
           >
             <svg
               style={{ width: '36px', height: '121px' }}
-              width="40"
-              height="121"
               viewBox="0 0 36 121"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -155,15 +82,14 @@ const handler = async (req: NextApiRequest) => {
                 fill="#141414"
               />
             </svg>
-            {imageUrls?.map((url) => {
+            {imageUrls?.map((url?: string) => {
               return url ? (
                 <img
-                  key={url ? url : '2'}
-                  width="370"
+                  key={url}
                   src={url}
                   style={{
-                    maxWidth: '190px',
-                    maxHeight: '190px',
+                    maxWidth: '250px',
+                    height: '190px',
                     display: 'block',
                     objectFit: 'contain',
                   }}
@@ -173,8 +99,6 @@ const handler = async (req: NextApiRequest) => {
             })}
             <svg
               style={{ width: '36px', height: '121px' }}
-              width="20"
-              height="194"
               viewBox="0 0 36 121"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -230,11 +154,6 @@ const handler = async (req: NextApiRequest) => {
             name: 'ABCDiatype-Regular',
             data: ABCDiatypeRegularFontData,
             weight: 400,
-          },
-          {
-            name: 'ABCDiatype-Bold',
-            data: ABCDiatypeBoldFontData,
-            weight: 700,
           },
           {
             name: 'GT Alpina',

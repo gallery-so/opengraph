@@ -42,13 +42,9 @@ const handler = async (req: NextApiRequest) => {
 
     const { user } = queryResponse.data;
 
-    if (!user || user?.__typename !== 'GalleryUser') {
+    if (user?.__typename !== 'GalleryUser') {
       return fallbackImageResponse;
     }
-
-    const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
-    const ABCDiatypeBoldFontData = await ABCDiatypeBold;
-    const alpinaLightFontData = await alpinaLight;
 
     const tokens = user.galleries
       ?.filter((gallery) =>
@@ -63,6 +59,10 @@ const handler = async (req: NextApiRequest) => {
     const leftToken = shouldHaveLeftToken ? tokensToDisplay[0] : null;
     const centerToken = tokensToDisplay[shouldHaveLeftToken ? 1 : 0];
     const rightToken = tokensToDisplay[shouldHaveLeftToken ? 2 : 1];
+
+    const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
+    const ABCDiatypeBoldFontData = await ABCDiatypeBold;
+    const alpinaLightFontData = await alpinaLight;
 
     return new ImageResponse(
       (

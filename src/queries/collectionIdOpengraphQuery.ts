@@ -1,163 +1,28 @@
-export const collectionIdIdOpengraphQuery = `query CollectionIdOpengraphQuery($collectionId: DBID!) {
-    collection: collectionById(id: $collectionId) {
-        ... on ErrInvalidInput {
-            __typename
-        }
-        ... on ErrCollectionNotFound {
-            __typename
-        }
-        ... on Collection {
-            __typename
-            name
-            collectorsNote
+import { mediaQuerySubstring } from './mediaQuerySubstring';
 
-            tokens {
-                token {
-                    dbid
-                    definition {
-                        media {
-                            ... on AudioMedia {
-                              __typename
-                              previewURLs {
-                                small
-                                medium
-                                large
-                              }
-                              fallbackMedia {
-                                mediaURL
-                              }
-                            }
-                            ... on GltfMedia {
-                              __typename
-                              previewURLs {
-                                small
-                                medium
-                                large
-                              }
-                              fallbackMedia {
-                                mediaURL
-                              }
-                            }
-                            ... on HtmlMedia {
-                              __typename
-                              previewURLs {
-                                small
-                                medium
-                                large
-                              }
-                              fallbackMedia {
-                                mediaURL
-                              }
-                            }
-                            ... on ImageMedia {
-                              __typename
-                              previewURLs {
-                                small
-                                medium
-                                large
-                              }
-                              fallbackMedia {
-                                mediaURL
-                              }
-                            }
-                            ... on GIFMedia {
-                              __typename
-                              staticPreviewURLs {
-                                small
-                                medium
-                                large
-                              }
-                              previewURLs {
-                                small
-                                medium
-                                large
-                              }
-                              fallbackMedia {
-                                mediaURL
-                              }
-                            }
-                            ... on JsonMedia {
-                              __typename
-                              previewURLs {
-                                small
-                                medium
-                                large
-                              }
-                              fallbackMedia {
-                                mediaURL
-                              }
-                            }
-                            ... on TextMedia {
-                              __typename
-                              previewURLs {
-                                small
-                                medium
-                                large
-                              }
-                              fallbackMedia {
-                                mediaURL
-                              }
-                            }
-                            ... on PdfMedia {
-                              __typename
-                              previewURLs {
-                                small
-                                medium
-                                large
-                              }
-                              fallbackMedia {
-                                mediaURL
-                              }
-                            }
-                            ... on UnknownMedia {
-                              __typename
-                              previewURLs {
-                                small
-                                medium
-                                large
-                              }
-                              fallbackMedia {
-                                mediaURL
-                              }
-                            }
-                            ... on InvalidMedia {
-                              __typename
-                              previewURLs {
-                                small
-                                medium
-                                large
-                              }
-                              fallbackMedia {
-                                mediaURL
-                              }
-                            }
-                            ... on SyncingMedia {
-                              __typename
-                              previewURLs {
-                                small
-                                medium
-                                large
-                              }
-                              fallbackMedia {
-                                mediaURL
-                              }
-                            }
-                            ... on VideoMedia {
-                              __typename
-                              previewURLs {
-                                small
-                                medium
-                                large
-                              }
-                              fallbackMedia {
-                                mediaURL
-                              }
-                            }
-                          }
-                    }
-                }
+export const collectionIdIdOpengraphQuery = `
+  query CollectionIdOpengraphQuery($collectionId: DBID!) {
+    collection: collectionById(id: $collectionId) {
+      ... on ErrInvalidInput {
+        __typename
+      }
+      ... on ErrCollectionNotFound {
+        __typename
+      }
+      ... on Collection {
+        __typename
+        name
+        collectorsNote
+
+        tokens {
+          token {
+            dbid
+            definition {
+              ${mediaQuerySubstring}
             }
+          }
         }
+      }
     }
-}
+  }
 `;

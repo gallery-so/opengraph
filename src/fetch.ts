@@ -49,3 +49,8 @@ export const getPreviewUrls = (media: any) => {
   }
   return previewUrls;
 };
+
+export const getPreviewUrl = (media: any) => {
+  const resultProfileImage = getPreviewUrls(media);
+  return resultProfileImage?.large || resultProfileImage?.small || '';
+};

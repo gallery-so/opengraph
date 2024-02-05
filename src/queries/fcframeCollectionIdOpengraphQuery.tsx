@@ -8,12 +8,11 @@ export const fcframeCollectionIdOpengraphQuery = `
       }
       ... on Collection {
         __typename
-
         tokens {
           token {
             dbid
             definition {
-              name
+            name
               community {
                 name
               }

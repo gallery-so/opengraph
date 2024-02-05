@@ -44,8 +44,6 @@ const handler = async (req: NextApiRequest) => {
       ?.filter((collection) => !collection?.hidden)
       .flatMap((collection) => collection?.tokens)
       .map((galleryToken) => {
-        //console.log("token", galleryToken?.token);
-        //console.log("previewUrls", getPreviewUrls(galleryToken.token.definition.media));
         return galleryToken?.token ? getPreviewUrl(galleryToken.token.definition.media) : null;
       })
       .slice(0, 4);

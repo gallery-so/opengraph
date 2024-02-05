@@ -61,7 +61,7 @@ const handler = async (req: NextApiRequest) => {
 
     let postImageUrl = '';
     const { media: postMedia } = postToken?.definition;
-    if (!postImageUrl && postMedia) {
+    if (postMedia) {
       postImageUrl = getPreviewUrl(postMedia);
     }
 
@@ -75,8 +75,8 @@ const handler = async (req: NextApiRequest) => {
           style={{
             height: '100%',
             width: '100%',
+            gap: 25,
             display: 'flex',
-            gap: '70px',
             alignItems: 'center',
             justifyContent: 'center',
             backgroundColor: '#fff',
@@ -96,7 +96,7 @@ const handler = async (req: NextApiRequest) => {
           <div
             style={{
               display: 'flex',
-              gap: '67px',
+              gap: 25,
               alignItems: 'center',
               justifyContent: 'center',
             }}
@@ -183,7 +183,8 @@ const handler = async (req: NextApiRequest) => {
                     lineHeight: '32px',
                     overflow: 'hidden',
                     wordBreak: 'break-word',
-                    maxWidth: '360px',
+                    maxWidth: '400px',
+                    minWidth: '240px',
                     margin: 0,
                   }}
                 >

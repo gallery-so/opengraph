@@ -51,7 +51,6 @@ const handler = async (req: NextApiRequest) => {
     }
 
     const profileMedia = profileToken?.definition?.media;
-
     if (!profileImageUrl && profileMedia) {
       profileImageUrl = getPreviewUrl(profileMedia);
     }

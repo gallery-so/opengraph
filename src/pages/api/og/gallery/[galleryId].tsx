@@ -37,7 +37,7 @@ const handler = async (req: NextApiRequest) => {
 
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
     const alpinaLightFontData = await alpinaLight;
-
+    
     const description = removeMarkdownStyling(gallery.description ?? '');
     const title = gallery.name ?? '';
     const imageUrls = gallery?.collections

@@ -9,6 +9,7 @@ import {
   fallbackImageResponse,
 } from '../../../../utils/fallback';
 import { ABCDiatypeRegular, alpinaLight } from '../../../../utils/fonts';
+import { removeMarkdownStyling } from '../../../../utils/removeMarkdownStyling';
 import React from 'react';
 
 export const config = {
@@ -37,7 +38,7 @@ const handler = async (req: NextApiRequest) => {
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
     const alpinaLightFontData = await alpinaLight;
 
-    const description = gallery.description ?? '';
+    const description = removeMarkdownStyling(gallery.description ?? '');
     const title = gallery.name ?? '';
     const imageUrls = gallery?.collections
       ?.filter((collection) => !collection?.hidden && collection.tokens?.length)?.[0]
@@ -81,7 +82,7 @@ const handler = async (req: NextApiRequest) => {
               />
             </svg>
 
-            {imageUrls.map((url) => {
+            {imageUrls.map((url?: string) => {
               return url ? (
                 <img
                   key={url}
@@ -92,7 +93,7 @@ const handler = async (req: NextApiRequest) => {
                     display: 'block',
                     objectFit: 'contain',
                   }}
-                  alt="post"
+                  alt="gallery token"
                 />
               ) : null;
             })}

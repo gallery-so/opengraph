@@ -7,6 +7,8 @@ import {
   fallbackImageResponse,
 } from '../../../../utils/fallback';
 import { ABCDiatypeRegular, ABCDiatypeBold, alpinaLight } from '../../../../utils/fonts';
+import { removeMarkdownStyling } from '../../../../utils/removeMarkdownStyling';
+import { extractWordsWithinLimit } from '../../../../utils/extractWordsWithinLimit';
 
 import { postIdQuery } from '../../../../queries/postIdOpengraphQuery';
 import { NextApiRequest } from 'next';
@@ -48,7 +50,7 @@ const handler = async (req: NextApiRequest) => {
       profileImageUrl = profileImage.previewURLs.medium;
     }
 
-    const { media: profileMedia } = profileToken?.definition;
+    const profileMedia = profileToken?.definition?.media;
 
     if (!profileImageUrl && profileMedia) {
       profileImageUrl = getPreviewUrl(profileMedia);
@@ -68,6 +70,11 @@ const handler = async (req: NextApiRequest) => {
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
     const ABCDiatypeBoldFontData = await ABCDiatypeBold;
     const alpinaLightFontData = await alpinaLight;
+
+    const cleanCaption = removeMarkdownStyling(post?.caption ?? '');
+    const truncatedCaption = extractWordsWithinLimit(cleanCaption);
+    const captionPlaintext =
+      truncatedCaption?.length === 0 ? 'View this post on gallery.so' : truncatedCaption;
 
     return new ImageResponse(
       (
@@ -188,7 +195,7 @@ const handler = async (req: NextApiRequest) => {
                     margin: 0,
                   }}
                 >
-                  {post?.caption.slice(0, 140) ?? 'View this post on gallery.so'}
+                  {captionPlaintext}
                 </p>
               </div>
             </div>

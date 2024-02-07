@@ -48,6 +48,8 @@ type MixpanelTrackProps = {
 async function mixpanelTrack({ path, headers, properties }: MixpanelTrackProps) {
   console.log({ path, headers, properties });
 
+  const isFrameButtonClick = 'buttonIndex' in properties;
+
   const data = new URLSearchParams();
   data.append(
     'data',
@@ -56,6 +58,7 @@ async function mixpanelTrack({ path, headers, properties }: MixpanelTrackProps) 
       properties: {
         token: process.env.NEXT_PUBLIC_MIXPANEL_TOKEN,
         path,
+        isFrameButtonClick,
         ...headers,
         ...properties,
       },

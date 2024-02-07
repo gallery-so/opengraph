@@ -1,8 +1,6 @@
-import { NextApiRequest } from 'next';
-
-export async function extractBody(request: NextApiRequest) {
+export async function extractBody(requestBody: any) {
   const dec = new TextDecoder();
-  const reader = request.body.getReader();
+  const reader = requestBody.getReader();
   let body = '';
 
   while (true) {

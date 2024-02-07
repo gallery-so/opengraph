@@ -11,16 +11,17 @@ export default async function middleware(request: NextRequest) {
 
   if (request.method === 'POST' && request.nextUrl.pathname.includes('fcframe')) {
     const body = JSON.parse(await extractBody(request.body));
-    if (body) {
+    console.log('frame post body', body);
+    if (body.untrustedData) {
       frameProperties = {
-        fid: body.fid,
-        url: body.url,
-        timestamp: body.timestamp,
-        network: body.network,
-        buttonIndex: body.buttonIndex,
-        inputText: body.inputText,
-        castIdFid: body.castId.fid,
-        hash: body.castId.hash,
+        fid: body.untrustedData.fid,
+        url: body.untrustedData.url,
+        timestamp: body.untrustedData.timestamp,
+        network: body.untrustedData.network,
+        buttonIndex: body.untrustedData.buttonIndex,
+        inputText: body.untrustedData.inputText,
+        castIdFid: body.untrustedData.castId.fid,
+        hash: body.untrustedData.castId.hash,
       };
     }
   }
@@ -45,6 +46,8 @@ type MixpanelTrackProps = {
 };
 
 async function mixpanelTrack({ path, headers, properties }: MixpanelTrackProps) {
+  console.log({ path, headers, properties });
+
   const data = new URLSearchParams();
   data.append(
     'data',
@@ -67,8 +70,6 @@ async function mixpanelTrack({ path, headers, properties }: MixpanelTrackProps) 
     },
     body: data,
   };
-
-  console.log('sending request to https://analytics.dev.gallery.so/track');
 
   await fetch('https://api.mixpanel.com/track', options)
     .then((response) => response.json())

@@ -4,7 +4,7 @@ import { extractBody } from './extractBody';
 export async function framePostHandler(req: NextApiRequest) {
   const url = new URL(req.url ?? '');
   const position = url.searchParams.get('position');
-  const body = JSON.parse(await extractBody(req));
+  const body = JSON.parse(await extractBody(req.body));
   const buttonIndex = body.untrustedData?.buttonIndex;
 
   console.log({ body, position, buttonIndex });
@@ -61,6 +61,6 @@ export async function framePostHandler(req: NextApiRequest) {
     {
       status: 200,
       headers,
-    },
+    }
   );
 }

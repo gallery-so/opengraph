@@ -10,6 +10,7 @@ import {
   fallbackImageResponse,
 } from '../../../../utils/fallback';
 import { ABCDiatypeRegular, ABCDiatypeBold, alpinaLight } from '../../../../utils/fonts';
+import { removeMarkdownStyling } from '../../../../utils/removeMarkdownStyling';
 import React from 'react';
 
 export const config = {
@@ -35,9 +36,9 @@ const handler = async (req: NextApiRequest) => {
       return fallbackImageResponse;
     }
 
-    const description = user.bio.split('\n')[0];
-    const nonEmptyGalleries = user.galleries?.filter(
-      (gallery) => gallery?.collections?.some((collection) => collection?.tokens?.length),
+    const description = removeMarkdownStyling(user.bio.split('\n')[0] ?? '');
+    const nonEmptyGalleries = user.galleries?.filter((gallery) =>
+      gallery?.collections?.some((collection) => collection?.tokens?.length)
     );
 
     const imageUrls = nonEmptyGalleries?.[0]?.collections
@@ -172,7 +173,7 @@ const handler = async (req: NextApiRequest) => {
             weight: 500,
           },
         ],
-      },
+      }
     );
   } catch (e) {
     console.log('error: ', e);

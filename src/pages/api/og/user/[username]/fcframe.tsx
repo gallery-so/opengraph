@@ -55,10 +55,9 @@ const handler = async (req: NextApiRequest) => {
 
     const tokensToDisplay = getPreviewTokens(tokens, position);
 
-    const shouldHaveLeftToken = tokensToDisplay.length === 3;
-    const leftToken = shouldHaveLeftToken ? tokensToDisplay[0] : null;
-    const centerToken = tokensToDisplay[shouldHaveLeftToken ? 1 : 0];
-    const rightToken = tokensToDisplay[shouldHaveLeftToken ? 2 : 1];
+    const leftToken = tokensToDisplay?.left;
+    const centerToken = tokensToDisplay?.current;
+    const rightToken = tokensToDisplay?.right;
 
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
     const ABCDiatypeBoldFontData = await ABCDiatypeBold;

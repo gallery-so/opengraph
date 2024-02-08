@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from '@vercel/og';
-import { fetchGraphql, getPreviewUrls } from '../../../../fetch';
+import { fetchGraphql, getPreviewUrl } from '../../../../fetch';
 import { galleryIdOpengraphQuery } from '../../../../queries/galleryIdOpengraphQuery';
 import { NextApiRequest } from 'next';
 import {
@@ -9,6 +9,7 @@ import {
   fallbackImageResponse,
 } from '../../../../utils/fallback';
 import { ABCDiatypeRegular, alpinaLight } from '../../../../utils/fonts';
+import { removeMarkdownStyling } from '../../../../utils/removeMarkdownStyling';
 import React from 'react';
 
 export const config = {
@@ -36,18 +37,16 @@ const handler = async (req: NextApiRequest) => {
 
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
     const alpinaLightFontData = await alpinaLight;
-
-    const description = gallery.description ?? '';
+    
+    const description = removeMarkdownStyling(gallery.description ?? '');
     const title = gallery.name ?? '';
-
     const imageUrls = gallery?.collections
-      ?.filter((collection) => !collection?.hidden)?.[0]
+      ?.filter((collection) => !collection?.hidden && collection.tokens?.length)?.[0]
       ?.tokens?.map((element) => {
         if (element?.token) {
-          return element?.token ? getPreviewUrls(element.token.definition.media) : null;
+          return element?.token ? getPreviewUrl(element.token.definition.media) : null;
         }
       })
-      .map((result) => result?.large)
       .slice(0, 4);
 
     return new ImageResponse(
@@ -83,7 +82,7 @@ const handler = async (req: NextApiRequest) => {
               />
             </svg>
 
-            {imageUrls.map((url) => {
+            {imageUrls.map((url?: string) => {
               return url ? (
                 <img
                   key={url}
@@ -94,7 +93,7 @@ const handler = async (req: NextApiRequest) => {
                     display: 'block',
                     objectFit: 'contain',
                   }}
-                  alt="post"
+                  alt="gallery token"
                 />
               ) : null;
             })}

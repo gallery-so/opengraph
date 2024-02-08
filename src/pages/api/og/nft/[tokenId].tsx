@@ -1,8 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from '@vercel/og';
 import { fetchGraphql, getPreviewUrl } from '../../../../fetch';
+import { removeMarkdownStyling } from '../../../../utils/removeMarkdownStyling';
 import { tokenIdOpengraphQuery } from '../../../../queries/tokenIdOpengraphQuery';
 import { NextApiRequest } from 'next';
+import { truncateAndStripMarkdown } from '../../../../utils/extractWordsWithinLimit';
 import {
   WIDTH_OPENGRAPH_IMAGE,
   HEIGHT_OPENGRAPH_IMAGE,
@@ -36,8 +38,8 @@ const handler = async (req: NextApiRequest) => {
 
     const tokenImageUrl = getPreviewUrl(token.definition.media);
     const title = token.definition.name;
-    const collectorsNoteText = token.collectorsNote;
-    const description = token.definition.description ?? '';
+    const collectorsNoteText = truncateAndStripMarkdown(token.collectorsNote);
+    const description = truncateAndStripMarkdown(token.definition.description);
 
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
     const alpinaLightFontData = await alpinaLight;
@@ -60,6 +62,7 @@ const handler = async (req: NextApiRequest) => {
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
+              gap: 44,
               height: '100%',
             }}
           >
@@ -74,17 +77,19 @@ const handler = async (req: NextApiRequest) => {
               alt="post"
             />
             {collectorsNoteText && (
-              <p
-                style={{
-                  fontFamily: "'GT Alpina Italic'",
-                  fontSize: '24px',
-                  fontWeight: 400,
-                  lineHeight: '24px',
-                  margin: 0,
-                }}
-              >
-                “{collectorsNoteText}”
-              </p>
+              <div style={{ display: 'flex', maxWidth: 440 }}>
+                <p
+                  style={{
+                    fontFamily: "'GT Alpina Italic'",
+                    fontSize: '24px',
+                    fontWeight: 400,
+                    lineHeight: '24px',
+                    margin: 0,
+                  }}
+                >
+                  “{collectorsNoteText}”
+                </p>
+              </div>
             )}
           </div>
           <div

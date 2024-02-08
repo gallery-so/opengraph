@@ -1,10 +1,12 @@
-export function extractWordsWithinLimit(inputString: string) {
+import { removeMarkdownStyling } from './removeMarkdownStyling';
+
+export function extractWordsWithinLimit(inputString: string, charLimit: number = 160) {
   const words = inputString?.split(' ') ?? [];
   let result = [];
   let characterCount = 0;
 
   for (const word of words) {
-    if (characterCount + word.length + result.length > 160) {
+    if (characterCount + word.length + result.length > charLimit) {
       break;
     }
     result.push(word);
@@ -12,4 +14,10 @@ export function extractWordsWithinLimit(inputString: string) {
   }
 
   return result.join(' ');
+}
+
+export function truncateAndStripMarkdown(text: string, charLimit?: number) {
+  const cleanText = removeMarkdownStyling(text ?? '');
+  const truncatedText = extractWordsWithinLimit(cleanText, charLimit);
+  return truncatedText ?? '';
 }

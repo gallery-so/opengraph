@@ -7,8 +7,7 @@ import {
   fallbackImageResponse,
 } from '../../../../utils/fallback';
 import { ABCDiatypeRegular, ABCDiatypeBold, alpinaLight } from '../../../../utils/fonts';
-import { removeMarkdownStyling } from '../../../../utils/removeMarkdownStyling';
-import { extractWordsWithinLimit } from '../../../../utils/extractWordsWithinLimit';
+import { truncateAndStripMarkdown } from '../../../../utils/extractWordsWithinLimit';
 
 import { postIdQuery } from '../../../../queries/postIdOpengraphQuery';
 import { NextApiRequest } from 'next';
@@ -70,10 +69,9 @@ const handler = async (req: NextApiRequest) => {
     const ABCDiatypeBoldFontData = await ABCDiatypeBold;
     const alpinaLightFontData = await alpinaLight;
 
-    const cleanCaption = removeMarkdownStyling(post?.caption ?? '');
-    const truncatedCaption = extractWordsWithinLimit(cleanCaption);
+    const caption = truncateAndStripMarkdown(post?.caption);
     const captionPlaintext =
-      truncatedCaption?.length === 0 ? 'View this post on gallery.so' : truncatedCaption;
+      caption?.length === 0 ? 'View this post on gallery.so' : caption;
 
     return new ImageResponse(
       (

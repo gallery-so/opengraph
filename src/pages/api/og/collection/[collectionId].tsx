@@ -5,7 +5,7 @@ import { collectionIdIdOpengraphQuery } from '../../../../queries/collectionIdOp
 import { NextApiRequest } from 'next';
 
 import { ABCDiatypeRegular, alpinaLight } from '../../../../utils/fonts';
-import { removeMarkdownStyling } from '../../../../utils/removeMarkdownStyling';
+import { truncateAndStripMarkdown } from '../../../../utils/extractWordsWithinLimit';
 import {
   HEIGHT_OPENGRAPH_IMAGE,
   WIDTH_OPENGRAPH_IMAGE,
@@ -36,7 +36,7 @@ const handler = async (req: NextApiRequest) => {
       return fallbackImageResponse;
     }
 
-    const description = removeMarkdownStyling(collection.collectorsNote ?? '');
+    const description = truncateAndStripMarkdown(collection.collectorsNote);
     const title = collection.name ?? '';
     const imageUrls = collection.tokens
       ?.map((element) => {

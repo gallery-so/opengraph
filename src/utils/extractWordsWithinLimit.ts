@@ -1,6 +1,30 @@
 import { removeMarkdownStyling } from './removeMarkdownStyling';
 
-export function extractWordsWithinLimit(inputString: string, charLimit: number = 160) {
+function customUnescape(str: string) {
+  return str
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&#34;/g, "'")
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&cent;/g, '¢')
+    .replace(/&pound;/g, '£')
+    .replace(/&yen;/g, '¥')
+    .replace(/&euro;/g, '€')
+    .replace(/&copy;/g, '©')
+    .replace(/&reg;/g, '®')
+    .replace(/&trade;/g, '™');
+}
+
+export const CHAR_LENGTH_ONE_LINE = 160;
+export const CHAR_LENGTH_TWO_LINE = 330;
+
+export function extractWordsWithinLimit(
+  inputString: string,
+  charLimit: number = CHAR_LENGTH_ONE_LINE,
+) {
   const words = inputString?.split(' ') ?? [];
   let result = [];
   let characterCount = 0;
@@ -13,11 +37,12 @@ export function extractWordsWithinLimit(inputString: string, charLimit: number =
     characterCount += word.length + 1; // Add 1 for the space
   }
 
-  return result.join(' ');
+  return result.join(' ').trim() + '...';
 }
 
 export function truncateAndStripMarkdown(text: string, charLimit?: number) {
-  const cleanText = removeMarkdownStyling(text ?? '');
+  const sanitizedText = customUnescape(text);
+  const cleanText = removeMarkdownStyling(sanitizedText ?? '');
   const truncatedText = extractWordsWithinLimit(cleanText, charLimit);
   return truncatedText ?? '';
 }

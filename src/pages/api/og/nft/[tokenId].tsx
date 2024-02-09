@@ -1,10 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from '@vercel/og';
 import { fetchGraphql, getPreviewUrl } from '../../../../fetch';
-import { removeMarkdownStyling } from '../../../../utils/removeMarkdownStyling';
 import { tokenIdOpengraphQuery } from '../../../../queries/tokenIdOpengraphQuery';
 import { NextApiRequest } from 'next';
-import { truncateAndStripMarkdown } from '../../../../utils/extractWordsWithinLimit';
+import {
+  CHAR_LENGTH_ONE_LINE,
+  truncateAndStripMarkdown,
+} from '../../../../utils/extractWordsWithinLimit';
 import {
   WIDTH_OPENGRAPH_IMAGE,
   HEIGHT_OPENGRAPH_IMAGE,
@@ -38,7 +40,7 @@ const handler = async (req: NextApiRequest) => {
 
     const tokenImageUrl = getPreviewUrl(token.definition.media);
     const title = token.definition.name;
-    const collectorsNoteText = truncateAndStripMarkdown(token.collectorsNote);
+    const collectorsNoteText = truncateAndStripMarkdown(token.collectorsNote, CHAR_LENGTH_ONE_LINE);
     const description = truncateAndStripMarkdown(token.definition.description);
 
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
@@ -99,6 +101,7 @@ const handler = async (req: NextApiRequest) => {
               position: 'absolute',
               bottom: '24px',
               left: '24px',
+              marginRight: 25,
             }}
           >
             <p
@@ -114,17 +117,25 @@ const handler = async (req: NextApiRequest) => {
               {title}
             </p>
             {description && (
-              <p
+              <div
                 style={{
-                  fontFamily: "'ABCDiatype-Regular'",
-                  fontSize: '18px',
-                  fontWeight: 400,
-                  lineHeight: '24px',
-                  margin: 0,
+                  display: 'flex',
+                  marginTop: 8,
                 }}
               >
-                {description}
-              </p>
+                <p
+                  style={{
+                    fontFamily: "'ABCDiatype-Regular'",
+                    fontSize: '18px',
+                    fontWeight: 400,
+                    lineHeight: '24px',
+
+                    margin: 0,
+                  }}
+                >
+                  {description}
+                </p>
+              </div>
             )}
           </div>
         </div>

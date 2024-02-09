@@ -7,7 +7,7 @@ import {
   fallbackImageResponse,
 } from '../../../../utils/fallback';
 import { ABCDiatypeRegular, ABCDiatypeBold, alpinaLight } from '../../../../utils/fonts';
-import { truncateAndStripMarkdown } from '../../../../utils/extractWordsWithinLimit';
+import { CHAR_LENGTH_ONE_LINE, truncateAndStripMarkdown } from '../../../../utils/extractWordsWithinLimit';
 
 import { postIdQuery } from '../../../../queries/postIdOpengraphQuery';
 import { NextApiRequest } from 'next';
@@ -69,7 +69,7 @@ const handler = async (req: NextApiRequest) => {
     const ABCDiatypeBoldFontData = await ABCDiatypeBold;
     const alpinaLightFontData = await alpinaLight;
 
-    const caption = truncateAndStripMarkdown(post?.caption);
+    const caption = truncateAndStripMarkdown(post?.caption, CHAR_LENGTH_ONE_LINE);
     const captionPlaintext =
       caption?.length === 0 ? 'View this post on gallery.so' : caption;
 

@@ -37,7 +37,7 @@ const handler = async (req: NextApiRequest) => {
 
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
     const alpinaLightFontData = await alpinaLight;
-    
+
     const description = truncateAndStripMarkdown(gallery.description);
     const title = gallery.name ?? '';
     const imageUrls = gallery?.collections
@@ -116,6 +116,7 @@ const handler = async (req: NextApiRequest) => {
               position: 'absolute',
               bottom: '24px',
               left: '24px',
+              marginRight: 25,
             }}
           >
             <p
@@ -131,17 +132,24 @@ const handler = async (req: NextApiRequest) => {
               {title}
             </p>
             {description && (
-              <p
+              <div
                 style={{
-                  fontFamily: "'ABCDiatype-Regular'",
-                  fontSize: '18px',
-                  fontWeight: 400,
-                  lineHeight: '24px',
-                  margin: 0,
+                  display: 'flex',
+                  marginTop: 8,
                 }}
               >
-                {description}
-              </p>
+                <p
+                  style={{
+                    fontFamily: "'ABCDiatype-Regular'",
+                    fontSize: '18px',
+                    fontWeight: 400,
+                    lineHeight: '24px',
+                    margin: 0,
+                  }}
+                >
+                  {description}
+                </p>
+              </div>
             )}
           </div>
         </div>

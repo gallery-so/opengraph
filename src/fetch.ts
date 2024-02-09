@@ -3,7 +3,7 @@ export const fetchGraphql = async ({
   variables,
 }: {
   queryText: string;
-  variables: Record<string, string>;
+  variables: Record<string, any>;
 }) => {
   const response = await fetch('https://api.gallery.so/glry/graphql/query', {
     method: 'POST',

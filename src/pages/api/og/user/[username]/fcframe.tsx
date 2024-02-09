@@ -7,7 +7,7 @@ import {
   WIDTH_OPENGRAPH_IMAGE,
   fallbackImageResponse,
 } from '../../../../../utils/fallback';
-import { ABCDiatypeRegular, ABCDiatypeBold, alpinaLight } from '../../../../../utils/fonts';
+import { ABCDiatypeRegular, ABCDiatypeBold } from '../../../../../utils/fonts';
 import { framePostHandler } from '../../../../../utils/framePostHandler';
 import { getPreviewTokens } from '../../../../../utils/getPreviewTokens';
 import React from 'react';
@@ -61,7 +61,6 @@ const handler = async (req: NextApiRequest) => {
 
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
     const ABCDiatypeBoldFontData = await ABCDiatypeBold;
-    const alpinaLightFontData = await alpinaLight;
 
     return new ImageResponse(
       (
@@ -269,12 +268,6 @@ const handler = async (req: NextApiRequest) => {
             name: 'ABCDiatype-Bold',
             data: ABCDiatypeBoldFontData,
             weight: 700,
-          },
-          {
-            name: 'GT Alpina',
-            data: alpinaLightFontData,
-            style: 'normal',
-            weight: 500,
           },
         ],
       }

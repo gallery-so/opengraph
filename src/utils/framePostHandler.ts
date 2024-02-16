@@ -63,7 +63,7 @@ export async function framePostHandler(req: NextApiRequest, isExplore?: boolean)
   const headers = new Headers();
   headers.append('Content-Type', 'text/html');
 
-  const check = hasPrevious || !isExplore;
+  const check = hasPrevious || isExplore;
 
   return new Response(
     `

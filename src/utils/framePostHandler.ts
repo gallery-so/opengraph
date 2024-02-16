@@ -20,24 +20,6 @@ export async function framePostHandler(req: NextApiRequest, isExplore?: boolean)
     const headers = new Headers();
     headers.append('Content-Type', 'text/html');
 
-    if (isExplore) {
-      return new Response(
-        `
-      <html>
-        <meta property="fc:frame" content="vNext">
-        <meta property="fc:frame:button:1" content="EXPLORE">
-        <meta property="fc:frame:image" content="${url}">
-        <meta property="fc:frame:post_url" content="${url}">
-        <body>gm</body>
-      </html>
-    `,
-        {
-          status: 200,
-          headers,
-        },
-      );
-    }
-
     // for all other tokens:
     // buttonIndex=1 maps to previous
     // buttonIndex=2 maps to next
@@ -45,7 +27,7 @@ export async function framePostHandler(req: NextApiRequest, isExplore?: boolean)
     // if we're on the second token and the user clicks `prev`, we should bump the user back to the first token
     // by deleting the position param so they won't see a `prev` arrow
     if (Number(position) === 1 && Number(buttonIndex) === 1) {
-      hasPrevious = false;
+      hasPrevious = isExplore ?? false;
       url.searchParams.delete('position');
     } else if (Number(buttonIndex) === 1) {
       // `prev` should decrement the position
@@ -63,14 +45,30 @@ export async function framePostHandler(req: NextApiRequest, isExplore?: boolean)
   const headers = new Headers();
   headers.append('Content-Type', 'text/html');
 
-  const check = hasPrevious || isExplore;
+  if (isExplore) {
+    return new Response(
+      `
+      <html>
+        <meta property="fc:frame" content="vNext">
+        <meta property="fc:frame:button:2" content="EXPLORE">
+        <meta property="fc:frame:image" content="${url}">
+        <meta property="fc:frame:post_url" content="${url}">
+        <body>gm</body>
+      </html>
+    `,
+      {
+        status: 200,
+        headers,
+      },
+    );
+  }
 
   return new Response(
     `
       <html>
         <meta property="fc:frame" content="vNext">
-        ${check ? '<meta property="fc:frame:button:1" content="←">' : ''}
-        <meta property="fc:frame:button:${check ? 2 : 1}" content="→">
+        ${hasPrevious ? '<meta property="fc:frame:button:1" content="←">' : ''}
+        <meta property="fc:frame:button:${hasPrevious ? 2 : 1}" content="→">
         <meta property="fc:frame:image" content="${url}">
         <meta property="fc:frame:post_url" content="${url}">
         <body>gm</body>

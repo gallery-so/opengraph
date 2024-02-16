@@ -12,8 +12,10 @@ import { ImageResponse } from '@vercel/og';
 import {
   ABCDiatypeBold,
   ABCDiatypeRegular,
+  alpinaLight,
   alpinaLightItalic,
 } from '../../../../../../utils/fonts';
+import { framePostHandler } from '../../../../../../utils/framePostHandler';
 import { getPreviewTokens } from '../../../../../../utils/getPreviewTokens';
 
 export const config = {
@@ -22,9 +24,9 @@ export const config = {
 
 const handler = async (req: NextApiRequest) => {
   //handle POST, where we should return `fcframe` og tags to render the next frame with appropriate buttons
-  // if (req.method === 'POST') {
-  //   return framePostHandler(req);
-  // }
+  if (req.method === 'POST') {
+    return framePostHandler(req, true);
+  }
 
   // handle GET, which should return the raw image for the frame
   try {
@@ -62,13 +64,238 @@ const handler = async (req: NextApiRequest) => {
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
     const ABCDiatypeBoldFontData = await ABCDiatypeBold;
     const alpinaLightItalicFontData = await alpinaLightItalic;
+    const alpinaLightFontData = await alpinaLight;
 
     const { name: communityName, tokensForFrame: tokens } = community;
 
     if (position) {
       const tokensToDisplay = getPreviewTokens(tokens, `${Number(position) - 1}`);
+      console.log('tokensToDisplay', tokensToDisplay);
 
-      // return carousel...
+      const leftToken = Number(position) !== 1 && tokensToDisplay?.left;
+      const centerToken = tokensToDisplay?.current;
+      const rightToken = tokensToDisplay?.right;
+
+      console.log('leftToken', leftToken);
+      console.log('centerToken', centerToken);
+      console.log('rightToken', rightToken);
+
+      return new ImageResponse(
+        (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              width: '100%',
+              height: '100%',
+              minHeight: 200,
+              backgroundColor: '#ffffff',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                position: 'relative',
+                marginLeft: '-25%',
+                filter: 'blur(6px)',
+                opacity: 0.26,
+              }}
+            >
+              {leftToken ? (
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <img
+                    width="500"
+                    src={leftToken?.src}
+                    style={{
+                      maxWidth: '500px',
+                      maxHeight: '500px',
+                      display: 'block',
+                      objectFit: 'contain',
+                    }}
+                    alt="left token"
+                  />
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-start',
+                      filter: 'blur(2px)',
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontFamily: "'ABCDiatype-Regular'",
+                        fontSize: '14px',
+                        fontWeight: 400,
+                        lineHeight: '20px',
+                        margin: 0,
+                      }}
+                    >
+                      {leftToken?.name}
+                    </p>
+                    <p
+                      style={{
+                        fontFamily: "'ABCDiatype-Bold'",
+                        fontSize: '14px',
+                        fontWeight: 400,
+                        lineHeight: '20px',
+                        margin: 0,
+                      }}
+                    >
+                      {leftToken?.ownerName}
+                    </p>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+
+                position: 'absolute',
+                width: '100%',
+
+                height: '100%',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                }}
+              >
+                <img
+                  width="500"
+                  src={centerToken?.src}
+                  style={{
+                    maxWidth: '500px',
+                    maxHeight: '500px',
+                    display: 'block',
+                    objectFit: 'contain',
+                  }}
+                  alt="center token"
+                />
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-start',
+                  }}
+                >
+                  <p
+                    style={{
+                      fontFamily: "'ABCDiatype-Regular'",
+                      fontSize: '14px',
+                      fontWeight: 'light',
+                      lineHeight: '20px',
+                      margin: 0,
+                    }}
+                  >
+                    {centerToken?.name}
+                  </p>
+                  <p
+                    style={{
+                      fontFamily: "'ABCDiatype-Bold'",
+                      fontSize: '14px',
+                      fontWeight: 400,
+                      lineHeight: '20px',
+                      margin: 0,
+                    }}
+                  >
+                    {centerToken?.ownerName}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div
+              style={{
+                display: 'flex',
+                position: 'relative',
+                marginRight: '-25%',
+                filter: 'blur(6px)',
+                opacity: 0.26,
+              }}
+            >
+              {rightToken ? (
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <img
+                    width="500"
+                    src={rightToken?.src}
+                    style={{
+                      maxWidth: '500px',
+                      maxHeight: '500px',
+                      display: 'block',
+                      objectFit: 'contain',
+                    }}
+                    alt="right token"
+                  />
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-start',
+                      filter: 'blur(2px)',
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontFamily: "'ABCDiatype-Regular'",
+                        fontSize: '14px',
+                        fontWeight: 400,
+                        lineHeight: '20px',
+                        margin: 0,
+                      }}
+                    >
+                      {rightToken?.name}
+                    </p>
+                    <p
+                      style={{
+                        fontFamily: "'ABCDiatype-Bold'",
+                        fontSize: '14px',
+                        fontWeight: 400,
+                        lineHeight: '20px',
+                        margin: 0,
+                      }}
+                    >
+                      {rightToken?.ownerName}
+                    </p>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        ),
+        {
+          width: WIDTH_OPENGRAPH_IMAGE,
+          height: HEIGHT_OPENGRAPH_IMAGE,
+          fonts: [
+            {
+              name: 'ABCDiatype-Regular',
+              data: ABCDiatypeRegularFontData,
+              weight: 400,
+            },
+            {
+              name: 'ABCDiatype-Bold',
+              data: ABCDiatypeBoldFontData,
+              weight: 700,
+            },
+            {
+              name: 'GT Alpina',
+              data: alpinaLightFontData,
+              style: 'normal',
+              weight: 500,
+            },
+          ],
+        },
+      );
     }
 
     // if no position is explicitly provided, that means we should serve the splash image
@@ -183,7 +410,7 @@ const handler = async (req: NextApiRequest) => {
               weight: 500,
             },
           ],
-        }
+        },
       );
     }
   } catch (e) {

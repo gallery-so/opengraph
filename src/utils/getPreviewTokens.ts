@@ -4,18 +4,19 @@
 import { getPreviewUrl } from '../fetch';
 
 export const getPreviewTokens = (allTokens: any[], position: string | null) => {
-  const tokens = allTokens.map(({ token }) => {
+  console.log('allTokens: ', allTokens);
+  const tokens = allTokens.map((token) => {
     if (token) {
       const url = getPreviewUrl(token.definition.media);
       return {
         src: url,
         name: token.definition.name,
         communityName: token.definition.community?.name,
+        ownerName: token.owner?.username,
       };
     }
   });
   const tokensLength = tokens.length ?? 0;
-
   if (tokensLength === 1) {
     const current = tokens[0];
     return { left: null, current, right: null };
@@ -26,6 +27,7 @@ export const getPreviewTokens = (allTokens: any[], position: string | null) => {
   if (!position) {
     const current = tokens[0];
     const right = tokens[1];
+    console.log('not here');
     return { left: null, current, right };
   }
 
@@ -61,6 +63,8 @@ export const getPreviewTokens = (allTokens: any[], position: string | null) => {
   // `right` may overflow beyond the length of the set if `current` is the last element.
   // in this case, `right` should simply be the first element to represent wrap-around.
   const right = mainPosition + 1 >= tokens.length ? tokens[0] : tokens[mainPosition + 1];
+
+  console.log('should be here main tokens', tokens);
 
   return { left, current, right };
 };

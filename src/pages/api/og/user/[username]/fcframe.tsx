@@ -53,7 +53,7 @@ const handler = async (req: NextApiRequest) => {
       .collections?.filter((collection) => !collection?.hidden)
       .flatMap((collection) => collection?.tokens);
 
-    const tokensToDisplay = getPreviewTokens(tokens, position);
+    const tokensToDisplay = getPreviewTokens(tokens.map(el => el?.token), position);
 
     const leftToken = tokensToDisplay?.left;
     const centerToken = tokensToDisplay?.current;

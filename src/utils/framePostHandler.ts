@@ -19,6 +19,7 @@ export async function framePostHandler(req: NextApiRequest, isExplore?: boolean)
 
     const headers = new Headers();
     headers.append('Content-Type', 'text/html');
+
     if (isExplore) {
       return new Response(
         `
@@ -62,12 +63,14 @@ export async function framePostHandler(req: NextApiRequest, isExplore?: boolean)
   const headers = new Headers();
   headers.append('Content-Type', 'text/html');
 
+  const check = hasPrevious || !isExplore;
+
   return new Response(
     `
       <html>
         <meta property="fc:frame" content="vNext">
-        ${hasPrevious ? '<meta property="fc:frame:button:1" content="←">' : ''}
-        <meta property="fc:frame:button:${hasPrevious ? 2 : 1}" content="→">
+        ${check ? '<meta property="fc:frame:button:1" content="←">' : ''}
+        <meta property="fc:frame:button:${check ? 2 : 1}" content="→">
         <meta property="fc:frame:image" content="${url}">
         <meta property="fc:frame:post_url" content="${url}">
         <body>gm</body>

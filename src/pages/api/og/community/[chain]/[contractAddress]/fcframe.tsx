@@ -17,6 +17,7 @@ import {
 } from '../../../../../../utils/fonts';
 import { framePostHandler } from '../../../../../../utils/framePostHandler';
 import { getPreviewTokens } from '../../../../../../utils/getPreviewTokens';
+import { truncateAndStripMarkdown } from '../../../../../../utils/extractWordsWithinLimit';
 
 export const config = {
   runtime: 'edge',
@@ -332,6 +333,8 @@ const handler = async (req: NextApiRequest) => {
         return { ...position, url: splashImageUrls[i] };
       });
 
+      const displayCommunityName = truncateAndStripMarkdown(communityName, 7)
+
       console.log({ imagesToRender });
 
       return new ImageResponse(
@@ -355,7 +358,6 @@ const handler = async (req: NextApiRequest) => {
                 left: textAreaBoundingBox.left,
                 width: textAreaBoundingBox.right - textAreaBoundingBox.left,
                 height: textAreaBoundingBox.bottom - textAreaBoundingBox.top,
-                border: '1px solid #3498db',
               }}
             />
             {imagesToRender.map(({ url, top, left }) => {
@@ -385,7 +387,7 @@ const handler = async (req: NextApiRequest) => {
                 margin: 0,
               }}
             >
-              {communityName}
+              {displayCommunityName}
             </p>
           </div>
         ),

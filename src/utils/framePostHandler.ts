@@ -10,12 +10,14 @@ export async function framePostHandler(req: NextApiRequest, isExplore?: boolean)
   console.log({ body, position, buttonIndex });
 
   let hasPrevious = true;
+  let showExplore = false;
 
   // when user interacts with initial frame, no position param exists. we can therefore assume
   // they've clicked `next` since it'll be the only available option
   if (!position) {
     // set the position for the next token
     url.searchParams.set('position', '1');
+    showExplore = true;
 
     const headers = new Headers();
     headers.append('Content-Type', 'text/html');
@@ -70,7 +72,7 @@ export async function framePostHandler(req: NextApiRequest, isExplore?: boolean)
         <meta property="fc:frame" content="vNext">
         ${hasPrevious ? '<meta property="fc:frame:button:1" content="←">' : ''}
         <meta property="fc:frame:button:${hasPrevious ? 2 : 1}" content="${
-          hasPrevious ? '→' : 'Explore'
+          showExplore ? 'Explore' : '→'
         }">
         <meta property="fc:frame:image" content="${url}">
         <meta property="fc:frame:post_url" content="${url}">

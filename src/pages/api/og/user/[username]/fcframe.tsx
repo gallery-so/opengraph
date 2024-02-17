@@ -47,13 +47,14 @@ const handler = async (req: NextApiRequest) => {
     }
 
     const tokens = user.galleries
-      ?.filter((gallery) =>
-        gallery?.collections?.some((collection) => collection?.tokens?.length)
+      ?.filter(
+        (gallery) => gallery?.collections?.some((collection) => collection?.tokens?.length),
       )?.[0]
       .collections?.filter((collection) => !collection?.hidden)
-      .flatMap((collection) => collection?.tokens);
+      .flatMap((collection) => collection?.tokens)
+      .map((el) => el?.token);
 
-    const tokensToDisplay = getPreviewTokens(tokens.map(el => el?.token), position);
+    const tokensToDisplay = getPreviewTokens(tokens, position);
 
     const leftToken = tokensToDisplay?.left;
     const centerToken = tokensToDisplay?.current;
@@ -270,7 +271,7 @@ const handler = async (req: NextApiRequest) => {
             weight: 700,
           },
         ],
-      }
+      },
     );
   } catch (e) {
     console.log('error: ', e);

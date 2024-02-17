@@ -1,7 +1,7 @@
 import { NextApiRequest } from 'next';
 import { extractBody } from './extractBody';
 
-export async function framePostHandler(req: NextApiRequest, initialButtonContent: string) {
+export async function framePostHandler(req: NextApiRequest, initialButtonContent?: string) {
   const url = new URL(req.url ?? '');
   const position = url.searchParams.get('position');
   const body = JSON.parse(await extractBody(req.body));
@@ -28,15 +28,18 @@ export async function framePostHandler(req: NextApiRequest, initialButtonContent
       hasPrevious = false;
       url.searchParams.delete('position');
 
-      console.log('buttonIndex', buttonIndex);
       const headers = new Headers();
       headers.append('Content-Type', 'text/html');
+
+      if (initialButtonContent) {
+        buttonContent = initialButtonContent;
+      }
 
       return new Response(
         `
       <html>
         <meta property="fc:frame" content="vNext">
-        <meta property="fc:frame:button:1" content="Explore">
+        <meta property="fc:frame:button:1" content=${initialButtonContent}>
         <meta property="fc:frame:image" content="${url}">
         <meta property="fc:frame:post_url" content="${url}">
         <body>gm</body>

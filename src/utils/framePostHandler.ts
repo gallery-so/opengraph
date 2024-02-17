@@ -1,7 +1,7 @@
 import { NextApiRequest } from 'next';
 import { extractBody } from './extractBody';
 
-export async function framePostHandler(req: NextApiRequest, buttonContent: string = "→") {
+export async function framePostHandler(req: NextApiRequest, initialButtonContent: string) {
   const url = new URL(req.url ?? '');
   const position = url.searchParams.get('position');
   const body = JSON.parse(await extractBody(req.body));
@@ -10,6 +10,7 @@ export async function framePostHandler(req: NextApiRequest, buttonContent: strin
   console.log({ body, position, buttonIndex });
 
   let hasPrevious = true;
+  let buttonContent = '→';
 
   // when user interacts with initial frame, no position param exists. we can therefore assume
   // they've clicked `next` since it'll be the only available option
@@ -27,6 +28,9 @@ export async function framePostHandler(req: NextApiRequest, buttonContent: strin
       hasPrevious = false;
       url.searchParams.delete('position');
 
+      if (initialButtonContent) {
+        buttonContent = initialButtonContent;
+      }
     } else if (Number(buttonIndex) === 1) {
       // `prev` should decrement the position
       url.searchParams.set('position', `${Number(position) - 1}`);

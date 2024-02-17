@@ -333,7 +333,7 @@ const handler = async (req: NextApiRequest) => {
         return { ...position, url: splashImageUrls[i] };
       });
 
-      const displayCommunityName = truncateAndStripMarkdown(communityName, 7)
+      const displayCommunityName = truncateAndStripMarkdown(communityName, 7);
 
       console.log({ imagesToRender });
 

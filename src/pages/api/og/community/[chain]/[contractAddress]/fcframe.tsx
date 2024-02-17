@@ -26,7 +26,7 @@ export const config = {
 const handler = async (req: NextApiRequest) => {
   //handle POST, where we should return `fcframe` og tags to render the next frame with appropriate buttons
   if (req.method === 'POST') {
-    return framePostHandler(req, true);
+    return framePostHandler(req, 'Explore');
   }
 
   // handle GET, which should return the raw image for the frame

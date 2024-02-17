@@ -28,28 +28,9 @@ export async function framePostHandler(req: NextApiRequest, initialButtonContent
       hasPrevious = false;
       url.searchParams.delete('position');
 
-      const headers = new Headers();
-      headers.append('Content-Type', 'text/html');
-
       if (initialButtonContent) {
         buttonContent = initialButtonContent;
       }
-
-      return new Response(
-        `
-      <html>
-        <meta property="fc:frame" content="vNext">
-        <meta property="fc:frame:button:1" content=${initialButtonContent}>
-        <meta property="fc:frame:image" content="${url}">
-        <meta property="fc:frame:post_url" content="${url}">
-        <body>gm</body>
-      </html>
-    `,
-        {
-          status: 200,
-          headers,
-        },
-      );
     } else if (Number(buttonIndex) === 1) {
       // `prev` should decrement the position
       url.searchParams.set('position', `${Number(position) - 1}`);

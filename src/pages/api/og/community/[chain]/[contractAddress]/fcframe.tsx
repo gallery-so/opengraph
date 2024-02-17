@@ -76,7 +76,7 @@ const handler = async (req: NextApiRequest) => {
       const tokensLength = tokens.length ?? 0;
       const mainPosition = Number(position) % tokensLength;
       if (mainPosition === 0) {
-        // we've wrapped around to the start again as position has been explicitly set
+        // we've wrapped around to the start again as position has been explicitly set to 0
         showSplashScreen = true;
       }
     }
@@ -197,7 +197,7 @@ const handler = async (req: NextApiRequest) => {
       );
     }
 
-    if (position) {
+    if (!showSplashScreen) {
       const tokensToDisplay = getPreviewTokens(tokens, `${Number(position) - 1}`);
       console.log('tokensToDisplay', tokensToDisplay);
 

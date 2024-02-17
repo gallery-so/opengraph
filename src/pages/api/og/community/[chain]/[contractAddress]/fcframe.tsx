@@ -69,6 +69,134 @@ const handler = async (req: NextApiRequest) => {
 
     const { name: communityName, tokensForFrame: tokens } = community;
 
+    // if no position is explicitly provided, that means we should serve the splash image
+    let showSplashScreen = !position;
+
+    if (position) {
+      const tokensLength = tokens.length ?? 0;
+      const mainPosition = Number(position) % tokensLength;
+      if (mainPosition === 0) {
+        // we've wrapped around to the start again as position has been explicitly set
+        showSplashScreen = true;
+      }
+    }
+
+    if (showSplashScreen) {
+      const numSplashImages = 4;
+      const splashImageUrls = tokens.slice(0, numSplashImages).map((token) => {
+        return getPreviewUrl(token.definition.media);
+      });
+
+      // todo: approximate these positions based on estimated dimensions of rendered text
+      const distanceFromTop = 240;
+      const distanceFromLeft = 400;
+      const textLength = 410;
+      const textHeight = 160;
+      const textAreaBoundingBox = {
+        top: distanceFromTop,
+        left: distanceFromLeft,
+        bottom: distanceFromTop + textHeight,
+        right: distanceFromLeft + textLength,
+      };
+
+      console.log(splashImageUrls);
+
+      const renderedImageDimension = 220;
+
+      const positions = generatePositionsForSplashImages({
+        numElements: numSplashImages,
+        elementSize: { width: renderedImageDimension, height: renderedImageDimension },
+        containerSize: { width: WIDTH_OPENGRAPH_IMAGE, height: HEIGHT_OPENGRAPH_IMAGE },
+        textAreaBoundingBox,
+      });
+
+      const imagesToRender = positions.map((position, i) => {
+        return { ...position, url: splashImageUrls[i] };
+      });
+
+      const displayCommunityName = truncateAndStripMarkdown(communityName, 7);
+
+      console.log({ imagesToRender });
+
+      return new ImageResponse(
+        (
+          <div
+            style={{
+              display: 'flex',
+              width: '100%',
+              height: '100%',
+              backgroundColor: '#ffffff',
+              justifyContent: 'center',
+              alignItems: 'center',
+              position: 'relative',
+            }}
+          >
+            <div
+              className="rectangle"
+              style={{
+                position: 'absolute',
+                top: textAreaBoundingBox.top,
+                left: textAreaBoundingBox.left,
+                width: textAreaBoundingBox.right - textAreaBoundingBox.left,
+                height: textAreaBoundingBox.bottom - textAreaBoundingBox.top,
+              }}
+            />
+            {imagesToRender.map(({ url, top, left }) => {
+              return (
+                <img
+                  key={url}
+                  alt={url}
+                  src={url}
+                  style={{
+                    position: 'absolute',
+                    top,
+                    left,
+                    maxWidth: `${renderedImageDimension}px`,
+                    maxHeight: `${renderedImageDimension}px`,
+                    display: 'block',
+                    objectFit: 'contain',
+                  }}
+                  width={renderedImageDimension}
+                />
+              );
+            })}
+            <p
+              style={{
+                fontFamily: "'GT Alpina'",
+                fontSize: '140px',
+                fontStyle: 'italic',
+                margin: 0,
+              }}
+            >
+              {displayCommunityName}
+            </p>
+          </div>
+        ),
+        {
+          width: WIDTH_OPENGRAPH_IMAGE,
+          height: HEIGHT_OPENGRAPH_IMAGE,
+          fonts: [
+            {
+              name: 'ABCDiatype-Regular',
+              data: ABCDiatypeRegularFontData,
+              weight: 400,
+            },
+            {
+              name: 'ABCDiatype-Bold',
+              data: ABCDiatypeBoldFontData,
+              weight: 700,
+            },
+            {
+              name: 'GT Alpina',
+              data: alpinaLightItalicFontData,
+              style: 'normal',
+              weight: 500,
+            },
+          ],
+        },
+      );
+    }
+
     if (position) {
       const tokensToDisplay = getPreviewTokens(tokens, `${Number(position) - 1}`);
       console.log('tokensToDisplay', tokensToDisplay);
@@ -291,123 +419,6 @@ const handler = async (req: NextApiRequest) => {
             {
               name: 'GT Alpina',
               data: alpinaLightFontData,
-              style: 'normal',
-              weight: 500,
-            },
-          ],
-        },
-      );
-    }
-
-    // if no position is explicitly provided, that means we should serve the splash image
-    if (!position) {
-      const numSplashImages = 4;
-      const splashImageUrls = tokens.slice(0, numSplashImages).map((token) => {
-        return getPreviewUrl(token.definition.media);
-      });
-
-      // todo: approximate these positions based on estimated dimensions of rendered text
-      const distanceFromTop = 240;
-      const distanceFromLeft = 400;
-      const textLength = 410;
-      const textHeight = 160;
-      const textAreaBoundingBox = {
-        top: distanceFromTop,
-        left: distanceFromLeft,
-        bottom: distanceFromTop + textHeight,
-        right: distanceFromLeft + textLength,
-      };
-
-      console.log(splashImageUrls);
-
-      const renderedImageDimension = 220;
-
-      const positions = generatePositionsForSplashImages({
-        numElements: numSplashImages,
-        elementSize: { width: renderedImageDimension, height: renderedImageDimension },
-        containerSize: { width: WIDTH_OPENGRAPH_IMAGE, height: HEIGHT_OPENGRAPH_IMAGE },
-        textAreaBoundingBox,
-      });
-
-      const imagesToRender = positions.map((position, i) => {
-        return { ...position, url: splashImageUrls[i] };
-      });
-
-      const displayCommunityName = truncateAndStripMarkdown(communityName, 7);
-
-      console.log({ imagesToRender });
-
-      return new ImageResponse(
-        (
-          <div
-            style={{
-              display: 'flex',
-              width: '100%',
-              height: '100%',
-              backgroundColor: '#ffffff',
-              justifyContent: 'center',
-              alignItems: 'center',
-              position: 'relative',
-            }}
-          >
-            <div
-              className="rectangle"
-              style={{
-                position: 'absolute',
-                top: textAreaBoundingBox.top,
-                left: textAreaBoundingBox.left,
-                width: textAreaBoundingBox.right - textAreaBoundingBox.left,
-                height: textAreaBoundingBox.bottom - textAreaBoundingBox.top,
-              }}
-            />
-            {imagesToRender.map(({ url, top, left }) => {
-              return (
-                <img
-                  key={url}
-                  alt={url}
-                  src={url}
-                  style={{
-                    position: 'absolute',
-                    top,
-                    left,
-                    maxWidth: `${renderedImageDimension}px`,
-                    maxHeight: `${renderedImageDimension}px`,
-                    display: 'block',
-                    objectFit: 'contain',
-                  }}
-                  width={renderedImageDimension}
-                />
-              );
-            })}
-            <p
-              style={{
-                fontFamily: "'GT Alpina'",
-                fontSize: '140px',
-                fontStyle: 'italic',
-                margin: 0,
-              }}
-            >
-              {displayCommunityName}
-            </p>
-          </div>
-        ),
-        {
-          width: WIDTH_OPENGRAPH_IMAGE,
-          height: HEIGHT_OPENGRAPH_IMAGE,
-          fonts: [
-            {
-              name: 'ABCDiatype-Regular',
-              data: ABCDiatypeRegularFontData,
-              weight: 400,
-            },
-            {
-              name: 'ABCDiatype-Bold',
-              data: ABCDiatypeBoldFontData,
-              weight: 700,
-            },
-            {
-              name: 'GT Alpina',
-              data: alpinaLightItalicFontData,
               style: 'normal',
               weight: 500,
             },

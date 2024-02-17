@@ -18,9 +18,6 @@ export async function framePostHandler(req: NextApiRequest) {
     // set the position for the next token
     url.searchParams.set('position', '1');
 
-    const headers = new Headers();
-    headers.append('Content-Type', 'text/html');
-
     // for all other tokens:
     // buttonIndex=1 maps to previous
     // buttonIndex=2 maps to next

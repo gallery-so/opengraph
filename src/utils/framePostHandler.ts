@@ -1,7 +1,7 @@
 import { NextApiRequest } from 'next';
 import { extractBody } from './extractBody';
 
-export async function framePostHandler(req: NextApiRequest, isExplore?: boolean) {
+export async function framePostHandler(req: NextApiRequest) {
   const url = new URL(req.url ?? '');
   const position = url.searchParams.get('position');
   const body = JSON.parse(await extractBody(req.body));
@@ -10,14 +10,13 @@ export async function framePostHandler(req: NextApiRequest, isExplore?: boolean)
   console.log({ body, position, buttonIndex });
 
   let hasPrevious = true;
-  let showExplore = false;
+  let buttonContent = "→";
 
   // when user interacts with initial frame, no position param exists. we can therefore assume
   // they've clicked `next` since it'll be the only available option
   if (!position) {
     // set the position for the next token
     url.searchParams.set('position', '1');
-    showExplore = true;
 
     const headers = new Headers();
     headers.append('Content-Type', 'text/html');
@@ -29,27 +28,11 @@ export async function framePostHandler(req: NextApiRequest, isExplore?: boolean)
     // if we're on the second token and the user clicks `prev`, we should bump the user back to the first token
     // by deleting the position param so they won't see a `prev` arrow
     if (Number(position) === 1 && Number(buttonIndex) === 1) {
-      hasPrevious = isExplore ?? false;
+      hasPrevious = false;
       url.searchParams.delete('position');
 
-      const headers = new Headers();
-      headers.append('Content-Type', 'text/html');
+      buttonContent = "Explore";
 
-      return new Response(
-        `
-      <html>
-        <meta property="fc:frame" content="vNext">
-        <meta property="fc:frame:button:1" content="EXPLORE">
-        <meta property="fc:frame:image" content="${url}">
-        <meta property="fc:frame:post_url" content="${url}">
-        <body>gm</body>
-      </html>
-    `,
-        {
-          status: 200,
-          headers,
-        },
-      );
     } else if (Number(buttonIndex) === 1) {
       // `prev` should decrement the position
       url.searchParams.set('position', `${Number(position) - 1}`);
@@ -66,12 +49,14 @@ export async function framePostHandler(req: NextApiRequest, isExplore?: boolean)
   const headers = new Headers();
   headers.append('Content-Type', 'text/html');
 
+  const showTwoButtons = hasPrevious;
+
   return new Response(
     `
       <html>
         <meta property="fc:frame" content="vNext">
-        ${hasPrevious ? '<meta property="fc:frame:button:1" content="←">' : ''}
-        <meta property="fc:frame:button:${hasPrevious ? 2 : 1}" content="Explore">
+        ${showTwoButtons ? '<meta property="fc:frame:button:1" content="←">' : ''}
+        <meta property="fc:frame:button:${showTwoButtons ? 2 : 1}" content="${buttonContent}">
         <meta property="fc:frame:image" content="${url}">
         <meta property="fc:frame:post_url" content="${url}">
         <body>gm</body>

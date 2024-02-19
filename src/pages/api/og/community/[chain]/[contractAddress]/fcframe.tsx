@@ -24,7 +24,7 @@ export const config = {
 };
 
 const handler = async (req: NextApiRequest) => {
-  //handle POST, where we should return `fcframe` og tags to render the next frame with appropriate buttons
+  // handle POST, where we should return `fcframe` og tags to render the next frame with appropriate buttons
   if (req.method === 'POST') {
     return framePostHandler(req, 'Explore');
   }
@@ -189,7 +189,7 @@ const handler = async (req: NextApiRequest) => {
             {
               name: 'GT Alpina',
               data: alpinaLightItalicFontData,
-              style: 'normal',
+              style: 'italic',
               weight: 500,
             },
           ],

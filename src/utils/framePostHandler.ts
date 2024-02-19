@@ -1,5 +1,6 @@
 import { NextApiRequest } from 'next';
 import { extractBody } from './extractBody';
+import { getFrameHtmlResponse } from '@coinbase/onchainkit';
 
 export async function framePostHandler(req: NextApiRequest, initialButtonContent?: string) {
   const url = new URL(req.url ?? '');
@@ -48,21 +49,26 @@ export async function framePostHandler(req: NextApiRequest, initialButtonContent
   headers.append('Content-Type', 'text/html');
 
   const showTwoButtons = hasPrevious;
+  const buttons = [
+    ...(hasPrevious ? [{ label: '←', action: 'prev' }] : []), // Conditionally add the "previous" button
+    { label: buttonContent, action: 'next' }, // This could be '→' or the initial button content
+  ];
 
-  return new Response(
-    `
-      <html>
-        <meta property="fc:frame" content="vNext">
-        ${showTwoButtons ? '<meta property="fc:frame:button:1" content="←">' : ''}
-        <meta property="fc:frame:button:${showTwoButtons ? 2 : 1}" content="${buttonContent}">
-        <meta property="fc:frame:image" content="${url}">
-        <meta property="fc:frame:post_url" content="${url}">
-        <body>gm</body>
-      </html>
-    `,
-    {
-      status: 200,
-      headers,
+  const image = url.toString(); // Assuming `url` is a URL object and you want to use its string representation
+
+  const postUrl = url.toString(); // Similarly, using the URL's string representation for the post URL
+
+  const html = getFrameHtmlResponse({
+    buttons,
+    image: {
+      src: image,
+      aspectRatio: '1:1',
     },
-  );
+    postUrl,
+  });
+
+  return new Response(html, {
+    status: 200,
+    headers,
+  });
 }

@@ -106,7 +106,7 @@ const handler = async (req: NextApiRequest) => {
       const positions = generatePositionsForSplashImages({
         numElements: numSplashImages,
         elementSize: { width: renderedImageDimension, height: renderedImageDimension },
-        containerSize: { width: WIDTH_OPENGRAPH_IMAGE, height: HEIGHT_OPENGRAPH_IMAGE },
+        containerSize: { width: WIDTH_OPENGRAPH_IMAGE + 200, height: HEIGHT_OPENGRAPH_IMAGE + 200 },
         textAreaBoundingBox,
       });
 

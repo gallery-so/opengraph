@@ -101,7 +101,7 @@ const handler = async (req: NextApiRequest) => {
 
       console.log(splashImageUrls);
 
-      const renderedImageDimension = 220;
+      const renderedImageDimension = 300;
 
       const positions = generatePositionsForSplashImages({
         numElements: numSplashImages,

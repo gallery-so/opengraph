@@ -61,7 +61,7 @@ export async function framePostHandler(req: NextApiRequest, initialButtonContent
     buttons,
     image: {
       src: image,
-      aspectRatio: '1:1',
+      aspectRatio: '1.91:1',
     },
     postUrl,
   });

@@ -36,44 +36,46 @@ const handler = async (req: NextApiRequest) => {
   if (req.method === 'POST') {
     let squareAspectRatio = false;
 
-    const { htmlObj, status, position } = await framePostHandler(req, 'Explore', squareAspectRatio);
+    const { htmlObj, status, position } = await framePostHandler(req, 'Explore');
     try {
-      const url = new URL(req.url ?? '');
+      if (position) {
+        const url = new URL(req.url ?? '');
 
-      const chain = url.searchParams.get('chain');
-      const contractAddress = url.searchParams.get('contractAddress');
+        const chain = url.searchParams.get('chain');
+        const contractAddress = url.searchParams.get('contractAddress');
 
-      if (!chain || typeof chain !== 'string') {
-        return;
-      }
+        if (!chain || typeof chain !== 'string') {
+          return;
+        }
 
-      if (!contractAddress || typeof contractAddress !== 'string') {
-        return;
-      }
-      const queryResponse = await fetchGraphql({
-        queryText: fcframeContractCommunityDimensionsOpengraphQuery,
-        variables: {
-          contractCommunityKey: {
-            contract: {
-              address: contractAddress,
-              chain,
+        if (!contractAddress || typeof contractAddress !== 'string') {
+          return;
+        }
+        const queryResponse = await fetchGraphql({
+          queryText: fcframeContractCommunityDimensionsOpengraphQuery,
+          variables: {
+            contractCommunityKey: {
+              contract: {
+                address: contractAddress,
+                chain,
+              },
             },
           },
-        },
-      });
-      const { community } = queryResponse.data;
+        });
+        const { community } = queryResponse.data;
 
-      if (community?.__typename !== 'Community') {
-        return;
+        if (community?.__typename !== 'Community') {
+          return;
+        }
+
+        const { tokensForFrame: tokens } = community;
+
+        const tokensToDisplay = getPreviewTokens(tokens, `${Number(position) - 1}`);
+
+        const centerToken = tokensToDisplay?.current;
+        const tokenAspectRatio = centerToken?.aspectRatio;
+        squareAspectRatio = isImageTall(tokenAspectRatio) && Boolean(position);
       }
-
-      const { tokensForFrame: tokens } = community;
-
-      const tokensToDisplay = getPreviewTokens(tokens, `${Number(position) - 1}`);
-
-      const centerToken = tokensToDisplay?.current;
-      const tokenAspectRatio = centerToken?.aspectRatio;
-      squareAspectRatio = isImageTall(tokenAspectRatio) && Boolean(position);
     } catch (e) {
       console.log('e', e);
       return;
@@ -134,6 +136,7 @@ const handler = async (req: NextApiRequest) => {
         showSplashScreen = true;
       }
     }
+    console.log('showSplashScreen', showSplashScreen);
 
     if (showSplashScreen) {
       const numSplashImages = 4;

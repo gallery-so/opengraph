@@ -5,7 +5,6 @@ import { getFrameHtmlResponse, FrameButtonMetadata } from '@coinbase/onchainkit'
 export async function framePostHandler(
   req: NextApiRequest,
   initialButtonContent?: string,
-  squareAspectRatio?: boolean,
 ) {
   const url = new URL(req.url ?? '');
   const position = url.searchParams.get('position');
@@ -65,7 +64,7 @@ export async function framePostHandler(
     buttons,
     image: {
       src: image,
-      aspectRatio: squareAspectRatio ? '1:1' : '1.91:1',
+      aspectRatio: '1.91:1',
     },
     postUrl,
   };

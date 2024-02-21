@@ -73,7 +73,7 @@ const handler = async (req: NextApiRequest) => {
 
       const centerToken = tokensToDisplay?.current;
       const tokenAspectRatio = centerToken?.aspectRatio;
-      squareAspectRatio = !isImageTall(tokenAspectRatio);
+      squareAspectRatio = !isImageTall(tokenAspectRatio) && Boolean(position);
     } catch (e) {
       console.log('e', e);
       return;

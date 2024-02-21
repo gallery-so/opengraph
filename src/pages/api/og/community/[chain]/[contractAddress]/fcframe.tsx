@@ -479,8 +479,8 @@ const handler = async (req: NextApiRequest) => {
             </div>
           ),
           {
-            width: 500,
-            height: 500,
+            width: 600,
+            height: 600,
             fonts: [
               {
                 name: 'ABCDiatype-Regular',

@@ -286,7 +286,7 @@ const handler = async (req: NextApiRequest) => {
                 height: '100%',
                 minHeight: 200,
                 backgroundColor: '#ffffff',
-                justifyContent: 'space-between',
+                gap: leftToken ? 460 : 800,
                 alignItems: 'center',
               }}
             >
@@ -294,7 +294,7 @@ const handler = async (req: NextApiRequest) => {
                 style={{
                   display: 'flex',
                   position: 'relative',
-                  marginLeft: '-70%',
+                  marginLeft: '-65%',
                   filter: 'blur(6px)',
                   opacity: 0.26,
                 }}
@@ -304,7 +304,7 @@ const handler = async (req: NextApiRequest) => {
                     <img
                       src={leftToken?.src}
                       style={{
-                        maxWidth: '380px',
+                        maxWidth: '340px',
                         maxHeight: '380px',
                         display: 'block',
                         objectFit: 'contain',
@@ -352,7 +352,6 @@ const handler = async (req: NextApiRequest) => {
                   flexDirection: 'column',
                   justifyContent: 'center',
                   alignItems: 'center',
-
                   position: 'absolute',
                   width: '100%',
 
@@ -363,50 +362,55 @@ const handler = async (req: NextApiRequest) => {
                   style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    width: 380,
-                    height: 420,
+                    width: '100%',
+                    alignItems: 'center',
                     gap: '8px',
                   }}
                 >
-                  <img
-                    src={centerToken?.src}
-                    style={{
-                      maxWidth: '380px',
-                      maxHeight: '380px',
-                      display: 'block',
-                      objectFit: 'contain',
-                    }}
-                    alt="center token"
-                  />
                   <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'flex-start',
-                    }}
+                    style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
                   >
-                    <p
+                    <img
+                      src={centerToken?.src}
                       style={{
-                        fontFamily: "'ABCDiatype-Regular'",
-                        fontSize: '14px',
-                        fontWeight: 'light',
-                        lineHeight: '20px',
-                        margin: 0,
+                        maxWidth: '380px',
+                        maxHeight: '380px',
+                        display: 'block',
+                        objectFit: 'contain',
+                      }}
+                      alt="center token"
+                    />
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-start',
+                        justifyContent: 'flex-start',
                       }}
                     >
-                      {centerToken?.name}
-                    </p>
-                    <p
-                      style={{
-                        fontFamily: "'ABCDiatype-Bold'",
-                        fontSize: '14px',
-                        fontWeight: 400,
-                        lineHeight: '20px',
-                        margin: 0,
-                      }}
-                    >
-                      {centerToken?.ownerName}
-                    </p>
+                      <p
+                        style={{
+                          fontFamily: "'ABCDiatype-Regular'",
+                          fontSize: '14px',
+                          fontWeight: 'light',
+                          lineHeight: '20px',
+                          margin: 0,
+                        }}
+                      >
+                        {centerToken?.name}
+                      </p>
+                      <p
+                        style={{
+                          fontFamily: "'ABCDiatype-Bold'",
+                          fontSize: '14px',
+                          fontWeight: 400,
+                          lineHeight: '20px',
+                          margin: 0,
+                        }}
+                      >
+                        {centerToken?.ownerName}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -415,17 +419,23 @@ const handler = async (req: NextApiRequest) => {
                 style={{
                   display: 'flex',
                   position: 'relative',
-                  marginRight: '-70%',
+                  marginRight: '-65%',
                   filter: 'blur(6px)',
                   opacity: 0.26,
                 }}
               >
                 {rightToken ? (
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      width: '380px',
+                    }}
+                  >
                     <img
                       src={rightToken?.src}
                       style={{
-                        maxWidth: '380px',
+                        maxWidth: '340px',
                         maxHeight: '380px',
                         display: 'block',
                         objectFit: 'contain',
@@ -449,7 +459,7 @@ const handler = async (req: NextApiRequest) => {
                           margin: 0,
                         }}
                       >
-                        {rightToken?.name}
+                        {rightToken?.name + 'hi'}
                       </p>
                       <p
                         style={{

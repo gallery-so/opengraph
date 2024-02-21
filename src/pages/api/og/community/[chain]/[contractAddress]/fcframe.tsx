@@ -7,7 +7,10 @@ import {
   fallbackImageResponse,
 } from '../../../../../../utils/fallback';
 import { fetchGraphql, getPreviewUrl } from '../../../../../../fetch';
-import { fcframeContractCommunityOpengraphQuery } from '../../../../../../queries/fcframeContractCommunityOpengraphQuery';
+import {
+  fcframeContractCommunityOpengraphQuery,
+  fcframeContractCommunityDimensionsOpengraphQuery,
+} from '../../../../../../queries/fcframeContractCommunityOpengraphQuery';
 import { ImageResponse } from '@vercel/og';
 import {
   ABCDiatypeBold,
@@ -18,15 +21,66 @@ import {
 import { framePostHandler } from '../../../../../../utils/framePostHandler';
 import { getPreviewTokens } from '../../../../../../utils/getPreviewTokens';
 import { truncateAndStripMarkdown } from '../../../../../../utils/extractWordsWithinLimit';
+import { getFrameHtmlResponse } from '@coinbase/onchainkit';
 
 export const config = {
   runtime: 'edge',
 };
 
+function isImageTall(aspectRatio) {
+  return aspectRatio < 1;
+}
+
 const handler = async (req: NextApiRequest) => {
   // handle POST, where we should return `fcframe` og tags to render the next frame with appropriate buttons
   if (req.method === 'POST') {
-    return framePostHandler(req, 'Explore');
+    let squareAspectRatio = false;
+
+    const { htmlObj, status, position } = await framePostHandler(req, 'Explore', squareAspectRatio);
+    try {
+      const url = new URL(req.url ?? '');
+
+      const chain = url.searchParams.get('chain');
+      const contractAddress = url.searchParams.get('contractAddress');
+
+      if (!chain || typeof chain !== 'string') {
+        return;
+      }
+
+      if (!contractAddress || typeof contractAddress !== 'string') {
+        return;
+      }
+      const queryResponse = await fetchGraphql({
+        queryText: fcframeContractCommunityDimensionsOpengraphQuery,
+        variables: {
+          contractCommunityKey: {
+            contract: {
+              address: contractAddress,
+              chain,
+            },
+          },
+        },
+      });
+      const { community } = queryResponse.data;
+
+      if (community?.__typename !== 'Community') {
+        return;
+      }
+
+      const { tokensForFrame: tokens } = community;
+
+      const tokensToDisplay = getPreviewTokens(tokens, `${Number(position) - 1}`);
+
+      const centerToken = tokensToDisplay?.current;
+      const tokenAspectRatio = centerToken?.aspectRatio;
+      squareAspectRatio = !isImageTall(tokenAspectRatio);
+    } catch (e) {
+      console.log('e', e);
+      return;
+    }
+    htmlObj.image.aspectRatio = squareAspectRatio ? '1:1' : '1.91:1';
+    const newHtml = getFrameHtmlResponse(htmlObj);
+    return new Response(newHtml, status);
   }
 
   // handle GET, which should return the raw image for the frame
@@ -98,6 +152,7 @@ const handler = async (req: NextApiRequest) => {
         bottom: distanceFromTop + textHeight,
         right: distanceFromLeft + textLength,
       };
+      const excessContainerSize = 105;
 
       console.log(splashImageUrls);
 
@@ -106,7 +161,10 @@ const handler = async (req: NextApiRequest) => {
       const positions = generatePositionsForSplashImages({
         numElements: numSplashImages,
         elementSize: { width: renderedImageDimension, height: renderedImageDimension },
-        containerSize: { width: WIDTH_OPENGRAPH_IMAGE + 200, height: HEIGHT_OPENGRAPH_IMAGE + 200 },
+        containerSize: {
+          width: WIDTH_OPENGRAPH_IMAGE + excessContainerSize,
+          height: HEIGHT_OPENGRAPH_IMAGE + excessContainerSize,
+        },
         textAreaBoundingBox,
       });
 

@@ -2,7 +2,11 @@ import { NextApiRequest } from 'next';
 import { extractBody } from './extractBody';
 import { getFrameHtmlResponse, FrameButtonMetadata } from '@coinbase/onchainkit';
 
-export async function framePostHandler(req: NextApiRequest, initialButtonContent?: string) {
+export async function framePostHandler(
+  req: NextApiRequest,
+  initialButtonContent?: string,
+  squareAspectRatio?: boolean,
+) {
   const url = new URL(req.url ?? '');
   const position = url.searchParams.get('position');
   const body = JSON.parse(await extractBody(req.body));
@@ -57,17 +61,21 @@ export async function framePostHandler(req: NextApiRequest, initialButtonContent
   const image = url.toString(); // Assuming `url` is a URL object and you want to use its string representation
   const postUrl = url.toString(); // Similarly, using the URL's string representation for the post URL
 
-  const html = getFrameHtmlResponse({
+  const htmlObj = {
     buttons,
     image: {
       src: image,
-      aspectRatio: '1.91:1',
+      aspectRatio: squareAspectRatio ? '1:1' : '1.91:1',
     },
     postUrl,
-  });
+  };
 
-  return new Response(html, {
-    status: 200,
-    headers,
-  });
+  return {
+    htmlObj,
+    status: {
+      status: 200,
+      headers,
+    },
+    position: url.searchParams.get('position'),
+  };
 }

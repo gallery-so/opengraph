@@ -9,9 +9,10 @@ export const getPreviewTokens = (allTokens: any[], position: string | null) => {
       const url = getPreviewUrl(token.definition.media);
       return {
         src: url,
-        name: token.definition.name,
+        name: token.definition?.name,
         communityName: token.definition.community?.name,
         ownerName: token.owner?.username,
+        aspectRatio: token.definition?.media?.dimensions?.aspectRatio,
       };
     }
   });

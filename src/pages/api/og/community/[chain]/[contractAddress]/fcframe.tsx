@@ -28,7 +28,7 @@ export const config = {
 };
 
 function isImageTall(aspectRatio) {
-  return aspectRatio < 1;
+  return aspectRatio <= 1;
 }
 
 const handler = async (req: NextApiRequest) => {
@@ -73,7 +73,7 @@ const handler = async (req: NextApiRequest) => {
 
       const centerToken = tokensToDisplay?.current;
       const tokenAspectRatio = centerToken?.aspectRatio;
-      squareAspectRatio = !isImageTall(tokenAspectRatio) && Boolean(position);
+      squareAspectRatio = isImageTall(tokenAspectRatio) && Boolean(position);
     } catch (e) {
       console.log('e', e);
       return;
@@ -152,7 +152,7 @@ const handler = async (req: NextApiRequest) => {
         bottom: distanceFromTop + textHeight,
         right: distanceFromLeft + textLength,
       };
-      const excessContainerSize = 105;
+      const excessContainerSize = 85;
 
       console.log(splashImageUrls);
 
@@ -268,8 +268,11 @@ const handler = async (req: NextApiRequest) => {
       console.log('rightToken', rightToken);
 
       const tokenAspectRatio = centerToken?.aspectRatio;
-      const squareAspectRatio = !isImageTall(tokenAspectRatio) && Boolean(position);
+      const squareAspectRatio = isImageTall(tokenAspectRatio);
+
+      console.log('tokenAspectRatio', tokenAspectRatio);
       if (squareAspectRatio) {
+        console.log('squareAspectRatio', squareAspectRatio);
         return new ImageResponse(
           (
             <div
@@ -288,7 +291,7 @@ const handler = async (req: NextApiRequest) => {
                 style={{
                   display: 'flex',
                   position: 'relative',
-                  marginRight: 80,
+
                   filter: 'blur(6px)',
                   opacity: 0.26,
                 }}
@@ -409,7 +412,6 @@ const handler = async (req: NextApiRequest) => {
                 style={{
                   display: 'flex',
                   position: 'relative',
-                  marginRight: '-25%',
                   filter: 'blur(6px)',
                   opacity: 0.26,
                 }}
@@ -626,7 +628,7 @@ const handler = async (req: NextApiRequest) => {
               style={{
                 display: 'flex',
                 position: 'relative',
-                marginRight: 80,
+                marginRight: '-25%',
                 filter: 'blur(6px)',
                 opacity: 0.26,
               }}

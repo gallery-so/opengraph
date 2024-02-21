@@ -43,6 +43,10 @@ export const mediaQuerySubstring = `
       fallbackMedia {
         mediaURL
       }
+
+                dimensions {
+                  aspectRatio
+      }
     }
     ... on GIFMedia {
       __typename

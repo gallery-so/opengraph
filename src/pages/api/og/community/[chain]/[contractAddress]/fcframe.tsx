@@ -155,7 +155,7 @@ const handler = async (req: NextApiRequest) => {
         bottom: distanceFromTop + textHeight,
         right: distanceFromLeft + textLength,
       };
-      const excessContainerSize = 85;
+      const excessContainerSize = 200;
 
       console.log(splashImageUrls);
 

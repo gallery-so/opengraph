@@ -37,9 +37,13 @@ export function extractWordsWithinLimit(text: string, charLimit: number = CHAR_L
   let truncatedText = result.join(' ').trim();
 
   if (truncatedText?.length > 0) {
-    return truncatedText + '...';
+    if (truncatedText.length < text.length) {
+      return truncatedText + '...';
+    }
+    return truncatedText;
 
     // TODO(rohan): improve logic here
+    // return first word if first word length > charLimit
   } else if (words?.[0]?.length > 0) {
     if (words[0].length === charLimit) {
       return words[0];

@@ -9,7 +9,7 @@ import {
   fallbackImageResponse,
 } from '../../../../utils/fallback';
 import { ABCDiatypeRegular, alpinaLight } from '../../../../utils/fonts';
-import { truncateAndStripMarkdown } from '../../../../utils/extractWordsWithinLimit';
+import { CHAR_LENGTH_TWO_LINE, truncateAndStripMarkdown } from '../../../../utils/extractWordsWithinLimit';
 import React from 'react';
 
 export const config = {
@@ -38,7 +38,7 @@ const handler = async (req: NextApiRequest) => {
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
     const alpinaLightFontData = await alpinaLight;
 
-    const description = truncateAndStripMarkdown(gallery.description);
+    const description = truncateAndStripMarkdown(gallery.description, CHAR_LENGTH_TWO_LINE);
     const title = gallery.name ?? '';
     const imageUrls = gallery?.collections
       ?.filter((collection) => !collection?.hidden && collection.tokens?.length)?.[0]
@@ -135,7 +135,7 @@ const handler = async (req: NextApiRequest) => {
               <div
                 style={{
                   display: 'flex',
-                  marginTop: 8,
+                  marginTop: 16,
                 }}
               >
                 <p

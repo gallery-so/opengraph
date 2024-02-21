@@ -10,7 +10,7 @@ import {
   fallbackImageResponse,
 } from '../../../../utils/fallback';
 import { ABCDiatypeRegular, ABCDiatypeBold, alpinaLight } from '../../../../utils/fonts';
-import { truncateAndStripMarkdown } from '../../../../utils/extractWordsWithinLimit';
+import { CHAR_LENGTH_TWO_LINE, truncateAndStripMarkdown } from '../../../../utils/extractWordsWithinLimit';
 import React from 'react';
 
 export const config = {
@@ -36,7 +36,7 @@ const handler = async (req: NextApiRequest) => {
       return fallbackImageResponse;
     }
 
-    const description = truncateAndStripMarkdown(user?.bio ?? '');
+    const description = truncateAndStripMarkdown(user?.bio ?? '', CHAR_LENGTH_TWO_LINE);
     const nonEmptyGalleries = user.galleries?.filter(
       (gallery) => gallery?.collections?.some((collection) => collection?.tokens?.length),
     );
@@ -141,7 +141,7 @@ const handler = async (req: NextApiRequest) => {
               <div
                 style={{
                   display: 'flex',
-                  marginTop: 8,
+                  marginTop: 16,
                 }}
               >
                 <p

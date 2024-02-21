@@ -5,6 +5,7 @@ import { tokenIdOpengraphQuery } from '../../../../queries/tokenIdOpengraphQuery
 import { NextApiRequest } from 'next';
 import {
   CHAR_LENGTH_ONE_LINE,
+    CHAR_LENGTH_TWO_LINE,
   truncateAndStripMarkdown,
 } from '../../../../utils/extractWordsWithinLimit';
 import {
@@ -40,8 +41,8 @@ const handler = async (req: NextApiRequest) => {
 
     const tokenImageUrl = getPreviewUrl(token.definition.media);
     const title = token.definition.name;
-    const collectorsNoteText = truncateAndStripMarkdown(token.collectorsNote, CHAR_LENGTH_ONE_LINE);
-    const description = truncateAndStripMarkdown(token.definition.description);
+    const collectorsNoteText = truncateAndStripMarkdown(token.collectorsNote);
+    const description = truncateAndStripMarkdown(token.definition.description, CHAR_LENGTH_TWO_LINE);
 
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
     const alpinaLightFontData = await alpinaLight;
@@ -120,7 +121,7 @@ const handler = async (req: NextApiRequest) => {
               <div
                 style={{
                   display: 'flex',
-                  marginTop: 8,
+                  marginTop: 16,
                 }}
               >
                 <p

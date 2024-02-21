@@ -155,7 +155,7 @@ const handler = async (req: NextApiRequest) => {
         bottom: distanceFromTop + textHeight,
         right: distanceFromLeft + textLength,
       };
-      const excessContainerSize = 200;
+      const excessContainerSize = 105;
 
       console.log(splashImageUrls);
 
@@ -479,8 +479,8 @@ const handler = async (req: NextApiRequest) => {
             </div>
           ),
           {
-            width: 600,
-            height: 600,
+            width: 500,
+            height: 500,
             fonts: [
               {
                 name: 'ABCDiatype-Regular',

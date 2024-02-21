@@ -75,12 +75,12 @@ const handler = async (req: NextApiRequest) => {
         const centerToken = tokensToDisplay?.current;
         const tokenAspectRatio = centerToken?.aspectRatio;
         squareAspectRatio = isImageTall(tokenAspectRatio) && Boolean(position);
+        htmlObj.image.aspectRatio = squareAspectRatio ? '1:1' : '1.91:1';
       }
     } catch (e) {
       console.log('e', e);
       return;
     }
-    htmlObj.image.aspectRatio = squareAspectRatio ? '1:1' : '1.91:1';
     const newHtml = getFrameHtmlResponse(htmlObj);
     return new Response(newHtml, status);
   }

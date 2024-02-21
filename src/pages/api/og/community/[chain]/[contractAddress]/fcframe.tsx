@@ -291,7 +291,7 @@ const handler = async (req: NextApiRequest) => {
                 style={{
                   display: 'flex',
                   position: 'relative',
-
+                  marginLeft: '-70%',
                   filter: 'blur(6px)',
                   opacity: 0.26,
                 }}
@@ -412,6 +412,7 @@ const handler = async (req: NextApiRequest) => {
                 style={{
                   display: 'flex',
                   position: 'relative',
+                  marginRight: '-70%',
                   filter: 'blur(6px)',
                   opacity: 0.26,
                 }}
@@ -465,8 +466,8 @@ const handler = async (req: NextApiRequest) => {
             </div>
           ),
           {
-            width: WIDTH_OPENGRAPH_IMAGE,
-            height: HEIGHT_OPENGRAPH_IMAGE,
+            width: 500,
+            height: 500,
             fonts: [
               {
                 name: 'ABCDiatype-Regular',

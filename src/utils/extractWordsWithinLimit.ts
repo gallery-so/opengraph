@@ -1,22 +1,5 @@
 import { removeMarkdownStyling } from './removeMarkdownStyling';
-
-function customUnescape(str: string) {
-  return str
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&#34;/g, "'")
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&cent;/g, '¢')
-    .replace(/&pound;/g, '£')
-    .replace(/&yen;/g, '¥')
-    .replace(/&euro;/g, '€')
-    .replace(/&copy;/g, '©')
-    .replace(/&reg;/g, '®')
-    .replace(/&trade;/g, '™');
-}
+const { unescape } = require('html-escaper');
 
 export const CHAR_LENGTH_ONE_LINE = 160;
 export const CHAR_LENGTH_TWO_LINE = 330;
@@ -56,7 +39,7 @@ export function extractWordsWithinLimit(text: string, charLimit: number = CHAR_L
 }
 
 export function truncateAndStripMarkdown(text: string, charLimit?: number) {
-  const sanitizedText = customUnescape(text);
+  const sanitizedText = unescape(text);
   const cleanText = removeMarkdownStyling(sanitizedText ?? '');
   const truncatedText = extractWordsWithinLimit(cleanText, charLimit);
   return truncatedText ?? '';

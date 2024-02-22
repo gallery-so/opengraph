@@ -4,8 +4,7 @@ import { fetchGraphql, getPreviewUrl } from '../../../../fetch';
 import { tokenIdOpengraphQuery } from '../../../../queries/tokenIdOpengraphQuery';
 import { NextApiRequest } from 'next';
 import {
-  CHAR_LENGTH_ONE_LINE,
-    CHAR_LENGTH_TWO_LINE,
+  CHAR_LENGTH_TWO_LINE,
   truncateAndStripMarkdown,
 } from '../../../../utils/extractWordsWithinLimit';
 import {
@@ -42,7 +41,10 @@ const handler = async (req: NextApiRequest) => {
     const tokenImageUrl = getPreviewUrl(token.definition.media);
     const title = token.definition.name;
     const collectorsNoteText = truncateAndStripMarkdown(token.collectorsNote);
-    const description = truncateAndStripMarkdown(token.definition.description, CHAR_LENGTH_TWO_LINE);
+    const description = truncateAndStripMarkdown(
+      token.definition.description,
+      CHAR_LENGTH_TWO_LINE,
+    );
 
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
     const alpinaLightFontData = await alpinaLight;

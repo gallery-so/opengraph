@@ -31,7 +31,6 @@ function isImageTall(aspectRatio) {
   return aspectRatio <= 1;
 }
 
-const widthOfOneChar = (largeFont: boolean) => (largeFont ? 78 : 27);
 const heightOfOneline = (largeFont: boolean) => (largeFont ? 160 : 100);
 
 const handler = async (req: NextApiRequest) => {
@@ -48,11 +47,11 @@ const handler = async (req: NextApiRequest) => {
         const contractAddress = url.searchParams.get('contractAddress');
 
         if (!chain || typeof chain !== 'string') {
-          return;
+          throw 'Error chain not found';
         }
 
         if (!contractAddress || typeof contractAddress !== 'string') {
-          return;
+          throw 'Error contractAddress not found';
         }
         const queryResponse = await fetchGraphql({
           queryText: fcframeContractCommunityDimensionsOpengraphQuery,
@@ -68,7 +67,7 @@ const handler = async (req: NextApiRequest) => {
         const { community } = queryResponse.data;
 
         if (community?.__typename !== 'Community') {
-          return;
+          throw 'Error community not found';
         }
 
         const { tokensForFrame: tokens } = community;
@@ -153,7 +152,6 @@ const handler = async (req: NextApiRequest) => {
 
       const distanceFromLeft = 340;
       let distanceFromTop = 240;
-      const textLength = widthOfOneChar(!longName) * displayCommunityName.length;
       let textHeight = heightOfOneline(!longName);
       if (longName) {
         distanceFromTop = 220;
@@ -328,6 +326,7 @@ const handler = async (req: NextApiRequest) => {
                       style={{
                         display: 'flex',
                         flexDirection: 'column',
+                        marginTop: 8,
                         justifyContent: 'flex-start',
                         filter: 'blur(2px)',
                       }}
@@ -397,6 +396,7 @@ const handler = async (req: NextApiRequest) => {
                       style={{
                         display: 'flex',
                         flexDirection: 'column',
+                        marginTop: 8,
                         alignItems: 'flex-start',
                         justifyContent: 'flex-start',
                       }}
@@ -417,7 +417,7 @@ const handler = async (req: NextApiRequest) => {
                           fontFamily: "'ABCDiatype-Bold'",
                           fontSize: '14px',
                           fontWeight: 400,
-                          lineHeight: '20px',
+                          lineHeight: '18px',
                           margin: 0,
                         }}
                       >
@@ -459,6 +459,7 @@ const handler = async (req: NextApiRequest) => {
                       style={{
                         display: 'flex',
                         flexDirection: 'column',
+                        marginTop: 8,
                         justifyContent: 'flex-start',
                         filter: 'blur(2px)',
                       }}
@@ -472,7 +473,7 @@ const handler = async (req: NextApiRequest) => {
                           margin: 0,
                         }}
                       >
-                        {rightToken?.name + 'hi'}
+                        {rightToken?.name}
                       </p>
                       <p
                         style={{

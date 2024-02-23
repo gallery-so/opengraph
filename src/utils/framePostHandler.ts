@@ -2,10 +2,7 @@ import { NextApiRequest } from 'next';
 import { extractBody } from './extractBody';
 import { FrameButtonMetadata } from '@coinbase/onchainkit';
 
-export async function framePostHandler(
-  req: NextApiRequest,
-  initialButtonContent?: string,
-) {
+export async function framePostHandler(req: NextApiRequest, initialButtonContent?: string) {
   const url = new URL(req.url ?? '');
   const position = url.searchParams.get('position');
   const body = JSON.parse(await extractBody(req.body));
@@ -29,7 +26,9 @@ export async function framePostHandler(
     // if we're on the second token and the user clicks `prev`, we should bump the user back to the first token
     // by deleting the position param so they won't see a `prev` arrow
     if (Number(position) === 1 && Number(buttonIndex) === 1) {
-      hasPrevious = false;
+      console.log('erroneous');
+
+      hasPrevious = true;
       url.searchParams.delete('position');
 
       if (initialButtonContent) {

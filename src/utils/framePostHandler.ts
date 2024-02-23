@@ -1,8 +1,19 @@
 import { NextApiRequest } from 'next';
 import { extractBody } from './extractBody';
-import { FrameButtonMetadata } from '@coinbase/onchainkit';
+import { FrameButtonMetadata, getFrameHtmlResponse } from '@coinbase/onchainkit';
+import { fetchGraphql } from '../fetch';
+import { fcframeContractCommunityDimensionsOpengraphQuery } from '../queries/fcframeContractCommunityOpengraphQuery';
+import { getPreviewTokens } from './getPreviewTokens';
 
-export async function framePostHandler(req: NextApiRequest, initialButtonContent?: string) {
+export function isImageTall(aspectRatio) {
+  return aspectRatio <= 1;
+}
+
+export async function framePostHandler(
+  req: NextApiRequest,
+  isExplore?: boolean,
+  initialButtonContent?: string,
+) {
   const url = new URL(req.url ?? '');
   const position = url.searchParams.get('position');
   const body = JSON.parse(await extractBody(req.body));
@@ -51,15 +62,15 @@ export async function framePostHandler(req: NextApiRequest, initialButtonContent
   headers.append('Content-Type', 'text/html');
 
   const showTwoButtons = hasPrevious;
-  const buttons: [FrameButtonMetadata, ...FrameButtonMetadata[]] = [
+  const frameButtons: [FrameButtonMetadata, ...FrameButtonMetadata[]] = [
     { label: showTwoButtons ? '←' : buttonContent, action: 'post' },
     ...(showTwoButtons ? [{ label: buttonContent, action: 'post' } as FrameButtonMetadata] : []),
   ];
   const image = url.toString();
   const postUrl = url.toString();
 
-  const htmlObj = {
-    buttons,
+  const htmlConfig = {
+    frameButtons,
     image: {
       src: image,
       aspectRatio: '1.91:1',
@@ -67,12 +78,51 @@ export async function framePostHandler(req: NextApiRequest, initialButtonContent
     postUrl,
   };
 
-  return {
-    htmlObj,
-    init: {
-      status: 200,
-      headers,
-    },
-    position: url.searchParams.get('position'),
-  };
+  if (isExplore && position) {
+    let squareAspectRatio = false;
+    const url = new URL(req.url ?? '');
+
+    const chain = url.searchParams.get('chain');
+    const contractAddress = url.searchParams.get('contractAddress');
+
+    if (!chain || typeof chain !== 'string') {
+      throw new Error('Error: chain not found');
+    }
+
+    if (!contractAddress || typeof contractAddress !== 'string') {
+      throw new Error('Error: contractAddress not found');
+    }
+
+    const queryResponse = await fetchGraphql({
+      queryText: fcframeContractCommunityDimensionsOpengraphQuery,
+      variables: {
+        contractCommunityKey: {
+          contract: {
+            address: contractAddress,
+            chain,
+          },
+        },
+      },
+    });
+    const { community } = queryResponse.data;
+
+    if (community?.__typename !== 'Community') {
+      throw new Error('Error: community not found');
+    }
+
+    const { tokensForFrame: tokens } = community;
+
+    const tokensToDisplay = getPreviewTokens(tokens, `${Number(position) - 1}`);
+
+    const centerToken = tokensToDisplay?.current;
+    const tokenAspectRatio = centerToken?.aspectRatio;
+    squareAspectRatio = isImageTall(tokenAspectRatio) && Boolean(position);
+    htmlConfig.image.aspectRatio = squareAspectRatio ? '1:1' : '1.91:1';
+  }
+
+  const html = getFrameHtmlResponse(htmlObj);
+  return new Response(html, {
+    status: 200,
+    headers,
+  });
 }

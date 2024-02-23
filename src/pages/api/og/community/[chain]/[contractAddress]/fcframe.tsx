@@ -18,7 +18,7 @@ import {
   alpinaLight,
   alpinaLightItalic,
 } from '../../../../../../utils/fonts';
-import { framePostHandler } from '../../../../../../utils/framePostHandler';
+import { framePostHandler, isImageTall } from '../../../../../../utils/framePostHandler';
 import { getPreviewTokens } from '../../../../../../utils/getPreviewTokens';
 import { truncateAndStripMarkdown } from '../../../../../../utils/extractWordsWithinLimit';
 import { getFrameHtmlResponse } from '@coinbase/onchainkit';
@@ -27,66 +27,12 @@ export const config = {
   runtime: 'edge',
 };
 
-function isImageTall(aspectRatio) {
-  return aspectRatio <= 1;
-}
-
 const heightOfOneline = (largeFont: boolean) => (largeFont ? 160 : 100);
 
 const handler = async (req: NextApiRequest) => {
   // handle POST, where we should return `fcframe` og tags to render the next frame with appropriate buttons
   if (req.method === 'POST') {
-    let squareAspectRatio = false;
-
-    const { htmlObj, init, position } = await framePostHandler(req, 'Explore');
-    try {
-      if (position) {
-        const url = new URL(req.url ?? '');
-
-        const chain = url.searchParams.get('chain');
-        const contractAddress = url.searchParams.get('contractAddress');
-
-        if (!chain || typeof chain !== 'string') {
-          throw 'Error chain not found';
-        }
-
-        if (!contractAddress || typeof contractAddress !== 'string') {
-          throw 'Error contractAddress not found';
-        }
-        const queryResponse = await fetchGraphql({
-          queryText: fcframeContractCommunityDimensionsOpengraphQuery,
-          variables: {
-            contractCommunityKey: {
-              contract: {
-                address: contractAddress,
-                chain,
-              },
-            },
-          },
-        });
-        const { community } = queryResponse.data;
-
-        if (community?.__typename !== 'Community') {
-          throw 'Error community not found';
-        }
-
-        const { tokensForFrame: tokens } = community;
-
-        const tokensToDisplay = getPreviewTokens(tokens, `${Number(position) - 1}`);
-
-        const centerToken = tokensToDisplay?.current;
-        const tokenAspectRatio = centerToken?.aspectRatio;
-        squareAspectRatio = isImageTall(tokenAspectRatio) && Boolean(position);
-        htmlObj.image.aspectRatio = squareAspectRatio ? '1:1' : '1.91:1';
-      }
-    } catch (e) {
-      console.log('e', e);
-      const newHtml = getFrameHtmlResponse(htmlObj);
-      return new Response(newHtml, init);
-    }
-
-    const newHtml = getFrameHtmlResponse(htmlObj);
-    return new Response(newHtml, init);
+    return framePostHandler(req, true, 'Explore');
   }
 
   // handle GET, which should return the raw image for the frame
@@ -132,6 +78,7 @@ const handler = async (req: NextApiRequest) => {
     // if no position is explicitly provided, that means we should serve the splash image
     let showSplashScreen = !position;
 
+    // if position is the end of the carousel,, that means we should serve the splash image
     if (position) {
       const tokensLength = tokens.length ?? 0;
       const mainPosition = Number(position) % tokensLength;
@@ -148,23 +95,23 @@ const handler = async (req: NextApiRequest) => {
       });
 
       const displayCommunityName = truncateAndStripMarkdown(communityName, 21);
-      // todo: approximate these positions based on estimated dimensions of rendered text
       const longName = displayCommunityName.length > 8;
 
+      const distanceFromTop = longName ? 220 : 240;
+      const communityNameFontSize = longName ? '90px' : '140px';
+
+      const textHeight = heightOfOneline(!longName) * (longName ? 2 : 1);
+
       const distanceFromLeft = 340;
-      let distanceFromTop = 240;
-      let textHeight = heightOfOneline(!longName);
-      if (longName) {
-        distanceFromTop = 220;
-        textHeight = 2 * textHeight;
-      }
+      const excessContainerSize = 100;
+      const textLength = 510;
+
       const textAreaBoundingBox = {
         top: distanceFromTop,
         left: distanceFromLeft,
         bottom: distanceFromTop + textHeight,
-        right: distanceFromLeft + 510,
+        right: distanceFromLeft + textLength,
       };
-      const excessContainerSize = 100;
 
       console.log(splashImageUrls);
 
@@ -185,7 +132,6 @@ const handler = async (req: NextApiRequest) => {
       });
 
       console.log({ imagesToRender });
-      const communityNameFontSize = !longName ? '140px' : '90px';
 
       return new ImageResponse(
         (

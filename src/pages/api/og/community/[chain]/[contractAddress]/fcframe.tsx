@@ -31,6 +31,9 @@ function isImageTall(aspectRatio) {
   return aspectRatio <= 1;
 }
 
+const widthOfOneChar = (largeFont: boolean) => (largeFont ? 78 : 27);
+const heightOfOneline = (largeFont: boolean) => (largeFont ? 160 : 100);
+
 const handler = async (req: NextApiRequest) => {
   // handle POST, where we should return `fcframe` og tags to render the next frame with appropriate buttons
   if (req.method === 'POST') {
@@ -144,22 +147,29 @@ const handler = async (req: NextApiRequest) => {
         return getPreviewUrl(token.definition.media);
       });
 
+      const displayCommunityName = truncateAndStripMarkdown('Chrome Squiggle', 21);
       // todo: approximate these positions based on estimated dimensions of rendered text
-      const distanceFromTop = 240;
-      const distanceFromLeft = 400;
-      const textLength = 410;
-      const textHeight = 160;
+      const longName = displayCommunityName.length > 8;
+
+      const distanceFromLeft = 340;
+      let distanceFromTop = 240;
+      const textLength = widthOfOneChar(!longName) * displayCommunityName.length;
+      let textHeight = heightOfOneline(!longName);
+      if (longName) {
+        distanceFromTop = 220;
+        textHeight = 2 * textHeight;
+      }
       const textAreaBoundingBox = {
         top: distanceFromTop,
         left: distanceFromLeft,
         bottom: distanceFromTop + textHeight,
-        right: distanceFromLeft + textLength,
+        right: distanceFromLeft + 510,
       };
-      const excessContainerSize = 200;
+      const excessContainerSize = 100;
 
       console.log(splashImageUrls);
 
-      const renderedImageDimension = 300;
+      const renderedImageDimension = 270;
 
       const positions = generatePositionsForSplashImages({
         numElements: numSplashImages,
@@ -175,9 +185,8 @@ const handler = async (req: NextApiRequest) => {
         return { ...position, url: splashImageUrls[i] };
       });
 
-      const displayCommunityName = truncateAndStripMarkdown(communityName, 7);
-
       console.log({ imagesToRender });
+      const communityNameFontSize = !longName ? '140px' : '90px';
 
       return new ImageResponse(
         (
@@ -224,9 +233,13 @@ const handler = async (req: NextApiRequest) => {
             <p
               style={{
                 fontFamily: "'GT Alpina'",
-                fontSize: '140px',
+                fontSize: communityNameFontSize,
                 fontStyle: 'italic',
+                display: 'flex',
+                justifyContent: 'center',
+                width: '520px',
                 margin: 0,
+                textAlign: 'center',
               }}
             >
               {displayCommunityName}

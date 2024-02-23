@@ -78,15 +78,15 @@ const handler = async (req: NextApiRequest) => {
         const tokenAspectRatio = centerToken?.aspectRatio;
         squareAspectRatio = isImageTall(tokenAspectRatio) && Boolean(position);
         htmlObj.image.aspectRatio = squareAspectRatio ? '1:1' : '1.91:1';
-
-        const newHtml = getFrameHtmlResponse(htmlObj);
-        return new Response(newHtml, init);
       }
     } catch (e) {
       console.log('e', e);
       const newHtml = getFrameHtmlResponse(htmlObj);
       return new Response(newHtml, init);
     }
+
+    const newHtml = getFrameHtmlResponse(htmlObj);
+    return new Response(newHtml, init);
   }
 
   // handle GET, which should return the raw image for the frame
@@ -140,7 +140,6 @@ const handler = async (req: NextApiRequest) => {
         showSplashScreen = true;
       }
     }
-    console.log('showSplashScreen', showSplashScreen);
 
     if (showSplashScreen) {
       const numSplashImages = 4;
@@ -273,22 +272,15 @@ const handler = async (req: NextApiRequest) => {
 
     if (!showSplashScreen) {
       const tokensToDisplay = getPreviewTokens(tokens, `${Number(position) - 1}`);
-      console.log('tokensToDisplay', tokensToDisplay);
 
       const leftToken = Number(position) !== 1 && tokensToDisplay?.left;
       const centerToken = tokensToDisplay?.current;
       const rightToken = tokensToDisplay?.right;
 
-      console.log('leftToken', leftToken);
-      console.log('centerToken', centerToken);
-      console.log('rightToken', rightToken);
-
       const tokenAspectRatio = centerToken?.aspectRatio;
       const squareAspectRatio = isImageTall(tokenAspectRatio);
 
-      console.log('tokenAspectRatio', tokenAspectRatio);
       if (squareAspectRatio) {
-        console.log('squareAspectRatio', squareAspectRatio);
         return new ImageResponse(
           (
             <div

@@ -28,7 +28,7 @@ export async function framePostHandler(req: NextApiRequest, initialButtonContent
     if (Number(position) === 1 && Number(buttonIndex) === 1) {
       console.log('erroneous');
 
-      hasPrevious = true;
+      hasPrevious = false;
       url.searchParams.delete('position');
 
       if (initialButtonContent) {

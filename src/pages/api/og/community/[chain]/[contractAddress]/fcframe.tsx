@@ -78,13 +78,15 @@ const handler = async (req: NextApiRequest) => {
         const tokenAspectRatio = centerToken?.aspectRatio;
         squareAspectRatio = isImageTall(tokenAspectRatio) && Boolean(position);
         htmlObj.image.aspectRatio = squareAspectRatio ? '1:1' : '1.91:1';
+
+        const newHtml = getFrameHtmlResponse(htmlObj);
+        return new Response(newHtml, init);
       }
     } catch (e) {
       console.log('e', e);
-      return;
+      const newHtml = getFrameHtmlResponse(htmlObj);
+      return new Response(newHtml, init);
     }
-    const newHtml = getFrameHtmlResponse(htmlObj);
-    return new Response(newHtml, init);
   }
 
   // handle GET, which should return the raw image for the frame

@@ -10,7 +10,7 @@ import {
   fallbackImageResponse,
 } from '../../../../utils/fallback';
 import { ABCDiatypeRegular, ABCDiatypeBold, alpinaLight } from '../../../../utils/fonts';
-import { removeMarkdownStyling } from '../../../../utils/removeMarkdownStyling';
+import { CHAR_LENGTH_TWO_LINE, truncateAndStripMarkdown } from '../../../../utils/extractWordsWithinLimit';
 import React from 'react';
 
 export const config = {
@@ -36,7 +36,7 @@ const handler = async (req: NextApiRequest) => {
       return fallbackImageResponse;
     }
 
-    const description = removeMarkdownStyling(user.bio.split('\n')[0] ?? '');
+    const description = truncateAndStripMarkdown(user?.bio ?? '', CHAR_LENGTH_TWO_LINE);
     const nonEmptyGalleries = user.galleries?.filter(
       (gallery) => gallery?.collections?.some((collection) => collection?.tokens?.length),
     );
@@ -122,6 +122,7 @@ const handler = async (req: NextApiRequest) => {
               position: 'absolute',
               bottom: '24px',
               left: '24px',
+              marginRight: 25,
             }}
           >
             <p
@@ -137,17 +138,24 @@ const handler = async (req: NextApiRequest) => {
               {username}
             </p>
             {description && (
-              <p
+              <div
                 style={{
-                  fontFamily: "'ABCDiatype-Regular'",
-                  fontSize: '18px',
-                  fontWeight: 400,
-                  lineHeight: '24px',
-                  margin: 0,
+                  display: 'flex',
+                  marginTop: 16,
                 }}
               >
-                {description}
-              </p>
+                <p
+                  style={{
+                    fontFamily: "'ABCDiatype-Regular'",
+                    fontSize: '18px',
+                    fontWeight: 400,
+                    lineHeight: '24px',
+                    margin: 0,
+                  }}
+                >
+                  {description}
+                </p>
+              </div>
             )}
           </div>
         </div>

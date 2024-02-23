@@ -1,6 +1,6 @@
 import { NextApiRequest } from 'next';
 import { extractBody } from './extractBody';
-import { getFrameHtmlResponse, FrameButtonMetadata } from '@coinbase/onchainkit';
+import { FrameButtonMetadata } from '@coinbase/onchainkit';
 
 export async function framePostHandler(
   req: NextApiRequest,
@@ -53,12 +53,11 @@ export async function framePostHandler(
 
   const showTwoButtons = hasPrevious;
   const buttons: [FrameButtonMetadata, ...FrameButtonMetadata[]] = [
-    { label: hasPrevious ? '←' : buttonContent, action: 'post' },
-    ...(hasPrevious ? [{ label: buttonContent, action: 'post' } as FrameButtonMetadata] : []),
+    { label: showTwoButtons ? '←' : buttonContent, action: 'post' },
+    ...(showTwoButtons ? [{ label: buttonContent, action: 'post' } as FrameButtonMetadata] : []),
   ];
-
-  const image = url.toString(); // Assuming `url` is a URL object and you want to use its string representation
-  const postUrl = url.toString(); // Similarly, using the URL's string representation for the post URL
+  const image = url.toString();
+  const postUrl = url.toString();
 
   const htmlObj = {
     buttons,
@@ -71,7 +70,7 @@ export async function framePostHandler(
 
   return {
     htmlObj,
-    status: {
+    init: {
       status: 200,
       headers,
     },

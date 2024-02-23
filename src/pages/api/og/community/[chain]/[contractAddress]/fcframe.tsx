@@ -39,7 +39,7 @@ const handler = async (req: NextApiRequest) => {
   if (req.method === 'POST') {
     let squareAspectRatio = false;
 
-    const { htmlObj, status, position } = await framePostHandler(req, 'Explore');
+    const { htmlObj, init, position } = await framePostHandler(req, 'Explore');
     try {
       if (position) {
         const url = new URL(req.url ?? '');
@@ -85,7 +85,7 @@ const handler = async (req: NextApiRequest) => {
       return;
     }
     const newHtml = getFrameHtmlResponse(htmlObj);
-    return new Response(newHtml, status);
+    return new Response(newHtml, init);
   }
 
   // handle GET, which should return the raw image for the frame
@@ -147,7 +147,7 @@ const handler = async (req: NextApiRequest) => {
         return getPreviewUrl(token.definition.media);
       });
 
-      const displayCommunityName = truncateAndStripMarkdown('Chrome Squiggle', 21);
+      const displayCommunityName = truncateAndStripMarkdown(communityName, 21);
       // todo: approximate these positions based on estimated dimensions of rendered text
       const longName = displayCommunityName.length > 8;
 

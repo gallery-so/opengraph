@@ -9,7 +9,7 @@ import {
   fallbackImageResponse,
 } from '../../../../utils/fallback';
 import { ABCDiatypeRegular, alpinaLight } from '../../../../utils/fonts';
-import { truncateAndStripMarkdown } from '../../../../utils/extractWordsWithinLimit';
+import { CHAR_LENGTH_TWO_LINE, truncateAndStripMarkdown } from '../../../../utils/extractWordsWithinLimit';
 import React from 'react';
 
 export const config = {
@@ -37,8 +37,8 @@ const handler = async (req: NextApiRequest) => {
 
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
     const alpinaLightFontData = await alpinaLight;
-    
-    const description = truncateAndStripMarkdown(gallery.description);
+
+    const description = truncateAndStripMarkdown(gallery.description, CHAR_LENGTH_TWO_LINE);
     const title = gallery.name ?? '';
     const imageUrls = gallery?.collections
       ?.filter((collection) => !collection?.hidden && collection.tokens?.length)?.[0]
@@ -116,6 +116,7 @@ const handler = async (req: NextApiRequest) => {
               position: 'absolute',
               bottom: '24px',
               left: '24px',
+              marginRight: 25,
             }}
           >
             <p
@@ -131,17 +132,24 @@ const handler = async (req: NextApiRequest) => {
               {title}
             </p>
             {description && (
-              <p
+              <div
                 style={{
-                  fontFamily: "'ABCDiatype-Regular'",
-                  fontSize: '18px',
-                  fontWeight: 400,
-                  lineHeight: '24px',
-                  margin: 0,
+                  display: 'flex',
+                  marginTop: 16,
                 }}
               >
-                {description}
-              </p>
+                <p
+                  style={{
+                    fontFamily: "'ABCDiatype-Regular'",
+                    fontSize: '18px',
+                    fontWeight: 400,
+                    lineHeight: '24px',
+                    margin: 0,
+                  }}
+                >
+                  {description}
+                </p>
+              </div>
             )}
           </div>
         </div>

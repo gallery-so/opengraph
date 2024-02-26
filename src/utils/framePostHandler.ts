@@ -78,6 +78,11 @@ export async function framePostHandler(
     },
     postUrl,
   };
+  const html = getFrameHtmlResponse(htmlConfig);
+  return new Response(html, {
+    status: 200,
+    headers,
+  });
 
   // use square aspect ratio for image if appropriate for collection token
   // TODO(rohan): similarly support it for other types of frames
@@ -119,15 +124,16 @@ export async function framePostHandler(
 
     const centerToken = tokensToDisplay?.current;
     const tokenAspectRatio = centerToken?.aspectRatio;
-    squareAspectRatio = isImageTall(tokenAspectRatio) && Boolean(position);
+    squareAspectRatio = isImageTall(tokenAspectRatio);
     htmlConfig.image.aspectRatio = squareAspectRatio
       ? ('1:1' as AllowedAspectRatio)
       : ('1.91:1' as AllowedAspectRatio);
   }
-
+  /*
   const html = getFrameHtmlResponse(htmlConfig);
   return new Response(html, {
     status: 200,
     headers,
   });
+*/
 }

@@ -116,10 +116,14 @@ export async function framePostHandler(
 
     const { tokensForFrame: tokens } = community;
     const tokensToDisplay = getPreviewTokens(tokens, `${Number(position) - 1}`);
+    const tokensLength = tokens.length ?? 0;
+    const mainPosition = Number(position) % tokensLength;
 
     const centerToken = tokensToDisplay?.current;
     const tokenAspectRatio = centerToken?.aspectRatio;
-    squareAspectRatio = isImageTall(tokenAspectRatio) && Boolean(position);
+
+    // if mainPosition is 0 we want to show splash screen in 1.91:1
+    squareAspectRatio = isImageTall(tokenAspectRatio) && mainPosition !== 0;
     htmlConfig.image.aspectRatio = squareAspectRatio
       ? ('1:1' as AllowedAspectRatio)
       : ('1.91:1' as AllowedAspectRatio);

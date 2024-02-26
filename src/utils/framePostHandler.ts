@@ -15,7 +15,7 @@ type AllowedAspectRatio = '1.91:1' | '1:1';
 export async function framePostHandler(
   req: NextApiRequest,
   handleSquareAspectRatioType: FrameSquareAspectRatioType = null,
-  initialButtonContent?: string,
+  initialButtonLabel?: string,
 ) {
   const url = new URL(req.url ?? '');
   let position = url.searchParams.get('position');
@@ -42,9 +42,8 @@ export async function framePostHandler(
     if (Number(position) === 1 && Number(buttonIndex) === 1) {
       hasPrevious = false;
       url.searchParams.delete('position');
-
-      if (initialButtonContent) {
-        buttonContent = initialButtonContent;
+      if (initialButtonLabel) {
+        buttonContent = initialButtonLabel;
       }
     } else if (Number(buttonIndex) === 1) {
       // `prev` should decrement the position

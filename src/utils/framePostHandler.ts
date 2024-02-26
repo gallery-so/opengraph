@@ -18,7 +18,7 @@ export async function framePostHandler(
   initialButtonContent?: string,
 ) {
   const url = new URL(req.url ?? '');
-  const position = url.searchParams.get('position');
+  let position = url.searchParams.get('position');
   const body = JSON.parse(await extractBody(req.body));
   const buttonIndex = body.untrustedData?.buttonIndex;
 
@@ -79,6 +79,8 @@ export async function framePostHandler(
     postUrl,
   };
 
+  position = url.searchParams.get('position');
+
   // use square aspect ratio for image if appropriate for collection token
   // TODO(rohan): similarly support it for other types of frames
   if (handleSquareAspectRatioType === 'CollectionFrame' && position) {
@@ -114,7 +116,6 @@ export async function framePostHandler(
     }
 
     const { tokensForFrame: tokens } = community;
-
     const tokensToDisplay = getPreviewTokens(tokens, `${Number(position) - 1}`);
 
     const centerToken = tokensToDisplay?.current;

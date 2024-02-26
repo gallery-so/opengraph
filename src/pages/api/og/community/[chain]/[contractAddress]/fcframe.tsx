@@ -7,9 +7,7 @@ import {
   fallbackImageResponse,
 } from '../../../../../../utils/fallback';
 import { fetchGraphql, getPreviewUrl } from '../../../../../../fetch';
-import {
-  fcframeContractCommunityOpengraphQuery,
-} from '../../../../../../queries/fcframeContractCommunityOpengraphQuery';
+import { fcframeContractCommunityOpengraphQuery } from '../../../../../../queries/fcframeContractCommunityOpengraphQuery';
 import { ImageResponse } from '@vercel/og';
 import {
   ABCDiatypeBold,
@@ -92,12 +90,20 @@ const handler = async (req: NextApiRequest) => {
         return getPreviewUrl(token.definition.media);
       });
 
-      const displayCommunityName = truncateAndStripMarkdown(communityName, 21);
+      const displayCommunityName = truncateAndStripMarkdown(communityName, 25);
       const longName = displayCommunityName.length > 8;
 
       const distanceFromTop = longName ? 220 : 240;
-      const communityNameFontSize = longName ? '90px' : '140px';
-
+      const communityNameFontSize = (nameLength: number) => {
+        switch (true) {
+          case nameLength > 20:
+            return '80px';
+          case nameLength > 8:
+            return '90px';
+          default:
+            return '140px';
+        }
+      };
       const textHeight = heightOfOneline(!longName) * (longName ? 2 : 1);
 
       const distanceFromLeft = 340;

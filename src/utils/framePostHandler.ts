@@ -10,7 +10,6 @@ export function isImageTall(aspectRatio: number): boolean {
 }
 
 type FrameSquareAspectRatioType = 'CollectionFrame' | null;
-
 type AllowedAspectRatio = '1.91:1' | '1:1';
 
 export async function framePostHandler(

@@ -94,7 +94,8 @@ const handler = async (req: NextApiRequest) => {
       const longName = displayCommunityName.length > 8;
 
       const distanceFromTop = longName ? 220 : 240;
-      const communityNameFontSize = (nameLength: number) => {
+      const communityNameFontSize = () => {
+        const nameLength = displayCommunityName.length;
         switch (true) {
           case nameLength > 20:
             return '80px';
@@ -182,7 +183,7 @@ const handler = async (req: NextApiRequest) => {
             <p
               style={{
                 fontFamily: "'GT Alpina'",
-                fontSize: communityNameFontSize,
+                fontSize: communityNameFontSize(displayCommunityName.length),
                 fontStyle: 'italic',
                 display: 'flex',
                 justifyContent: 'center',

@@ -10,6 +10,7 @@ export function isImageTall(aspectRatio: number): boolean {
 }
 
 type FrameSquareAspectRatioType = 'CollectionFrame' | null;
+
 type AllowedAspectRatio = '1.91:1' | '1:1';
 
 export async function framePostHandler(
@@ -71,23 +72,13 @@ export async function framePostHandler(
   const postUrl = url.toString();
 
   const htmlConfig = {
-    frameButtons: [
-      {
-        label: showTwoButtons ? '←' : buttonContent,
-        action: 'post',
-      },
-    ],
+    buttons: frameButtons,
     image: {
       src: image,
       aspectRatio: '1.91:1' as AllowedAspectRatio,
     },
     postUrl,
   };
-  const html = getFrameHtmlResponse(htmlConfig);
-  return new Response(html, {
-    status: 200,
-    headers,
-  });
 
   // use square aspect ratio for image if appropriate for collection token
   // TODO(rohan): similarly support it for other types of frames
@@ -129,16 +120,15 @@ export async function framePostHandler(
 
     const centerToken = tokensToDisplay?.current;
     const tokenAspectRatio = centerToken?.aspectRatio;
-    squareAspectRatio = isImageTall(tokenAspectRatio);
+    squareAspectRatio = isImageTall(tokenAspectRatio) && Boolean(position);
     htmlConfig.image.aspectRatio = squareAspectRatio
       ? ('1:1' as AllowedAspectRatio)
       : ('1.91:1' as AllowedAspectRatio);
   }
-  /*
+
   const html = getFrameHtmlResponse(htmlConfig);
   return new Response(html, {
     status: 200,
     headers,
   });
-*/
 }

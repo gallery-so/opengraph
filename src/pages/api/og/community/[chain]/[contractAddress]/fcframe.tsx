@@ -30,7 +30,7 @@ const heightOfOneline = (largeFont: boolean) => (largeFont ? 160 : 100);
 const handler = async (req: NextApiRequest) => {
   // handle POST, where we should return `fcframe` og tags to render the next frame with appropriate buttons
   if (req.method === 'POST') {
-    return framePostHandler(req, true, 'Explore');
+    return framePostHandler(req, 'CollectionFrame');
   }
 
   // handle GET, which should return the raw image for the frame

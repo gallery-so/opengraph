@@ -40,8 +40,6 @@ export async function framePostHandler(
     // if we're on the second token and the user clicks `prev`, we should bump the user back to the first token
     // by deleting the position param so they won't see a `prev` arrow
     if (Number(position) === 1 && Number(buttonIndex) === 1) {
-      console.log('erroneous');
-
       hasPrevious = false;
       url.searchParams.delete('position');
 

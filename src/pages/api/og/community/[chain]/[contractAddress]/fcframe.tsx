@@ -23,6 +23,7 @@ export const config = {
   runtime: 'edge',
 };
 
+const MAX_LENGTH_COMMUNITY_NAME = 36;
 const heightOfOneline = (largeFont: boolean) => (largeFont ? 160 : 100);
 
 const handler = async (req: NextApiRequest) => {
@@ -90,14 +91,18 @@ const handler = async (req: NextApiRequest) => {
         return getPreviewUrl(token.definition.media);
       });
 
-      const displayCommunityName = truncateAndStripMarkdown(communityName, 25);
+      const displayCommunityName = truncateAndStripMarkdown(
+        communityName,
+        MAX_LENGTH_COMMUNITY_NAME,
+      );
       const longName = displayCommunityName.length > 8;
 
-      const distanceFromTop = longName ? 220 : 240;
       const communityNameFontSize = () => {
         const nameLength = displayCommunityName.length;
         switch (true) {
-          case nameLength > 20:
+          case nameLength > 22:
+            return '66px';
+          case nameLength > 14:
             return '80px';
           case nameLength > 8:
             return '90px';
@@ -107,6 +112,7 @@ const handler = async (req: NextApiRequest) => {
       };
       const textHeight = heightOfOneline(!longName) * (longName ? 2 : 1);
 
+      const distanceFromTop = longName ? 220 : 240;
       const distanceFromLeft = 340;
       const excessContainerSize = 100;
       const textLength = 510;
@@ -183,7 +189,7 @@ const handler = async (req: NextApiRequest) => {
             <p
               style={{
                 fontFamily: "'GT Alpina'",
-                fontSize: communityNameFontSize(displayCommunityName.length),
+                fontSize: communityNameFontSize(),
                 fontStyle: 'italic',
                 display: 'flex',
                 justifyContent: 'center',

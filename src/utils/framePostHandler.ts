@@ -71,7 +71,12 @@ export async function framePostHandler(
   const postUrl = url.toString();
 
   const htmlConfig = {
-    frameButtons,
+    frameButtons: [
+      {
+        label: showTwoButtons ? '←' : buttonContent,
+        action: 'post',
+      },
+    ],
     image: {
       src: image,
       aspectRatio: '1.91:1' as AllowedAspectRatio,

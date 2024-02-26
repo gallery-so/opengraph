@@ -9,7 +9,6 @@ import {
 import { fetchGraphql, getPreviewUrl } from '../../../../../../fetch';
 import {
   fcframeContractCommunityOpengraphQuery,
-  fcframeContractCommunityDimensionsOpengraphQuery,
 } from '../../../../../../queries/fcframeContractCommunityOpengraphQuery';
 import { ImageResponse } from '@vercel/og';
 import {
@@ -21,7 +20,6 @@ import {
 import { framePostHandler, isImageTall } from '../../../../../../utils/framePostHandler';
 import { getPreviewTokens } from '../../../../../../utils/getPreviewTokens';
 import { truncateAndStripMarkdown } from '../../../../../../utils/extractWordsWithinLimit';
-import { getFrameHtmlResponse } from '@coinbase/onchainkit';
 
 export const config = {
   runtime: 'edge',

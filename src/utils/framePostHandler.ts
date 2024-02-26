@@ -5,13 +5,16 @@ import { fetchGraphql } from '../fetch';
 import { fcframeContractCommunityDimensionsOpengraphQuery } from '../queries/fcframeContractCommunityOpengraphQuery';
 import { getPreviewTokens } from './getPreviewTokens';
 
-export function isImageTall(aspectRatio) {
+export function isImageTall(aspectRatio: number): boolean {
   return aspectRatio <= 1;
 }
 
+type FrameSquareAspectRatioType = 'CollectionFrame' | null;
+type AllowedAspectRatio = '1.91:1' | '1:1';
+
 export async function framePostHandler(
   req: NextApiRequest,
-  isExplore?: boolean,
+  handleSquareAspectRatioType: FrameSquareAspectRatioType = null,
   initialButtonContent?: string,
 ) {
   const url = new URL(req.url ?? '');
@@ -73,12 +76,14 @@ export async function framePostHandler(
     frameButtons,
     image: {
       src: image,
-      aspectRatio: '1.91:1',
+      aspectRatio: '1.91:1' as AllowedAspectRatio,
     },
     postUrl,
   };
 
-  if (isExplore && position) {
+  // use square aspect ratio for image if appropriate for collection token
+  // TODO(rohan): similarly support it for other types of frames
+  if (handleSquareAspectRatioType === 'CollectionFrame' && position) {
     let squareAspectRatio = false;
     const url = new URL(req.url ?? '');
 
@@ -117,10 +122,12 @@ export async function framePostHandler(
     const centerToken = tokensToDisplay?.current;
     const tokenAspectRatio = centerToken?.aspectRatio;
     squareAspectRatio = isImageTall(tokenAspectRatio) && Boolean(position);
-    htmlConfig.image.aspectRatio = squareAspectRatio ? '1:1' : '1.91:1';
+    htmlConfig.image.aspectRatio = squareAspectRatio
+      ? ('1:1' as AllowedAspectRatio)
+      : ('1.91:1' as AllowedAspectRatio);
   }
 
-  const html = getFrameHtmlResponse(htmlObj);
+  const html = getFrameHtmlResponse(htmlConfig);
   return new Response(html, {
     status: 200,
     headers,

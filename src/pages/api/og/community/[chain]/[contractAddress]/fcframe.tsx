@@ -114,7 +114,7 @@ const handler = async (req: NextApiRequest) => {
 
       const distanceFromTop = longName ? 220 : 240;
       const distanceFromLeft = 340;
-      const excessContainerSize = 70;
+      const excessContainerSize = 100;
       const textLength = 510;
 
       const textAreaBoundingBox = {

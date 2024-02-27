@@ -84,7 +84,6 @@ export async function framePostHandler(
   // TODO(rohan): similarly support it for other types of frames
   if (handleSquareAspectRatioType === 'CollectionFrame' && position) {
     let squareAspectRatio = false;
-    const url = new URL(req.url ?? '');
 
     const chain = url.searchParams.get('chain');
     const contractAddress = url.searchParams.get('contractAddress');

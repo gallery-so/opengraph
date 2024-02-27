@@ -4,18 +4,19 @@
 import { getPreviewUrl } from '../fetch';
 
 export const getPreviewTokens = (allTokens: any[], position: string | null) => {
-  const tokens = allTokens.map(({ token }) => {
+  const tokens = allTokens.map((token) => {
     if (token) {
       const url = getPreviewUrl(token.definition.media);
       return {
         src: url,
-        name: token.definition.name,
-        communityName: token.definition.community?.name,
+        name: token.definition?.name,
+        communityName: token.definition?.community?.name,
+        ownerName: token.owner?.username,
+        aspectRatio: token.definition?.media?.dimensions?.aspectRatio,
       };
     }
   });
   const tokensLength = tokens.length ?? 0;
-
   if (tokensLength === 1) {
     const current = tokens[0];
     return { left: null, current, right: null };

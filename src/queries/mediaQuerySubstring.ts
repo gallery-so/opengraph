@@ -10,6 +10,9 @@ export const mediaQuerySubstring = `
       fallbackMedia {
         mediaURL
       }
+      dimensions {
+        aspectRatio
+      }
     }
     ... on GltfMedia {
       __typename
@@ -20,6 +23,9 @@ export const mediaQuerySubstring = `
       }
       fallbackMedia {
         mediaURL
+      }
+      dimensions {
+        aspectRatio
       }
     }
     ... on HtmlMedia {
@@ -32,6 +38,9 @@ export const mediaQuerySubstring = `
       fallbackMedia {
         mediaURL
       }
+      dimensions {
+        aspectRatio
+      }
     }
     ... on ImageMedia {
       __typename
@@ -42,6 +51,9 @@ export const mediaQuerySubstring = `
       }
       fallbackMedia {
         mediaURL
+      }
+      dimensions {
+        aspectRatio
       }
     }
     ... on GIFMedia {
@@ -59,6 +71,9 @@ export const mediaQuerySubstring = `
       fallbackMedia {
         mediaURL
       }
+      dimensions {
+        aspectRatio
+      }
     }
     ... on JsonMedia {
       __typename
@@ -69,6 +84,9 @@ export const mediaQuerySubstring = `
       }
       fallbackMedia {
         mediaURL
+      }
+      dimensions {
+        aspectRatio
       }
     }
     ... on TextMedia {
@@ -81,6 +99,9 @@ export const mediaQuerySubstring = `
       fallbackMedia {
         mediaURL
       }
+      dimensions {
+        aspectRatio
+      }
     }
     ... on PdfMedia {
       __typename
@@ -91,6 +112,9 @@ export const mediaQuerySubstring = `
       }
       fallbackMedia {
         mediaURL
+      }
+      dimensions {
+        aspectRatio
       }
     }
     ... on UnknownMedia {
@@ -103,6 +127,9 @@ export const mediaQuerySubstring = `
       fallbackMedia {
         mediaURL
       }
+      dimensions {
+        aspectRatio
+      }
     }
     ... on InvalidMedia {
       __typename
@@ -113,6 +140,9 @@ export const mediaQuerySubstring = `
       }
       fallbackMedia {
         mediaURL
+      }
+      dimensions {
+        aspectRatio
       }
     }
     ... on SyncingMedia {
@@ -125,6 +155,9 @@ export const mediaQuerySubstring = `
       fallbackMedia {
         mediaURL
       }
+      dimensions {
+        aspectRatio
+      }
     }
     ... on VideoMedia {
       __typename
@@ -135,6 +168,9 @@ export const mediaQuerySubstring = `
       }
       fallbackMedia {
         mediaURL
+      }
+      dimensions {
+        aspectRatio
       }
     }
   }

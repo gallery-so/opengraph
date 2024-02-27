@@ -7,7 +7,7 @@ import {
   WIDTH_OPENGRAPH_IMAGE,
   fallbackImageResponse,
 } from '../../../../../utils/fallback';
-import { ABCDiatypeRegular, ABCDiatypeBold, alpinaLight } from '../../../../../utils/fonts';
+import { ABCDiatypeRegular, ABCDiatypeBold } from '../../../../../utils/fonts';
 import { framePostHandler } from '../../../../../utils/framePostHandler';
 import { getPreviewTokens } from '../../../../../utils/getPreviewTokens';
 import React from 'react';
@@ -47,11 +47,12 @@ const handler = async (req: NextApiRequest) => {
     }
 
     const tokens = user.galleries
-      ?.filter((gallery) =>
-        gallery?.collections?.some((collection) => collection?.tokens?.length)
+      ?.filter(
+        (gallery) => gallery?.collections?.some((collection) => collection?.tokens?.length),
       )?.[0]
       .collections?.filter((collection) => !collection?.hidden)
-      .flatMap((collection) => collection?.tokens);
+      .flatMap((collection) => collection?.tokens)
+      .map((el) => el?.token);
 
     const tokensToDisplay = getPreviewTokens(tokens, position);
 
@@ -61,7 +62,6 @@ const handler = async (req: NextApiRequest) => {
 
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
     const ABCDiatypeBoldFontData = await ABCDiatypeBold;
-    const alpinaLightFontData = await alpinaLight;
 
     return new ImageResponse(
       (
@@ -270,14 +270,8 @@ const handler = async (req: NextApiRequest) => {
             data: ABCDiatypeBoldFontData,
             weight: 700,
           },
-          {
-            name: 'GT Alpina',
-            data: alpinaLightFontData,
-            style: 'normal',
-            weight: 500,
-          },
         ],
-      }
+      },
     );
   } catch (e) {
     console.log('error: ', e);

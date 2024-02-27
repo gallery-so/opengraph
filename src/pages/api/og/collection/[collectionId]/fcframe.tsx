@@ -46,7 +46,7 @@ const handler = async (req: NextApiRequest) => {
       return fallbackImageResponse;
     }
 
-    const tokensToDisplay = getPreviewTokens(collection.tokens, position);
+    const tokensToDisplay = getPreviewTokens(collection.tokens.map((el) => el?.token), position);
 
     const leftToken = tokensToDisplay?.left;
     const centerToken = tokensToDisplay?.current;

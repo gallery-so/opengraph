@@ -5,6 +5,9 @@ export const config = {
   matcher: ['/api/og/:path*'],
 };
 
+// add this to silence request logs but let's NOT send this to prod
+console.log = () => {};
+
 export default async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   let frameProperties = {};

@@ -51,7 +51,8 @@ const handler = async (req: NextApiRequest) => {
 
     const tokens = gallery.collections
       .filter((collection) => !collection?.hidden)
-      .flatMap((collection) => collection?.tokens);
+      .flatMap((collection) => collection?.tokens)
+      .map((el) => el?.token);
 
     const tokensToDisplay = getPreviewTokens(tokens, position);
 
@@ -273,7 +274,7 @@ const handler = async (req: NextApiRequest) => {
             weight: 500,
           },
         ],
-      }
+      },
     );
   } catch (e) {
     console.log('error: ', e);

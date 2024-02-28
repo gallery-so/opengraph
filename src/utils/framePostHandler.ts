@@ -60,7 +60,6 @@ export async function framePostHandler(
 
   const headers = new Headers();
   headers.append('Content-Type', 'text/html');
-  headers.append('Cache-Control', 'no-store');
 
   const showTwoButtons = hasPrevious;
   const frameButtons: [FrameButtonMetadata, ...FrameButtonMetadata[]] = [

@@ -93,7 +93,7 @@ const handler = async (req: NextApiRequest) => {
 
       const displayCommunityName = truncateAndStripMarkdown(
         communityName,
-        MAX_LENGTH_COMMUNITY_NAME,
+        MAX_LENGTH_COMMUNITY_NAME
       );
       const longName = displayCommunityName.length > 8;
 
@@ -114,7 +114,7 @@ const handler = async (req: NextApiRequest) => {
 
       const distanceFromTop = longName ? 220 : 240;
       const distanceFromLeft = 340;
-      const excessContainerSize = 100;
+      const excessContainerSize = 120;
       const textLength = 510;
 
       const textAreaBoundingBox = {
@@ -223,7 +223,7 @@ const handler = async (req: NextApiRequest) => {
               weight: 500,
             },
           ],
-        },
+        }
       );
     }
 
@@ -464,7 +464,7 @@ const handler = async (req: NextApiRequest) => {
                 weight: 500,
               },
             ],
-          },
+          }
         );
       }
 
@@ -682,7 +682,10 @@ const handler = async (req: NextApiRequest) => {
               weight: 500,
             },
           ],
-        },
+          headers: {
+            'Cache-Control': 'no-store',
+          },
+        }
       );
     }
   } catch (e) {

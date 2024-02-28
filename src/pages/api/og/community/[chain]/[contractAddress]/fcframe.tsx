@@ -223,6 +223,9 @@ const handler = async (req: NextApiRequest) => {
               weight: 500,
             },
           ],
+          headers: {
+            'Cache-Control': 'public, immutable, no-transform, max-age=1',
+          },
         }
       );
     }
@@ -682,9 +685,6 @@ const handler = async (req: NextApiRequest) => {
               weight: 500,
             },
           ],
-          headers: {
-            'Cache-Control': 'public, immutable, no-transform, max-age=1',
-          },
         }
       );
     }

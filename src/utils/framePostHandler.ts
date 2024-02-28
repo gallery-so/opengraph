@@ -15,7 +15,7 @@ type AllowedAspectRatio = '1.91:1' | '1:1';
 export async function framePostHandler(
   req: NextApiRequest,
   handleSquareAspectRatioType: FrameSquareAspectRatioType = null,
-  initialButtonLabel?: string,
+  initialButtonLabel?: string
 ) {
   const url = new URL(req.url ?? '');
   let position = url.searchParams.get('position');
@@ -60,6 +60,7 @@ export async function framePostHandler(
 
   const headers = new Headers();
   headers.append('Content-Type', 'text/html');
+  headers.append('Cache-Control', 'no-store');
 
   const showTwoButtons = hasPrevious;
   const frameButtons: [FrameButtonMetadata, ...FrameButtonMetadata[]] = [

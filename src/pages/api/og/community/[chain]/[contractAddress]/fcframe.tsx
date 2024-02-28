@@ -683,7 +683,7 @@ const handler = async (req: NextApiRequest) => {
             },
           ],
           headers: {
-            'Cache-Control': 'no-store',
+            'Cache-Control': 'public, immutable, no-transform, max-age=1',
           },
         }
       );

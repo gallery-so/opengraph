@@ -224,7 +224,7 @@ const handler = async (req: NextApiRequest) => {
             },
           ],
           headers: {
-            'Cache-Control': 'public, immutable, no-transform, max-age=1',
+            'Cache-Control': 'public, immutable, no-transform, max-age=604800',
           },
         }
       );

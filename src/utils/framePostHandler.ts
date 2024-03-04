@@ -23,7 +23,7 @@ type FramePostHandlerProps = {
 
 export async function framePostHandler({
   req,
-  frameType = null,
+  frameType,
   initialButtonLabel,
 }: FramePostHandlerProps) {
   const url = new URL(req.url ?? '');
@@ -93,6 +93,7 @@ export async function framePostHandler({
   // use square aspect ratio for image if appropriate for collection token
   // TODO(rohan): similarly support it for other types of frames
   let squareAspectRatio = false;
+  console.log('frameType', frameType);
   if (frameType === 'CommunityFrame' && position) {
     const chain = url.searchParams.get('chain');
     const contractAddress = url.searchParams.get('contractAddress');
@@ -150,11 +151,14 @@ export async function framePostHandler({
     }
     const tokens = user.galleries
       ?.filter(
-        (gallery: { collections: any[]; }) => gallery?.collections?.some((collection: { tokens: string | any[]; }) => collection?.tokens?.length),
+        (gallery: { collections: any[] }) =>
+          gallery?.collections?.some(
+            (collection: { tokens: string | any[] }) => collection?.tokens?.length,
+          ),
       )?.[0]
-      .collections?.filter((collection: { hidden: any; }) => !collection?.hidden)
-      .flatMap((collection: { tokens: any; }) => collection?.tokens)
-      .map((el: { token: any; }) => el?.token);
+      .collections?.filter((collection: { hidden: any }) => !collection?.hidden)
+      .flatMap((collection: { tokens: any }) => collection?.tokens)
+      .map((el: { token: any }) => el?.token);
 
     const tokensToDisplay = getPreviewTokens(tokens, position);
     const tokensLength = tokens.length ?? 0;
@@ -180,7 +184,7 @@ export async function framePostHandler({
       throw new Error('Error: collection not found');
     }
 
-    const tokens = collection.tokens.map((el: { token: any; }) => el?.token);
+    const tokens = collection.tokens.map((el: { token: any }) => el?.token);
     const tokensLength = tokens.length ?? 0;
     const tokensToDisplay = getPreviewTokens(tokens, position);
     const mainPosition = Number(position) % tokensLength;
@@ -207,9 +211,9 @@ export async function framePostHandler({
     }
 
     const tokens = gallery.collections
-      .filter((collection: { hidden: any; }) => !collection?.hidden)
-      .flatMap((collection: { tokens: any; }) => collection?.tokens)
-      .map((el: { token: any; }) => el?.token);
+      .filter((collection: { hidden: any }) => !collection?.hidden)
+      .flatMap((collection: { tokens: any }) => collection?.tokens)
+      .map((el: { token: any }) => el?.token);
 
     const tokensToDisplay = getPreviewTokens(tokens, position);
     const tokensLength = tokens.length ?? 0;

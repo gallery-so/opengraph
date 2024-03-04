@@ -29,8 +29,11 @@ const heightOfOneline = (largeFont: boolean) => (largeFont ? 160 : 100);
 const handler = async (req: NextApiRequest) => {
   // handle POST, where we should return `fcframe` og tags to render the next frame with appropriate buttons
   if (req.method === 'POST') {
-    return framePostHandler(req, 'CollectionFrame', 'Explore');
-  }
+return framePostHandler({
+  req,
+  frameType: 'CollectionFrame',
+  initialButtonLabel: 'Explore'
+});  }
 
   // handle GET, which should return the raw image for the frame
   try {
@@ -755,11 +758,6 @@ function calcRandomPosition({
 
 // TODOs:
 // - art blocks / prohibition support *
-// - correctly estimate rendered text dimensions ***
-// might just make the community title be max-1-line-tall for now (i know we wanted to allow for 2 lines)
-// - different aspect ratios (tall vs. flat)
-// letting images get cropped off the sides (right now they’re forced to be contained within the frame
-// - post request to flip through different tokens in that collection
 
 function generatePositionsForSplashImages({
   numElements,

@@ -20,7 +20,7 @@ export const config = {
 const handler = async (req: NextApiRequest) => {
   // handle POST, where we should return `fcframe` og tags to render the next frame with appropriate buttons
   if (req.method === 'POST') {
-    return framePostHandler(req);
+    return framePostHandler({ req });
   }
 
   // handle GET, which should return the raw image for the frame
@@ -46,7 +46,10 @@ const handler = async (req: NextApiRequest) => {
       return fallbackImageResponse;
     }
 
-    const tokensToDisplay = getPreviewTokens(collection.tokens.map((el) => el?.token), position);
+    const tokensToDisplay = getPreviewTokens(
+      collection.tokens.map((el) => el?.token),
+      position,
+    );
 
     const leftToken = tokensToDisplay?.left;
     const centerToken = tokensToDisplay?.current;

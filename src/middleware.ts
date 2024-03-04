@@ -5,8 +5,10 @@ export const config = {
   matcher: ['/api/og/:path*'],
 };
 
-// add this to silence request logs but let's NOT send this to prod
-console.log = () => {};
+// add this to silence request logs when local QUIET variable is true but let's send this to prod
+if (process.env.QUIET === 'true') {
+  console.log = () => {};
+}
 
 export default async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;

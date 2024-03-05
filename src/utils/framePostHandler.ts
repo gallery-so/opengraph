@@ -8,10 +8,6 @@ import { fcframeCollectionIdOpengraphQuery } from '../queries/fcframeCollectionI
 import { fcframeGalleryIdOpengraphQuery } from '../queries/fcframeGalleryIdOpengraphQuery';
 import { getPreviewTokens } from './getPreviewTokens';
 
-export function isImageTall(aspectRatio: number): boolean {
-  return aspectRatio <= 1;
-}
-
 type FrameType = 'CollectionFrame' | 'UserFrame' | 'CommunityFrame' | 'GalleryFrame' | null;
 type AllowedAspectRatio = '1.91:1' | '1:1';
 
@@ -90,10 +86,8 @@ export async function framePostHandler({
   // we re-calculate the position to get the position used for the og image response
   position = url.searchParams.get('position');
 
-  // use square aspect ratio for image if appropriate for collection token
-  // TODO(rohan): similarly support it for other types of frames
+  // use square aspect ratio for image if appropriate for token in carousel
   let squareAspectRatio = false;
-  console.log('frameType', frameType);
   if (frameType === 'CommunityFrame' && position) {
     const chain = url.searchParams.get('chain');
     const contractAddress = url.searchParams.get('contractAddress');
@@ -124,15 +118,11 @@ export async function framePostHandler({
     }
 
     const { tokensForFrame: tokens } = community;
-    const tokensToDisplay = getPreviewTokens(tokens, `${Number(position) - 1}`);
     const tokensLength = tokens.length ?? 0;
     const mainPosition = Number(position) % tokensLength;
 
-    const centerToken = tokensToDisplay?.current;
-    const tokenAspectRatio = centerToken?.aspectRatio;
-
     // if mainPosition is 0 we want to show splash screen in 1.91:1
-    squareAspectRatio = isImageTall(tokenAspectRatio) && mainPosition !== 0;
+    squareAspectRatio = determineAspectRatio(tokens, position, mainPosition !== 0);
   } else if (frameType === 'UserFrame' && position) {
     const username = url.searchParams.get('username');
     if (!username || typeof username !== 'string') {
@@ -160,13 +150,7 @@ export async function framePostHandler({
       .flatMap((collection: { tokens: any }) => collection?.tokens)
       .map((el: { token: any }) => el?.token);
 
-    const tokensToDisplay = getPreviewTokens(tokens, position);
-    const tokensLength = tokens.length ?? 0;
-    const mainPosition = Number(position) % tokensLength;
-
-    const centerToken = tokensToDisplay?.current;
-    const tokenAspectRatio = centerToken?.aspectRatio;
-    squareAspectRatio = isImageTall(tokenAspectRatio) && mainPosition !== 0;
+    squareAspectRatio = determineAspectRatio(tokens, position);
   } else if (frameType === 'CollectionFrame' && position) {
     const collectionId = url.searchParams.get('collectionId');
 
@@ -185,13 +169,7 @@ export async function framePostHandler({
     }
 
     const tokens = collection.tokens.map((el: { token: any }) => el?.token);
-    const tokensLength = tokens.length ?? 0;
-    const tokensToDisplay = getPreviewTokens(tokens, position);
-    const mainPosition = Number(position) % tokensLength;
-
-    const centerToken = tokensToDisplay?.current;
-    const tokenAspectRatio = centerToken?.aspectRatio;
-    squareAspectRatio = isImageTall(tokenAspectRatio) && mainPosition !== 0;
+    squareAspectRatio = determineAspectRatio(tokens, position);
   } else if (frameType === 'GalleryFrame' && position) {
     const galleryId = url.searchParams.get('galleryId');
 
@@ -215,14 +193,7 @@ export async function framePostHandler({
       .flatMap((collection: { tokens: any }) => collection?.tokens)
       .map((el: { token: any }) => el?.token);
 
-    const tokensToDisplay = getPreviewTokens(tokens, position);
-    const tokensLength = tokens.length ?? 0;
-
-    const mainPosition = Number(position) % tokensLength;
-    const centerToken = tokensToDisplay?.current;
-    const tokenAspectRatio = centerToken?.aspectRatio;
-
-    squareAspectRatio = isImageTall(tokenAspectRatio) && mainPosition !== 0;
+    squareAspectRatio = determineAspectRatio(tokens, position);
   }
 
   if (squareAspectRatio) {
@@ -236,4 +207,17 @@ export async function framePostHandler({
     status: 200,
     headers,
   });
+}
+
+export function isImageTall(aspectRatio: number): boolean {
+  return aspectRatio <= 1;
+}
+
+// we check the aspect ratio of the center token in carousel using the position
+function determineAspectRatio(tokens: any[], position: string, isSplashScreen: boolean = false) {
+  const tokensToDisplay = getPreviewTokens(tokens, `${Number(position) - 1}`);
+  const centerToken = tokensToDisplay?.current;
+  const tokenAspectRatio = centerToken?.aspectRatio;
+
+  return isImageTall(tokenAspectRatio) && !isSplashScreen;
 }

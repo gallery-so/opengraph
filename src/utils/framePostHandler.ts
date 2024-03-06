@@ -122,7 +122,7 @@ export async function framePostHandler({
     const mainPosition = Number(position) % tokensLength;
 
     // if mainPosition is 0 we want to show splash screen in 1.91:1
-    squareAspectRatio = determineAspectRatio(tokens, position, mainPosition !== 0);
+    squareAspectRatio = determineAspectRatio(tokens, position, mainPosition === 0);
   } else if (frameType === 'UserFrame' && position) {
     const username = url.searchParams.get('username');
     if (!username || typeof username !== 'string') {

@@ -8,6 +8,9 @@ First, run the development server:
 npm run dev
 # or
 yarn dev
+
+# or to silence the tracking logs locally
+yarn dev:quiet
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.

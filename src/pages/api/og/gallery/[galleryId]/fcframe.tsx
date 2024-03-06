@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from '@vercel/og';
 import { NextApiRequest } from 'next';
 import React from 'react';
@@ -19,7 +20,7 @@ export const config = {
 const handler = async (req: NextApiRequest) => {
   // handle POST, where we should return `fcframe` og tags to render the next frame with appropriate buttons
   if (req.method === 'POST') {
-    return framePostHandler(req);
+    return framePostHandler({ req, frameType: 'GalleryFrame' });
   }
 
   // handle GET, which should return the raw image for the frame

@@ -86,6 +86,7 @@ const handler = async (req: NextApiRequest) => {
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <img
                   width="500"
+                  height="500"
                   src={leftToken?.src}
                   style={{
                     maxWidth: '500px',
@@ -152,6 +153,7 @@ const handler = async (req: NextApiRequest) => {
             >
               <img
                 width="500"
+                height="500"
                 src={centerToken?.src}
                 style={{
                   maxWidth: '500px',
@@ -207,6 +209,7 @@ const handler = async (req: NextApiRequest) => {
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <img
                   width="500"
+                  height="500"
                   src={rightToken?.src}
                   style={{
                     maxWidth: '500px',

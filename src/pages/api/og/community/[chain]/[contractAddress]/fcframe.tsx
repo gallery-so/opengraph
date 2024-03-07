@@ -97,7 +97,7 @@ const handler = async (req: NextApiRequest) => {
 
       const displayCommunityName = truncateAndStripMarkdown(
         communityName,
-        MAX_LENGTH_COMMUNITY_NAME
+        MAX_LENGTH_COMMUNITY_NAME,
       );
       const longName = displayCommunityName.length > 8;
 
@@ -230,7 +230,7 @@ const handler = async (req: NextApiRequest) => {
           headers: {
             'Cache-Control': 'public, immutable, no-transform, max-age=604800',
           },
-        }
+        },
       );
     }
 
@@ -471,7 +471,7 @@ const handler = async (req: NextApiRequest) => {
                 weight: 500,
               },
             ],
-          }
+          },
         );
       }
 
@@ -502,6 +502,7 @@ const handler = async (req: NextApiRequest) => {
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                   <img
                     width="500"
+                    height="500"
                     src={leftToken?.src}
                     style={{
                       maxWidth: '500px',
@@ -568,6 +569,7 @@ const handler = async (req: NextApiRequest) => {
               >
                 <img
                   width="500"
+                  height="500"
                   src={centerToken?.src}
                   style={{
                     maxWidth: '500px',
@@ -623,6 +625,7 @@ const handler = async (req: NextApiRequest) => {
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                   <img
                     width="500"
+                    height="500"
                     src={rightToken?.src}
                     style={{
                       maxWidth: '500px',
@@ -689,7 +692,7 @@ const handler = async (req: NextApiRequest) => {
               weight: 500,
             },
           ],
-        }
+        },
       );
     }
   } catch (e) {

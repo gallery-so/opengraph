@@ -1,4 +1,4 @@
-import { mediaQuerySubstring } from './mediaQuerySubstring';
+import { mediaQuerySubstring } from './_mediaQuerySubstring';
 
 export const galleryIdOpengraphQuery = `
   query GalleryIdOpengraphQuery($galleryId: DBID!) {

@@ -1,4 +1,5 @@
-import { mediaQuerySubstring } from './mediaQuerySubstring';
+import { contractAndTokenIdSubstring } from './_contractAndTokenIdSubstring';
+import { mediaQuerySubstring } from './_mediaQuerySubstring';
 
 export const fcframeContractCommunityOpengraphQuery = `
   query fcframeContractCommunityOpengraphQuery($contractCommunityKey: ContractCommunityKeyInput!) {
@@ -42,26 +43,7 @@ export const fcframeContractCommunityDimensionsOpengraphQuery = `
                 }
               }
             }
-            tokenId
-            community {
-              __typename
-              ... on ContractCommunity {
-                communityKey {
-                  contract {
-                    address
-                    chain
-                  }
-                }
-              }
-              ... on ArtBlocksCommunity {
-                communityKey {
-                  contract {
-                    address
-                    chain
-                  }
-                }
-              }
-            }
+            ${contractAndTokenIdSubstring}
           }
         }
       }

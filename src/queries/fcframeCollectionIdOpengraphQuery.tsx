@@ -1,4 +1,5 @@
-import { mediaQuerySubstring } from './mediaQuerySubstring';
+import { contractAndTokenIdSubstring } from './_contractAndTokenIdSubstring';
+import { mediaQuerySubstring } from './_mediaQuerySubstring';
 
 export const fcframeCollectionIdOpengraphQuery = `
   query fcframeCollectionIdOpengraphQuery($collectionId: DBID!) {
@@ -18,6 +19,7 @@ export const fcframeCollectionIdOpengraphQuery = `
                 name
               }
               ${mediaQuerySubstring}
+              ${contractAndTokenIdSubstring}
             }
           }
         }

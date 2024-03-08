@@ -12,6 +12,7 @@ import { framePostHandler } from '../../../../../utils/framePostHandler';
 import { getPreviewTokens } from '../../../../../utils/getPreviewTokens';
 import React from 'react';
 import { fcframeUsernameOpengraphQuery } from '../../../../../queries/fcframeUsernameOpengraphQuery';
+import { generateSplashImageResponse } from '../../../../../utils/splashScreen';
 
 export const config = {
   runtime: 'edge',
@@ -47,14 +48,25 @@ const handler = async (req: NextApiRequest) => {
     }
 
     const tokens = user.galleries
-      ?.filter(
-        (gallery) => gallery?.collections?.some((collection) => collection?.tokens?.length),
+      ?.filter((gallery) =>
+        gallery?.collections?.some((collection) => collection?.tokens?.length)
       )?.[0]
       .collections?.filter((collection) => !collection?.hidden)
       .flatMap((collection) => collection?.tokens)
       .map((el) => el?.token);
 
-    const tokensToDisplay = getPreviewTokens(tokens, position);
+    // if no position is explicitly provided, serve splash image
+    let showSplashScreen = !position;
+
+    if (showSplashScreen) {
+      return generateSplashImageResponse({
+        titleText: username,
+        numSplashImages: 5,
+        tokens,
+      });
+    }
+
+    const tokensToDisplay = getPreviewTokens(tokens, `${Number(position) - 1}`);
 
     const leftToken = tokensToDisplay?.left;
     const centerToken = tokensToDisplay?.current;
@@ -274,7 +286,7 @@ const handler = async (req: NextApiRequest) => {
             weight: 700,
           },
         ],
-      },
+      }
     );
   } catch (e) {
     console.log('error: ', e);

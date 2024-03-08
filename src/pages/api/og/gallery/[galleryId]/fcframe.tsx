@@ -12,6 +12,7 @@ import {
 import { ABCDiatypeRegular, ABCDiatypeBold, alpinaLight } from '../../../../../utils/fonts';
 import { framePostHandler } from '../../../../../utils/framePostHandler';
 import { getPreviewTokens } from '../../../../../utils/getPreviewTokens';
+import { generateSplashImageResponse } from '../../../../../utils/splashScreen';
 
 export const config = {
   runtime: 'edge',
@@ -54,6 +55,17 @@ const handler = async (req: NextApiRequest) => {
       .filter((collection) => !collection?.hidden)
       .flatMap((collection) => collection?.tokens)
       .map((el) => el?.token);
+
+    // if no position is explicitly provided, serve splash image
+    let showSplashScreen = !position;
+
+    if (showSplashScreen) {
+      return generateSplashImageResponse({
+        titleText: gallery.name,
+        numSplashImages: 5,
+        tokens,
+      });
+    }
 
     const tokensToDisplay = getPreviewTokens(tokens, position);
 
@@ -278,7 +290,7 @@ const handler = async (req: NextApiRequest) => {
             weight: 500,
           },
         ],
-      },
+      }
     );
   } catch (e) {
     console.log('error: ', e);

@@ -1,4 +1,5 @@
-import { mediaQuerySubstring } from './mediaQuerySubstring';
+import { contractAndTokenIdSubstring } from './_contractAndTokenIdSubstring';
+import { mediaQuerySubstring } from './_mediaQuerySubstring';
 
 export const fcframeUsernameOpengraphQuery = `
   query fcframeUsernameOpengraphQuery($username: String!) {
@@ -25,6 +26,7 @@ export const fcframeUsernameOpengraphQuery = `
                     name
                   }
                   ${mediaQuerySubstring}
+                  ${contractAndTokenIdSubstring}
                 }
               }
             }

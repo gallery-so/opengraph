@@ -1,21 +1,27 @@
 import { NextApiRequest } from 'next';
 import { extractBody } from './extractBody';
-import { FrameButtonMetadata, getFrameHtmlResponse } from '@coinbase/onchainkit';
+import { FrameImageMetadata, FrameMetadataType, getFrameHtmlResponse } from '@coinbase/onchainkit';
 import { fetchGraphql } from '../fetch';
 import { fcframeContractCommunityDimensionsOpengraphQuery } from '../queries/fcframeContractCommunityOpengraphQuery';
 import { fcframeUsernameOpengraphQuery } from '../queries/fcframeUsernameOpengraphQuery';
 import { fcframeCollectionIdOpengraphQuery } from '../queries/fcframeCollectionIdOpengraphQuery';
 import { fcframeGalleryIdOpengraphQuery } from '../queries/fcframeGalleryIdOpengraphQuery';
 import { getPreviewTokens } from './getPreviewTokens';
+import { getTokenMintTarget } from './getTokenMintTarget';
 
 type FrameType = 'CollectionFrame' | 'UserFrame' | 'CommunityFrame' | 'GalleryFrame' | null;
-type AllowedAspectRatio = '1.91:1' | '1:1';
 
 type FramePostHandlerProps = {
   req: NextApiRequest;
   frameType?: FrameType;
   initialButtonLabel?: string;
 };
+
+/**
+ * Example local POST handler for a user
+ *
+ * curl -X POST http://localhost:3000/api/og/user/robin/fcframe -H "Content-Type: application/json" -d '{"untrustedData": {"buttonIndex": 1, "castId": { "fid": 1, "hash": "123" }}}'
+ */
 
 export async function framePostHandler({
   req,
@@ -39,8 +45,9 @@ export async function framePostHandler({
     url.searchParams.set('position', '1');
 
     // for all other tokens:
-    // buttonIndex=1 maps to previous
-    // buttonIndex=2 maps to next
+    // buttonIndex=1 maps to Previous
+    // buttonIndex=2 maps to Mint *or* Next
+    // buttonIndex=3 maps to Next
   } else if (buttonIndex) {
     // if we're on the second token and the user clicks `prev`, we should bump the user back to the first token
     // by deleting the position param so they won't see a `prev` arrow
@@ -55,39 +62,22 @@ export async function framePostHandler({
       url.searchParams.set('position', `${Number(position) - 1}`);
     }
 
-    // `next` should increment the position
-    if (Number(buttonIndex) === 2) {
+    // `next` should increment the position.
+    // we're assuming that the `Mint` button will be handled by farcaster, and not proxied to this server,
+    // so any buttonIndex greater than 1 can safely map to "Next"
+    if (Number(buttonIndex) > 1) {
       // if the position is incremented beyond the length of the set, `getTokensDisplay` will
       // handle this edge case when the image is fetched
       url.searchParams.set('position', `${Number(position) + 1}`);
     }
   }
 
-  const headers = new Headers();
-  headers.append('Content-Type', 'text/html');
-
-  const showTwoButtons = hasPrevious;
-  const frameButtons: [FrameButtonMetadata, ...FrameButtonMetadata[]] = [
-    { label: showTwoButtons ? '←' : buttonContent, action: 'post' },
-    ...(showTwoButtons ? [{ label: buttonContent, action: 'post' } as FrameButtonMetadata] : []),
-  ];
-  const image = url.toString();
-  const postUrl = url.toString();
-
-  const htmlConfig = {
-    buttons: frameButtons,
-    image: {
-      src: image,
-      aspectRatio: '1.91:1' as AllowedAspectRatio,
-    },
-    postUrl,
-  };
-
   // we re-calculate the position to get the position used for the og image response
   position = url.searchParams.get('position');
 
   // use square aspect ratio for image if appropriate for token in carousel
   let squareAspectRatio = false;
+  let mintTarget = null;
   if (frameType === 'CommunityFrame' && position) {
     const chain = url.searchParams.get('chain');
     const contractAddress = url.searchParams.get('contractAddress');
@@ -123,6 +113,7 @@ export async function framePostHandler({
 
     // if mainPosition is 0 we want to show splash screen in 1.91:1
     squareAspectRatio = determineAspectRatio(tokens, position, mainPosition === 0);
+    mintTarget = getTokenMintTarget(tokens[Number(position) - 1]);
   } else if (frameType === 'UserFrame' && position) {
     const username = url.searchParams.get('username');
     if (!username || typeof username !== 'string') {
@@ -140,17 +131,17 @@ export async function framePostHandler({
       throw new Error('Error: user not found');
     }
     const tokens = user.galleries
-      ?.filter(
-        (gallery: { collections: any[] }) =>
-          gallery?.collections?.some(
-            (collection: { tokens: string | any[] }) => collection?.tokens?.length,
-          ),
+      ?.filter((gallery: { collections: any[] }) =>
+        gallery?.collections?.some(
+          (collection: { tokens: string | any[] }) => collection?.tokens?.length
+        )
       )?.[0]
       .collections?.filter((collection: { hidden: any }) => !collection?.hidden)
       .flatMap((collection: { tokens: any }) => collection?.tokens)
       .map((el: { token: any }) => el?.token);
 
     squareAspectRatio = determineAspectRatio(tokens, position);
+    mintTarget = getTokenMintTarget(tokens[Number(position) - 1]);
   } else if (frameType === 'CollectionFrame' && position) {
     const collectionId = url.searchParams.get('collectionId');
 
@@ -170,6 +161,7 @@ export async function framePostHandler({
 
     const tokens = collection.tokens.map((el: { token: any }) => el?.token);
     squareAspectRatio = determineAspectRatio(tokens, position);
+    mintTarget = getTokenMintTarget(tokens[Number(position) - 1]);
   } else if (frameType === 'GalleryFrame' && position) {
     const galleryId = url.searchParams.get('galleryId');
 
@@ -194,13 +186,32 @@ export async function framePostHandler({
       .map((el: { token: any }) => el?.token);
 
     squareAspectRatio = determineAspectRatio(tokens, position);
+    mintTarget = getTokenMintTarget(tokens[Number(position) - 1]);
   }
 
-  if (squareAspectRatio) {
-    htmlConfig.image.aspectRatio = squareAspectRatio
-      ? ('1:1' as AllowedAspectRatio)
-      : ('1.91:1' as AllowedAspectRatio);
+  const headers = new Headers();
+  headers.append('Content-Type', 'text/html');
+
+  const frameButtons: FrameMetadataType['buttons'] = [
+    { label: hasPrevious ? '←' : buttonContent, action: 'post' },
+  ];
+  if (hasPrevious) {
+    if (mintTarget) {
+      frameButtons.push({ label: 'Mint', action: 'mint', target: mintTarget });
+    }
+    frameButtons.push({ label: buttonContent, action: 'post' });
   }
+  const image = url.toString();
+  const postUrl = url.toString();
+
+  const htmlConfig = {
+    buttons: frameButtons,
+    image: {
+      src: image,
+      aspectRatio: squareAspectRatio ? '1:1' : '1.91:1',
+    } as FrameImageMetadata,
+    postUrl,
+  };
 
   const html = getFrameHtmlResponse(htmlConfig);
   return new Response(html, {

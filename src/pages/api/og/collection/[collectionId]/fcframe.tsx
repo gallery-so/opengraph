@@ -12,6 +12,7 @@ import {
 import { framePostHandler } from '../../../../../utils/framePostHandler';
 import { getPreviewTokens } from '../../../../../utils/getPreviewTokens';
 import React from 'react';
+import { generateSplashImageResponse } from '../../../../../utils/splashScreen';
 
 export const config = {
   runtime: 'edge',
@@ -48,8 +49,19 @@ const handler = async (req: NextApiRequest) => {
 
     const tokensToDisplay = getPreviewTokens(
       collection.tokens.map((el) => el?.token),
-      position,
+      position
     );
+
+    // if no position is explicitly provided, serve splash image
+    let showSplashScreen = !position;
+
+    if (showSplashScreen) {
+      return generateSplashImageResponse({
+        titleText: collection.name,
+        numSplashImages: 5,
+        tokens: collection.tokens.map((el) => el?.token),
+      });
+    }
 
     const leftToken = tokensToDisplay?.left;
     const centerToken = tokensToDisplay?.current;
@@ -276,7 +288,7 @@ const handler = async (req: NextApiRequest) => {
             weight: 500,
           },
         ],
-      },
+      }
     );
   } catch (e) {
     console.log('error: ', e);

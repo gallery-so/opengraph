@@ -1,4 +1,4 @@
-import { mediaQuerySubstring } from './mediaQuerySubstring';
+import { mediaQuerySubstring } from './_mediaQuerySubstring';
 
 export const usernameOpengraphQuery = `
   query UsernameOpengraphQuery($username: String!) {

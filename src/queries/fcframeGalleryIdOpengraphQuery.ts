@@ -9,6 +9,7 @@ export const fcframeGalleryIdOpengraphQuery = `
       }
       ... on Gallery {
         __typename
+        name
         collections {
           hidden
           tokens {

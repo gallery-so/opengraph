@@ -9,7 +9,7 @@ export const fcframeCollectionIdOpengraphQuery = `
       }
       ... on Collection {
         __typename
-        
+        name
         tokens {
           token {
             dbid

@@ -47,9 +47,6 @@ const handler = async (req: NextApiRequest) => {
       return fallbackImageResponse;
     }
 
-    // if no position is explicitly provided, serve splash image
-    let showSplashScreen = !position;
-
     const tokens = user.galleries
       ?.filter((gallery) =>
         gallery?.collections?.some((collection) => collection?.tokens?.length)
@@ -57,6 +54,9 @@ const handler = async (req: NextApiRequest) => {
       .collections?.filter((collection) => !collection?.hidden)
       .flatMap((collection) => collection?.tokens)
       .map((el) => el?.token);
+
+    // if no position is explicitly provided, serve splash image
+    let showSplashScreen = !position;
 
     if (showSplashScreen) {
       return generateSplashImageResponse({

@@ -39,15 +39,18 @@ function generatePositionsForSplashImages({
   numElements: number;
   possibleElementSizes: number[];
 } & BaseProps) {
-  console.log({ textAreaBoundingBox });
-
   const positions: ((Position & { containerHeight: number }) | null)[] = [];
   const maxAttempts = 1000;
   for (let i = 0; i < numElements; i++) {
     let newPosition;
     let attempts = 0;
-    const dimensionToUse = pickRandomInt(possibleElementSizes);
+    let dimensionToUse = pickRandomInt(possibleElementSizes);
     do {
+      // as we try more attempts, use a smaller size
+      if (attempts > 500) {
+        dimensionToUse = possibleElementSizes[1];
+      }
+
       newPosition = calcRandomPosition({
         elementSize: {
           width: dimensionToUse,
@@ -136,17 +139,29 @@ export function calcRandomPosition({
   return isOverlapping ? null : position;
 }
 
-function getTitleFontSize(length: number) {
-  switch (true) {
-    case length > 22:
-      return '66px';
-    case length > 14:
-      return '80px';
-    case length > 8:
-      return '90px';
-    default:
-      return '140px';
+function getFontSizeAndSpacing(length: number) {
+  if (length > 22) {
+    return {
+      fontSize: '66px',
+      letterSpacing: '-0.3rem',
+    };
   }
+  if (length > 14) {
+    return {
+      fontSize: '80px',
+      letterSpacing: '-0.4rem',
+    };
+  }
+  if (length > 8) {
+    return {
+      fontSize: '90px',
+      letterSpacing: '-0.45rem',
+    };
+  }
+  return {
+    fontSize: '140px',
+    letterSpacing: '-0.8rem',
+  };
 }
 
 export async function generateSplashImageResponse({
@@ -163,8 +178,9 @@ export async function generateSplashImageResponse({
   });
   const numSplashImages = splashImageUrls.length;
 
-  const displayUsername = truncateAndStripMarkdown(titleText, CHAR_LENGTH_CENTER_TITLE);
-  const longName = displayUsername.length > 8;
+  const displayedTitle =
+    truncateAndStripMarkdown(titleText, CHAR_LENGTH_CENTER_TITLE) || 'Untitled';
+  const longName = displayedTitle.length > 8;
 
   const textHeight = calcLineHeightPx(!longName) * (longName ? 2 : 1);
 
@@ -182,7 +198,7 @@ export async function generateSplashImageResponse({
 
   const positions = generatePositionsForSplashImages({
     numElements: numSplashImages,
-    possibleElementSizes: [320, 200],
+    possibleElementSizes: [360, 200],
     containerSize: {
       width: WIDTH_OPENGRAPH_IMAGE + excessContainerSize,
       height: HEIGHT_OPENGRAPH_IMAGE + excessContainerSize,
@@ -195,6 +211,8 @@ export async function generateSplashImageResponse({
   });
 
   const alpinaLightItalicFontData = await alpinaLightItalic;
+
+  const { fontSize, letterSpacing } = getFontSizeAndSpacing(titleText.length);
 
   return new ImageResponse(
     (
@@ -242,17 +260,17 @@ export async function generateSplashImageResponse({
         <p
           style={{
             fontFamily: "'GT Alpina'",
-            fontSize: getTitleFontSize(titleText.length),
+            fontSize,
             fontStyle: 'italic',
             display: 'flex',
             justifyContent: 'center',
             width: '520px',
             margin: 0,
             textAlign: 'center',
-            letterSpacing: '-0.8rem',
+            letterSpacing,
           }}
         >
-          {displayUsername}
+          {displayedTitle}
         </p>
       </div>
     ),

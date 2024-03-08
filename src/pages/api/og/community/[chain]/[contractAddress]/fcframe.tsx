@@ -25,7 +25,7 @@ const handler = async (req: NextApiRequest) => {
     return framePostHandler({
       req,
       frameType: 'CommunityFrame',
-      initialButtonLabel: 'Explore',
+      initialButtonLabel: '→',
     });
   }
 

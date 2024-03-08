@@ -268,7 +268,7 @@ export async function generateSplashImageResponse({
         },
       ],
       headers: {
-        'Cache-Control': 'public, immutable, no-transform, max-age=604800',
+        'Cache-Control': 'public, immutable, no-transform, max-age=1',
       },
     }
   );

@@ -18,10 +18,12 @@ type Token = {
   definition: {
     tokenId: string;
     community: {
-      communityKey: {
-        contract: {
-          address: string;
-          chain: Chain;
+      subtype: {
+        communityKey: {
+          contract: {
+            address: string;
+            chain: Chain;
+          };
         };
       };
     };
@@ -35,9 +37,9 @@ type Token = {
 // eip155:8453:0xab16a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb:1
 
 export function getTokenMintTarget(token: Token) {
-  const chain = token.definition.community.communityKey.contract.chain;
-  const contractAddress = token.definition.community.communityKey.contract.address;
-  const tokenId = token.definition.tokenId;
+  const chain = token.definition.community.subtype.communityKey.contract.chain;
+  const contractAddress = token.definition.community.subtype.communityKey.contract.address;
+  const tokenId = hexToDec(token.definition.tokenId);
 
   if (chain === 'Tezos') {
     // Tezos not supported by FC frames
@@ -52,4 +54,14 @@ export function getTokenMintTarget(token: Token) {
 
   const chainId = evmChainToChainId(chain);
   return `eip155:${chainId}:${contractAddress}:${tokenId}`;
+}
+
+function hexToDec(str: string) {
+  if (str.length % 2) {
+    str = '0' + str;
+  }
+
+  const bn = BigInt('0x' + str);
+  const d = bn.toString(10);
+  return d;
 }

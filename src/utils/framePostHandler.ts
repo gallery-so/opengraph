@@ -17,6 +17,12 @@ type FramePostHandlerProps = {
   initialButtonLabel?: string;
 };
 
+/**
+ * Example local POST handler for a user
+ *
+ * curl -X POST http://localhost:3000/api/og/user/robin/fcframe -H "Content-Type: application/json" -d '{"untrustedData": {"buttonIndex": 1, "castId": { "fid": 1, "hash": "123" }}}'
+ */
+
 export async function framePostHandler({
   req,
   frameType,

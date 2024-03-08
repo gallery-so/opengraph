@@ -49,7 +49,7 @@ const handler = async (req: NextApiRequest) => {
 
     const tokensToDisplay = getPreviewTokens(
       collection.tokens.map((el) => el?.token),
-      position
+      `${Number(position) - 1}`
     );
 
     // if no position is explicitly provided, serve splash image

@@ -67,7 +67,7 @@ const handler = async (req: NextApiRequest) => {
       });
     }
 
-    const tokensToDisplay = getPreviewTokens(tokens, position);
+    const tokensToDisplay = getPreviewTokens(tokens, `${Number(position) - 1}`);
 
     const leftToken = tokensToDisplay?.left;
     const centerToken = tokensToDisplay?.current;

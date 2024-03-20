@@ -92,7 +92,7 @@ export function calcRandomPosition({
   textAreaBoundingBox,
   // the positions of existing images
   existingPositions,
-  //
+  // the size of the username text for collection/gallery frames
   usernameContainerSize,
 }: BaseProps & {
   elementSize: Dimensions;
@@ -117,8 +117,9 @@ export function calcRandomPosition({
 
     let overlapsUsernameArea = false;
     if (usernameContainerSize) {
-      const lowerBound = (containerSize.width - usernameContainerSize.width) / 2 - 110;
-      const upperBound = (containerSize.width + usernameContainerSize.width) / 2 + 50;
+      const offsetPadding = 100;
+      const lowerBound = (containerSize.width - usernameContainerSize.width) / 2 - offsetPadding;
+      const upperBound = (containerSize.width + usernameContainerSize.width) / 2 + offsetPadding;
       overlapsUsernameArea = false;
       if (pos.top > containerSize.height / 2) {
         if (pos.left < upperBound && pos.left > lowerBound) {
@@ -148,15 +149,6 @@ export function calcRandomPosition({
       }
     }
 
-    if (!(overlapTitleArea || overlapsUsernameArea || overlapsWithOtherImages)) {
-      const lowerBound = (containerSize.width - usernameContainerSize.width) / 2 - 140;
-      const upperBound = (containerSize.width + usernameContainerSize.width) / 2 - 90;
-      console.log('pos.left', pos.left);
-      console.log('pos.top', pos.top);
-      console.log('upperBound', upperBound);
-      console.log('lowerBound', lowerBound);
-      console.log(' elementSize.width', elementSize.width);
-    }
     return overlapTitleArea || overlapsUsernameArea || overlapsWithOtherImages;
   }
 
@@ -170,7 +162,6 @@ export function calcRandomPosition({
 
     isOverlapping = checkOverlap(position);
 
-    console.log('isOverlapping', isOverlapping);
     if (!isOverlapping) {
       break;
     }
@@ -238,8 +229,6 @@ export async function generateSplashImageResponse({
     bottom: distanceFromTop + textHeight,
     right: distanceFromLeft + textLength,
   };
-  console.log('containerWidth', WIDTH_OPENGRAPH_IMAGE + excessContainerSize);
-  console.log('containerHeight', HEIGHT_OPENGRAPH_IMAGE + excessContainerSize);
 
   const positions = generatePositionsForSplashImages({
     numElements: numSplashImages,
@@ -370,7 +359,7 @@ export async function generateSplashImageResponse({
         {
           name: 'GT Alpina Italic',
           data: alpinaLightItalicFontData,
-          style: 'normal',
+          style: 'italic',
           weight: 500,
         },
       ],

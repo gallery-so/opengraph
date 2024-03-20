@@ -14,6 +14,9 @@ export const fcframeGalleryIdOpengraphQuery = `
           hidden
           tokens {
             token {
+              owner {
+                username
+              }
               dbid
               definition {
                 name

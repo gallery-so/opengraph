@@ -3,9 +3,9 @@ import { ImageResponse } from '@vercel/og';
 import { getPreviewUrl } from '../fetch';
 import { truncateAndStripMarkdown } from './extractWordsWithinLimit';
 import { HEIGHT_OPENGRAPH_IMAGE, WIDTH_OPENGRAPH_IMAGE, fallbackImageResponse } from './fallback';
-import { alpinaLightItalic } from './fonts';
+import { alpinaLight, alpinaLightItalic } from './fonts';
 
-const CHAR_LENGTH_CENTER_TITLE = 36;
+const CHAR_LENGTH_CENTER_TITLE = 56;
 const calcLineHeightPx = (largeFont: boolean) => (largeFont ? 160 : 100);
 
 type Position = { left: number; top: number };
@@ -16,6 +16,7 @@ type Dimensions = {
 };
 
 type BaseProps = {
+  showUsername?: boolean;
   containerSize: Dimensions;
   textAreaBoundingBox: {
     top: number;
@@ -23,6 +24,7 @@ type BaseProps = {
     bottom: number;
     right: number;
   };
+  usernameContainerSize?: Dimensions;
 };
 
 function pickRandomInt([first, second]: number[]): number {
@@ -35,6 +37,7 @@ function generatePositionsForSplashImages({
   possibleElementSizes,
   containerSize,
   textAreaBoundingBox,
+  usernameContainerSize,
 }: {
   numElements: number;
   possibleElementSizes: number[];
@@ -47,8 +50,10 @@ function generatePositionsForSplashImages({
     let dimensionToUse = pickRandomInt(possibleElementSizes);
     do {
       // as we try more attempts, use a smaller size
-      if (attempts > 500) {
+      if (attempts > 400) {
         dimensionToUse = possibleElementSizes[1];
+      } else if (attempts > 700) {
+        dimensionToUse = possibleElementSizes[2];
       }
 
       newPosition = calcRandomPosition({
@@ -58,6 +63,7 @@ function generatePositionsForSplashImages({
         },
         containerSize,
         textAreaBoundingBox,
+        usernameContainerSize,
         existingPositions: positions,
       });
 
@@ -86,15 +92,18 @@ export function calcRandomPosition({
   textAreaBoundingBox,
   // the positions of existing images
   existingPositions,
+  // the size of the username text for collection/gallery frames
+  usernameContainerSize,
 }: BaseProps & {
   elementSize: Dimensions;
   existingPositions: PositionOrNull[];
 }): PositionOrNull {
   let position: PositionOrNull = null;
-  let isOverlapping;
+  let isOverlapping = false;
 
   // check if the generated position overlaps with the text area or other photos
   function checkOverlap(pos: Position) {
+    let overlapTitleArea = false;
     // safety padding
     const buffer = 20;
     if (
@@ -103,9 +112,30 @@ export function calcRandomPosition({
       pos.top < textAreaBoundingBox.bottom + buffer &&
       pos.top + elementSize.height > textAreaBoundingBox.top - buffer
     ) {
-      return true;
+      overlapTitleArea = true;
     }
 
+    let overlapsUsernameArea = false;
+    if (usernameContainerSize) {
+      const offsetPadding = 100;
+      const lowerBound = (containerSize.width - usernameContainerSize.width) / 2 - offsetPadding;
+      const upperBound = (containerSize.width + usernameContainerSize.width) / 2 + offsetPadding;
+      overlapsUsernameArea = false;
+      if (pos.top > containerSize.height / 2) {
+        if (pos.left < upperBound && pos.left > lowerBound) {
+          overlapsUsernameArea = true;
+        } else if (
+          pos.left + elementSize.width < upperBound &&
+          pos.left + elementSize.width > lowerBound
+        ) {
+          overlapsUsernameArea = true;
+        } else if (pos.left < lowerBound && pos.left + elementSize.width > upperBound) {
+          overlapsUsernameArea = true;
+        }
+      }
+    }
+
+    let overlapsWithOtherImages = false;
     // check against other images
     for (const existingPosition of existingPositions) {
       if (
@@ -115,10 +145,11 @@ export function calcRandomPosition({
         pos.top < existingPosition.top + elementSize.height + buffer &&
         pos.top + elementSize.height > existingPosition.top - buffer
       ) {
-        return true;
+        overlapsWithOtherImages = true;
       }
     }
-    return false;
+
+    return overlapTitleArea || overlapsUsernameArea || overlapsWithOtherImages;
   }
 
   // try to find a non-overlapping position
@@ -168,14 +199,17 @@ export async function generateSplashImageResponse({
   titleText,
   numSplashImages: maxNumSplashImages,
   tokens,
+  showUsername = false,
 }: {
   titleText: string;
+  showUsername?: boolean;
   numSplashImages: number;
-  tokens: { definition: { media: string } }[];
+  tokens: { definition: { media: string }; owner: { username: string } }[];
 }) {
   const splashImageUrls = tokens.slice(0, maxNumSplashImages).map((token) => {
     return getPreviewUrl(token.definition.media);
   });
+  const ownerName = tokens[0]?.owner?.username;
   const numSplashImages = splashImageUrls.length;
 
   const displayedTitle =
@@ -198,11 +232,17 @@ export async function generateSplashImageResponse({
 
   const positions = generatePositionsForSplashImages({
     numElements: numSplashImages,
-    possibleElementSizes: [360, 200],
+    possibleElementSizes: [360, 200, 170],
     containerSize: {
       width: WIDTH_OPENGRAPH_IMAGE + excessContainerSize,
       height: HEIGHT_OPENGRAPH_IMAGE + excessContainerSize,
     },
+    usernameContainerSize: showUsername
+      ? {
+          width: 150,
+          height: 48,
+        }
+      : null,
     textAreaBoundingBox,
   });
 
@@ -210,6 +250,7 @@ export async function generateSplashImageResponse({
     return { ...position, url: splashImageUrls[i] };
   });
 
+  const alpinaLightFontData = await alpinaLight;
   const alpinaLightItalicFontData = await alpinaLightItalic;
 
   const { fontSize, letterSpacing } = getFontSizeAndSpacing(titleText.length);
@@ -257,21 +298,52 @@ export async function generateSplashImageResponse({
             />
           );
         })}
-        <p
+        <div
           style={{
-            fontFamily: "'GT Alpina'",
-            fontSize,
-            fontStyle: 'italic',
             display: 'flex',
+            backgroundColor: 'transparent',
             justifyContent: 'center',
-            width: '520px',
-            margin: 0,
-            textAlign: 'center',
-            letterSpacing,
+            alignItems: 'center',
+            height: '100%',
+            width: '100%',
+            position: 'relative',
           }}
         >
-          {displayedTitle}
-        </p>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <p
+              style={{
+                fontFamily: "'GT Alpina Italic'",
+                fontSize,
+                maxWidth: '520px',
+                letterSpacing,
+                textAlign: 'center',
+              }}
+            >
+              {displayedTitle}
+            </p>
+          </div>
+          {showUsername && (
+            <p
+              style={{
+                position: 'absolute',
+                fontFamily: "'GT Alpina'",
+                fontSize: '48px',
+                fontStyle: 'normal',
+                bottom: 7,
+                textAlign: 'center',
+              }}
+            >
+              {ownerName}
+            </p>
+          )}
+        </div>
       </div>
     ),
     {
@@ -280,6 +352,12 @@ export async function generateSplashImageResponse({
       fonts: [
         {
           name: 'GT Alpina',
+          data: alpinaLightFontData,
+          style: 'normal',
+          weight: 500,
+        },
+        {
+          name: 'GT Alpina Italic',
           data: alpinaLightItalicFontData,
           style: 'italic',
           weight: 500,
@@ -289,6 +367,6 @@ export async function generateSplashImageResponse({
         // 24 hours
         'Cache-Control': 'public, immutable, no-transform, max-age=86400',
       },
-    }
+    },
   );
 }

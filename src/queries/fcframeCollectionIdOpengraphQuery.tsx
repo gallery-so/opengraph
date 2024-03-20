@@ -12,6 +12,9 @@ export const fcframeCollectionIdOpengraphQuery = `
         name
         tokens {
           token {
+            owner {
+              username
+            }
             dbid
             definition {
               name

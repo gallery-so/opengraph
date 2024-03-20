@@ -49,7 +49,7 @@ const handler = async (req: NextApiRequest) => {
 
     const tokensToDisplay = getPreviewTokens(
       collection.tokens.map((el) => el?.token),
-      `${Number(position) - 1}`
+      `${Number(position) - 1}`,
     );
 
     // if no position is explicitly provided, serve splash image
@@ -60,6 +60,7 @@ const handler = async (req: NextApiRequest) => {
         titleText: collection.name,
         numSplashImages: 5,
         tokens: collection.tokens.map((el) => el?.token),
+        showUsername: true,
       });
     }
 
@@ -288,7 +289,7 @@ const handler = async (req: NextApiRequest) => {
             weight: 500,
           },
         ],
-      }
+      },
     );
   } catch (e) {
     console.log('error: ', e);

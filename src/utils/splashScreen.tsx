@@ -5,7 +5,7 @@ import { truncateAndStripMarkdown } from './extractWordsWithinLimit';
 import { HEIGHT_OPENGRAPH_IMAGE, WIDTH_OPENGRAPH_IMAGE, fallbackImageResponse } from './fallback';
 import { alpinaLight, alpinaLightItalic } from './fonts';
 
-const CHAR_LENGTH_CENTER_TITLE = 44;
+const CHAR_LENGTH_CENTER_TITLE = 56;
 const calcLineHeightPx = (largeFont: boolean) => (largeFont ? 160 : 100);
 
 type Position = { left: number; top: number };
@@ -50,8 +50,10 @@ function generatePositionsForSplashImages({
     let dimensionToUse = pickRandomInt(possibleElementSizes);
     do {
       // as we try more attempts, use a smaller size
-      if (attempts > 500) {
+      if (attempts > 400) {
         dimensionToUse = possibleElementSizes[1];
+      } else if (attempts > 700) {
+        dimensionToUse = possibleElementSizes[2];
       }
 
       newPosition = calcRandomPosition({
@@ -241,7 +243,7 @@ export async function generateSplashImageResponse({
 
   const positions = generatePositionsForSplashImages({
     numElements: numSplashImages,
-    possibleElementSizes: [360, 200],
+    possibleElementSizes: [360, 200, 170],
     containerSize: {
       width: WIDTH_OPENGRAPH_IMAGE + excessContainerSize,
       height: HEIGHT_OPENGRAPH_IMAGE + excessContainerSize,
@@ -314,6 +316,7 @@ export async function generateSplashImageResponse({
             justifyContent: 'center',
             alignItems: 'center',
             height: '100%',
+            width: '100%',
             position: 'relative',
           }}
         >
@@ -329,29 +332,28 @@ export async function generateSplashImageResponse({
               style={{
                 fontFamily: "'GT Alpina Italic'",
                 fontSize,
-                width: '520px',
-                margin: 'auto',
-                textAlign: 'center',
+                maxWidth: '520px',
                 letterSpacing,
+                textAlign: 'center',
               }}
             >
               {displayedTitle}
             </p>
-            {showUsername && (
-              <p
-                style={{
-                  position: 'absolute',
-                  fontFamily: "'GT Alpina'",
-                  fontSize: '48px',
-                  fontStyle: 'normal',
-                  top: '300px',
-                  textAlign: 'center',
-                }}
-              >
-                {ownerName}
-              </p>
-            )}
           </div>
+          {showUsername && (
+            <p
+              style={{
+                position: 'absolute',
+                fontFamily: "'GT Alpina'",
+                fontSize: '48px',
+                fontStyle: 'normal',
+                bottom: 7,
+                textAlign: 'center',
+              }}
+            >
+              {ownerName}
+            </p>
+          )}
         </div>
       </div>
     ),

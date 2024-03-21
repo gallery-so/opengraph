@@ -336,6 +336,7 @@ export async function generateSplashImageResponse({
                 fontFamily: "'GT Alpina'",
                 fontSize: '48px',
                 fontStyle: 'normal',
+                letterSpacing: '-3.6px',
                 bottom: 7,
                 textAlign: 'center',
               }}

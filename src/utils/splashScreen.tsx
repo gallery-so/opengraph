@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { ImageResponse } from '@vercel/og';
 import { getPreviewUrl } from '../fetch';
 import { truncateAndStripMarkdown } from './extractWordsWithinLimit';
@@ -257,95 +257,97 @@ export async function generateSplashImageResponse({
 
   return new ImageResponse(
     (
-      <div
-        style={{
-          display: 'flex',
-          width: '100%',
-          height: '100%',
-          backgroundColor: '#ffffff',
-          justifyContent: 'center',
-          alignItems: 'center',
-          position: 'relative',
-        }}
-      >
-        <div
-          className="rectangle"
-          style={{
-            position: 'absolute',
-            top: textAreaBoundingBox.top,
-            left: textAreaBoundingBox.left,
-            width: textAreaBoundingBox.right - textAreaBoundingBox.left,
-            height: textAreaBoundingBox.bottom - textAreaBoundingBox.top,
-          }}
-        />
-        {imagesToRender.map(({ url, top, left, containerHeight }) => {
-          return (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              key={url}
-              alt={url}
-              src={url}
-              style={{
-                position: 'absolute',
-                top,
-                left,
-                maxWidth: `${containerHeight}px`,
-                maxHeight: `${containerHeight}px`,
-                display: 'block',
-                objectFit: 'contain',
-              }}
-              width={containerHeight}
-            />
-          );
-        })}
+      <Suspense div={<div>fallback</div>}>
         <div
           style={{
             display: 'flex',
-            backgroundColor: 'transparent',
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#ffffff',
             justifyContent: 'center',
             alignItems: 'center',
-            height: '100%',
-            width: '100%',
             position: 'relative',
           }}
         >
           <div
+            className="rectangle"
+            style={{
+              position: 'absolute',
+              top: textAreaBoundingBox.top,
+              left: textAreaBoundingBox.left,
+              width: textAreaBoundingBox.right - textAreaBoundingBox.left,
+              height: textAreaBoundingBox.bottom - textAreaBoundingBox.top,
+            }}
+          />
+          {imagesToRender.map(({ url, top, left, containerHeight }) => {
+            return (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={url}
+                alt={url}
+                src={url}
+                style={{
+                  position: 'absolute',
+                  top,
+                  left,
+                  maxWidth: `${containerHeight}px`,
+                  maxHeight: `${containerHeight}px`,
+                  display: 'block',
+                  objectFit: 'contain',
+                }}
+                width={containerHeight}
+              />
+            );
+          })}
+          <div
             style={{
               display: 'flex',
-              flexDirection: 'column',
+              backgroundColor: 'transparent',
               justifyContent: 'center',
               alignItems: 'center',
+              height: '100%',
+              width: '100%',
+              position: 'relative',
             }}
           >
-            <p
+            <div
               style={{
-                fontFamily: "'GT Alpina Italic'",
-                fontSize,
-                maxWidth: '520px',
-                letterSpacing,
-                textAlign: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
               }}
             >
-              {displayedTitle}
-            </p>
+              <p
+                style={{
+                  fontFamily: "'GT Alpina Italic'",
+                  fontSize,
+                  maxWidth: '520px',
+                  letterSpacing,
+                  textAlign: 'center',
+                }}
+              >
+                {displayedTitle}
+              </p>
+            </div>
+            {showUsername && (
+              <p
+                style={{
+                  position: 'absolute',
+                  fontFamily: "'GT Alpina'",
+                  fontSize: '48px',
+                  fontStyle: 'normal',
+                  letterSpacing: '-3.6px',
+                  bottom: 7,
+                  textAlign: 'center',
+                }}
+              >
+                {ownerName}
+              </p>
+            )}
           </div>
-          {showUsername && (
-            <p
-              style={{
-                position: 'absolute',
-                fontFamily: "'GT Alpina'",
-                fontSize: '48px',
-                fontStyle: 'normal',
-                letterSpacing: '-3.6px',
-                bottom: 7,
-                textAlign: 'center',
-              }}
-            >
-              {ownerName}
-            </p>
-          )}
         </div>
-      </div>
+      </Suspense>
     ),
     {
       width: WIDTH_OPENGRAPH_IMAGE,

@@ -51,13 +51,15 @@ const handler = async (req: NextApiRequest) => {
     const ABCDiatypeBoldFontData = await ABCDiatypeBold;
     const alpinaLightFontData = await alpinaLight;
 
-    const temoIgnoreTokensWithIds = ['2bT2G4iiB0LfMVZ6k3YfdiIs8sU'];
+    const tempIgnoreTokensWithIds = ['2bT2G4iiB0LfMVZ6k3YfdiIs8sU', '2bhcj7DcaxAROSHodJH99glBt17'];
 
     const tokens = gallery.collections
       .filter((collection) => !collection?.hidden)
       .flatMap((collection) => collection?.tokens)
       .map((el) => el?.token)
-      .filter((token) => !temoIgnoreTokensWithIds.includes(token.dbid));
+      .filter((token) => {
+        return !tempIgnoreTokensWithIds.filter((tokenId) => token.dbid === tokenId).length;
+      });
 
     // if no position is explicitly provided, serve splash image
     let showSplashScreen = !position;

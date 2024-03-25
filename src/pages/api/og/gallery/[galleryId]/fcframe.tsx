@@ -53,8 +53,9 @@ const handler = async (req: NextApiRequest) => {
 
     const tempIgnoreTokensWithIds = [
       '2bT2G4iiB0LfMVZ6k3YfdiIs8sU',
+      '2bT2FzE3iB59Zm5PTUTAhM9lor7',
+      '2blxlBBmty8MFX3qLevWqOXorJX',
       '2bhcj7DcaxAROSHodJH99glBt17',
-      '2dbdYbvUNK8t51wBqrIuqk2hV4N',
     ];
 
     const tokens = gallery.collections

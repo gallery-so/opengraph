@@ -51,10 +51,13 @@ const handler = async (req: NextApiRequest) => {
     const ABCDiatypeBoldFontData = await ABCDiatypeBold;
     const alpinaLightFontData = await alpinaLight;
 
+    const temoIgnoreTokensWithIds = ['2bT2G4iiB0LfMVZ6k3YfdiIs8sU'];
+
     const tokens = gallery.collections
       .filter((collection) => !collection?.hidden)
       .flatMap((collection) => collection?.tokens)
-      .map((el) => el?.token);
+      .map((el) => el?.token)
+      .filter((token) => !temoIgnoreTokensWithIds.includes(token.dbid));
 
     // if no position is explicitly provided, serve splash image
     let showSplashScreen = !position;

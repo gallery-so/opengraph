@@ -51,11 +51,16 @@ const handler = async (req: NextApiRequest) => {
     const ABCDiatypeBoldFontData = await ABCDiatypeBold;
     const alpinaLightFontData = await alpinaLight;
 
+    // TODO(Rohan): remove these once we can support these assets
+    // temp fix to get the WLTA winner gallery frames working
     const tempIgnoreTokensWithIds = [
       '2bT2G4iiB0LfMVZ6k3YfdiIs8sU',
       '2bT2FzE3iB59Zm5PTUTAhM9lor7',
       '2blxlBBmty8MFX3qLevWqOXorJX',
       '2bhcj7DcaxAROSHodJH99glBt17',
+      '2cPoZ0hrNJbaiNsMOvLkeHrfIFc',
+      '2bT2FzEWNvgShbVLFwWDMnZ36ud',
+      '2cPoYvcYW2xsDoSHhJn9YoMFjY2',
     ];
 
     const tokens = gallery.collections

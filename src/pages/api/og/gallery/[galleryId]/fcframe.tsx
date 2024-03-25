@@ -51,7 +51,11 @@ const handler = async (req: NextApiRequest) => {
     const ABCDiatypeBoldFontData = await ABCDiatypeBold;
     const alpinaLightFontData = await alpinaLight;
 
-    const tempIgnoreTokensWithIds = ['2bT2G4iiB0LfMVZ6k3YfdiIs8sU', '2bhcj7DcaxAROSHodJH99glBt17'];
+    const tempIgnoreTokensWithIds = [
+      '2bT2G4iiB0LfMVZ6k3YfdiIs8sU',
+      '2bhcj7DcaxAROSHodJH99glBt17',
+      '2dbdYbvUNK8t51wBqrIuqk2hV4N',
+    ];
 
     const tokens = gallery.collections
       .filter((collection) => !collection?.hidden)

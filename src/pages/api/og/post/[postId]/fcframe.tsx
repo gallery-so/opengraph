@@ -28,7 +28,7 @@ const handler = async (req: NextApiRequest) => {
     const postId = url.searchParams.get('postId');
 
     if (!postId || typeof postId !== 'string') {
-      return fallbackImageResponse;
+      throw new Error('Error: post not found');
     }
     console.log({ postId });
 

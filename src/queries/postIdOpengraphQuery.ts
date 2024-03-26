@@ -1,4 +1,5 @@
 import { mediaQuerySubstring } from './_mediaQuerySubstring';
+import { contractAndTokenIdSubstring } from './_contractAndTokenIdSubstring';
 
 export const postIdQuery = `
   query PostIdOpengraphQuery($postId: DBID!) {
@@ -35,6 +36,7 @@ export const postIdQuery = `
           dbid
           definition {
             ${mediaQuerySubstring}
+            ${contractAndTokenIdSubstring}
           }
         }
       }

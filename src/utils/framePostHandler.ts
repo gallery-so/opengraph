@@ -1,4 +1,3 @@
-import { NextApiRequest } from 'next';
 import { extractBody } from './extractBody';
 import { FrameImageMetadata, FrameMetadataType, getFrameHtmlResponse } from '@coinbase/onchainkit';
 import { fetchGraphql } from '../fetch';
@@ -9,7 +8,13 @@ import { fcframeGalleryIdOpengraphQuery } from '../queries/fcframeGalleryIdOpeng
 import { getPreviewTokens } from './getPreviewTokens';
 import { getTokenMintTarget } from './getTokenMintTarget';
 
-type FrameType = 'CollectionFrame' | 'UserFrame' | 'CommunityFrame' | 'GalleryFrame' | null;
+type FrameType =
+  | 'CollectionFrame'
+  | 'UserFrame'
+  | 'CommunityFrame'
+  | 'GalleryFrame'
+  | 'PostFrame'
+  | null;
 
 type FramePostHandlerProps = {
   req: NextApiRequest;
@@ -131,10 +136,11 @@ export async function framePostHandler({
       throw new Error('Error: user not found');
     }
     const tokens = user.galleries
-      ?.filter((gallery: { collections: any[] }) =>
-        gallery?.collections?.some(
-          (collection: { tokens: string | any[] }) => collection?.tokens?.length
-        )
+      ?.filter(
+        (gallery: { collections: any[] }) =>
+          gallery?.collections?.some(
+            (collection: { tokens: string | any[] }) => collection?.tokens?.length,
+          ),
       )?.[0]
       .collections?.filter((collection: { hidden: any }) => !collection?.hidden)
       .flatMap((collection: { tokens: any }) => collection?.tokens)

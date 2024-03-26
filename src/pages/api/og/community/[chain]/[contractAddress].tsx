@@ -1,10 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 import React from 'react';
 import { NextApiRequest } from 'next';
-import { fallbackImageResponse } from '../../../../../../utils/fallback';
-import { fetchGraphql } from '../../../../../../fetch';
-import { fcframeContractCommunityOpengraphQuery } from '../../../../../../queries/fcframeContractCommunityOpengraphQuery';
-import { generateSplashImageResponse } from '../../../../../../utils/splashScreen';
+import { fallbackImageResponse } from '../../../../../utils/fallback';
+import { fetchGraphql } from '../../../../../fetch';
+import { fcframeContractCommunityOpengraphQuery } from '../../../../../queries/fcframeContractCommunityOpengraphQuery';
+import { generateSplashImageResponse } from '../../../../../utils/splashScreen';
 
 export const config = {
   runtime: 'edge',
@@ -17,7 +17,6 @@ const handler = async (req: NextApiRequest) => {
     const url = new URL(req.url ?? '');
     const chain = url.searchParams.get('chain');
     const contractAddress = url.searchParams.get('contractAddress');
-    const position = url.searchParams.get('position');
 
     if (!chain || typeof chain !== 'string') {
       return fallbackImageResponse;

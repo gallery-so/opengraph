@@ -2,9 +2,9 @@ import React from 'react';
 import { NextApiRequest } from 'next';
 
 import { fetchGraphql, getPreviewUrl } from '../../../../fetch';
-import { collectionIdIdOpengraphQuery } from '../../../../queries/collectionIdOpengraphQuery';
+import { fcframeCollectionIdOpengraphQuery } from '../../../../queries/fcframeCollectionIdOpengraphQuery';
 import { fallbackImageResponse } from '../../../../utils/fallback';
-import { generateSplashImageResponse } from '../../../../../../utils/splashScreen';
+import { generateSplashImageResponse } from '../../../../utils/splashScreen';
 
 export const config = {
   runtime: 'edge',
@@ -20,7 +20,7 @@ const handler = async (req: NextApiRequest) => {
     }
 
     const queryResponse = await fetchGraphql({
-      queryText: collectionIdIdOpengraphQuery,
+      queryText: fcframeCollectionIdOpengraphQuery,
       variables: { collectionId: collectionId },
     });
 

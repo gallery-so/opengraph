@@ -1,9 +1,10 @@
+import React from 'react';
+import { NextApiRequest } from 'next';
+
 import { fetchGraphql } from '../../../../fetch';
 import { fcframeGalleryIdOpengraphQuery } from '../../../../queries/fcframeGalleryIdOpengraphQuery';
-import { fallbackImageResponse } from '../../../../../../utils/fallback';
-import { NextApiRequest } from 'next';
-import { generateSplashImageResponse } from '../../../../../../utils/splashScreen';
-import React from 'react';
+import { fallbackImageResponse } from '../../../../utils/fallback';
+import { generateSplashImageResponse } from '../../../../utils/splashScreen';
 
 export const config = {
   runtime: 'edge',

@@ -1,6 +1,7 @@
 import { NextApiRequest } from 'next';
-import { extractBody } from './extractBody';
 import { FrameImageMetadata, FrameMetadataType, getFrameHtmlResponse } from '@coinbase/onchainkit';
+
+import { extractBody } from './extractBody';
 import { fetchGraphql } from '../fetch';
 import { fcframeContractCommunityDimensionsOpengraphQuery } from '../queries/fcframeContractCommunityOpengraphQuery';
 import { fcframeUsernameOpengraphQuery } from '../queries/fcframeUsernameOpengraphQuery';
@@ -9,13 +10,7 @@ import { fcframeGalleryIdOpengraphQuery } from '../queries/fcframeGalleryIdOpeng
 import { getPreviewTokens } from './getPreviewTokens';
 import { getTokenMintTarget } from './getTokenMintTarget';
 
-type FrameType =
-  | 'CollectionFrame'
-  | 'UserFrame'
-  | 'CommunityFrame'
-  | 'GalleryFrame'
-  | 'PostFrame'
-  | null;
+type FrameType = 'CollectionFrame' | 'UserFrame' | 'CommunityFrame' | 'GalleryFrame' | null;
 
 type FramePostHandlerProps = {
   req: NextApiRequest;

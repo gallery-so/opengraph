@@ -1,3 +1,4 @@
+import { NextApiRequest } from 'next';
 import { extractBody } from './extractBody';
 import { FrameImageMetadata, FrameMetadataType, getFrameHtmlResponse } from '@coinbase/onchainkit';
 import { fetchGraphql } from '../fetch';

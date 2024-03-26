@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+import React from 'react';
 import { ImageResponse } from '@vercel/og';
 import { fetchGraphql, getPreviewUrl } from '../../../../../fetch';
 import { getTokenMintTarget } from '../../../../../utils/getTokenMintTarget';
@@ -16,7 +17,6 @@ import {
 
 import { postIdQuery } from '../../../../../queries/postIdOpengraphQuery';
 import { NextApiRequest } from 'next';
-import React from 'react';
 
 export const config = {
   runtime: 'edge',
@@ -69,7 +69,9 @@ const handler = async (req: NextApiRequest) => {
 
     const headers = new Headers();
     headers.append('Content-Type', 'text/html');
+
     const image = url.toString();
+    const postUrl = url.toString();
 
     const htmlConfig = {
       buttons: frameButtons.length ? frameButtons : null,
@@ -77,6 +79,7 @@ const handler = async (req: NextApiRequest) => {
         src: image,
         aspectRatio: '1.91:1',
       } as FrameImageMetadata,
+      postUrl,
     };
 
     const html = getFrameHtmlResponse(htmlConfig);

@@ -10,7 +10,13 @@ import { fcframeGalleryIdOpengraphQuery } from '../queries/fcframeGalleryIdOpeng
 import { getPreviewTokens } from './getPreviewTokens';
 import { getTokenMintTarget } from './getTokenMintTarget';
 
-type FrameType = 'CollectionFrame' | 'UserFrame' | 'CommunityFrame' | 'GalleryFrame' | null;
+type FrameType =
+  | 'CollectionFrame'
+  | 'UserFrame'
+  | 'CommunityFrame'
+  | 'GalleryFrame'
+  | 'PostFrame'
+  | null;
 
 type FramePostHandlerProps = {
   req: NextApiRequest;

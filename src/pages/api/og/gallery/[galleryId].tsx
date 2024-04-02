@@ -31,7 +31,7 @@ const handler = async (req: NextApiRequest) => {
 
     // TODO(Rohan): remove these once we can support these assets
     // temp fix to get the WLTA winner gallery frames working
-    const tempIgnoreTokensWithIds = [
+    const tempIgnoreTokensWithIds = new Set([
       '2bT2G4iiB0LfMVZ6k3YfdiIs8sU',
       '2bT2FzE3iB59Zm5PTUTAhM9lor7',
       '2blxlBBmty8MFX3qLevWqOXorJX',
@@ -39,15 +39,13 @@ const handler = async (req: NextApiRequest) => {
       '2cPoZ0hrNJbaiNsMOvLkeHrfIFc',
       '2bT2FzEWNvgShbVLFwWDMnZ36ud',
       '2cPoYvcYW2xsDoSHhJn9YoMFjY2',
-    ];
+    ]);
 
     const tokens = gallery.collections
       .filter((collection) => !collection?.hidden)
       .flatMap((collection) => collection?.tokens)
       .map((el) => el?.token)
-      .filter((token) => {
-        return !tempIgnoreTokensWithIds.filter((tokenId) => token.dbid === tokenId).length;
-      });
+      .filter((token) => !tempIgnoreTokensWithIds.has(token?.dbid));
 
     return generateSplashImageResponse({
       titleText: gallery.name,

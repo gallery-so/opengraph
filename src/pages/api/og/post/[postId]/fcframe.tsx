@@ -47,7 +47,7 @@ const handler = async (req: NextApiRequest) => {
     let profileImageUrl = '';
     const { token: profileToken, profileImage } = post?.author?.profileImage ?? {};
 
-    if (profileImage && profileImage.previewURLs?.medium) {
+    if (profileImage?.previewURLs?.medium) {
       profileImageUrl = profileImage.previewURLs.medium;
     }
 
@@ -116,7 +116,7 @@ const handler = async (req: NextApiRequest) => {
     let profileImageUrl = '';
     const { token: profileToken, profileImage } = post?.author?.profileImage ?? {};
 
-    if (profileImage && profileImage.previewURLs?.medium) {
+    if (profileImage?.previewURLs?.medium) {
       profileImageUrl = profileImage.previewURLs.medium;
     }
 

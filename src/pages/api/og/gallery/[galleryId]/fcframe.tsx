@@ -10,7 +10,12 @@ import {
   WIDTH_OPENGRAPH_IMAGE,
   HEIGHT_OPENGRAPH_IMAGE,
 } from '../../../../../utils/fallback';
-import { ABCDiatypeRegular, ABCDiatypeBold, alpinaLight } from '../../../../../utils/fonts';
+import {
+  ABCDiatypeRegular,
+  ABCDiatypeBold,
+  alpinaLight,
+  arialUnicode,
+} from '../../../../../utils/fonts';
 import { framePostHandler } from '../../../../../utils/framePostHandler';
 import { getPreviewTokens } from '../../../../../utils/getPreviewTokens';
 import { generateSplashImageResponse } from '../../../../../utils/splashScreen';
@@ -51,6 +56,7 @@ const handler = async (req: NextApiRequest) => {
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
     const ABCDiatypeBoldFontData = await ABCDiatypeBold;
     const alpinaLightFontData = await alpinaLight;
+    const arialUnicodeFontData = await arialUnicode;
 
     // TODO(Rohan): remove these once we can support these assets
     // temp fix to get the WLTA winner gallery frames working
@@ -303,6 +309,11 @@ const handler = async (req: NextApiRequest) => {
             data: alpinaLightFontData,
             style: 'normal',
             weight: 500,
+          },
+          {
+            name: 'Arial Unicode',
+            data: arialUnicodeFontData,
+            style: 'normal',
           },
         ],
       },

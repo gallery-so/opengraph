@@ -13,3 +13,7 @@ export const alpinaLight = fetch(
 export const alpinaLightItalic = fetch(
   new URL('../assets/fonts/GT-Alpina-Standard-Light-Italic.ttf', import.meta.url).toString(),
 ).then((res) => res.arrayBuffer());
+
+export const arialUnicode = fetch(
+  new URL('../assets/fonts/ArialUnicode.ttf', import.meta.url).toString(),
+).then((res) => res.arrayBuffer());

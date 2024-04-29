@@ -37,9 +37,15 @@ type Token = {
 // eip155:8453:0xab16a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb:1
 
 export function getTokenMintTarget(token: Token) {
-  const chain = token.definition.community.subtype.communityKey.contract.chain;
-  const contractAddress = token.definition.community.subtype.communityKey.contract.address;
-  const tokenId = hexToDec(token.definition.tokenId);
+  if (
+    !token?.definition?.community?.subtype?.communityKey?.contract?.chain ||
+    !token.definition.community.subtype.communityKey.contract.address
+  ) {
+    return null; // Token structure incomplete or lacks necessary data
+  }
+
+  const { chain, address: contractAddress } =
+    token.definition.community.subtype.communityKey.contract;
 
   if (chain === 'Tezos') {
     // Tezos not supported by FC frames
@@ -52,8 +58,16 @@ export function getTokenMintTarget(token: Token) {
     return null;
   }
 
+  // Attempt to convert tokenId to decimal, return null if conversion fails
+  let tokenIdDec;
+  try {
+    tokenIdDec = hexToDec(token.definition.tokenId);
+  } catch (error) {
+    return null; // Invalid tokenId format
+  }
+
   const chainId = evmChainToChainId(chain);
-  return `eip155:${chainId}:${contractAddress}:${tokenId}`;
+  return `eip155:${chainId}:${contractAddress}:${tokenIdDec}`;
 }
 
 function hexToDec(str: string) {

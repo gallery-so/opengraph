@@ -41,7 +41,7 @@ export function getTokenMintTarget(token: Token) {
     !token?.definition?.community?.subtype?.communityKey?.contract?.chain ||
     !token.definition.community.subtype.communityKey.contract.address
   ) {
-    return null; // Token structure incomplete or lacks necessary data
+    return null;
   }
 
   const { chain, address: contractAddress } =
@@ -63,7 +63,7 @@ export function getTokenMintTarget(token: Token) {
   try {
     tokenIdDec = hexToDec(token.definition.tokenId);
   } catch (error) {
-    return null; // Invalid tokenId format
+    return null;
   }
 
   const chainId = evmChainToChainId(chain);

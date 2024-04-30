@@ -229,7 +229,11 @@ export async function framePostHandler({
   };
 
   const html = getFrameHtmlResponse(htmlConfig);
-  return new Response(html, {
+
+  // Add UTF-8 charset meta tag
+  const updatedHtml = html.replace('<head>', '<head>\n  <meta charset="UTF-8">');
+
+  return new Response(updatedHtml, {
     status: 200,
     headers,
   });

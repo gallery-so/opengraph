@@ -162,6 +162,13 @@ export async function framePostHandler({
     }
 
     const tokens = collection.tokens.map((el: { token: any }) => el?.token);
+
+    // check if we looped around carousel back and if so, we show the splash screen next
+    const mainPosition = Number(position) % tokens?.length;
+    if (mainPosition === 1) {
+      url.searchParams.delete('position');
+    }
+
     squareAspectRatio = determineAspectRatio(tokens, position);
     mintTarget = getTokenMintTarget(tokens[Number(position) - 1]);
   } else if (frameType === 'GalleryFrame' && position) {
@@ -186,6 +193,12 @@ export async function framePostHandler({
       .filter((collection: { hidden: any }) => !collection?.hidden)
       .flatMap((collection: { tokens: any }) => collection?.tokens)
       .map((el: { token: any }) => el?.token);
+
+    // check if we looped around carousel back and if so, we show the splash screen next
+    const mainPosition = Number(position) % tokens?.length;
+    if (mainPosition === 1) {
+      url.searchParams.delete('position');
+    }
 
     squareAspectRatio = determineAspectRatio(tokens, position);
     mintTarget = getTokenMintTarget(tokens[Number(position) - 1]);
@@ -216,7 +229,11 @@ export async function framePostHandler({
   };
 
   const html = getFrameHtmlResponse(htmlConfig);
-  return new Response(html, {
+
+  // Add UTF-8 charset meta tag
+  const updatedHtml = html.replace('<head>', '<head>\n  <meta charset="UTF-8">');
+
+  return new Response(updatedHtml, {
     status: 200,
     headers,
   });

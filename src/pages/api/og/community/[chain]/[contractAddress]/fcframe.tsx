@@ -14,6 +14,19 @@ import { framePostHandler, isImageTall } from '../../../../../../utils/framePost
 import { getPreviewTokens } from '../../../../../../utils/getPreviewTokens';
 import { generateSplashImageResponse } from '../../../../../../utils/splashScreen';
 
+import {
+  containerStyle,
+  blurredLeftSideImageStyle,
+  blurredRightSideImageStyle,
+  centeredImageContainerStyle,
+  imageDescriptionStyle,
+  textStyle,
+  boldTextStyle,
+  imageStyle,
+  columnFlexStyle,
+  columnAltFlexStyle,
+} from '../../../../../../styles';
+
 export const config = {
   runtime: 'edge',
 };
@@ -102,203 +115,38 @@ const handler = async (req: NextApiRequest) => {
       if (squareAspectRatio) {
         return new ImageResponse(
           (
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                width: '100%',
-                height: '100%',
-                minHeight: 200,
-                backgroundColor: '#ffffff',
-                gap: leftToken ? 460 : 800,
-                alignItems: 'center',
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  position: 'relative',
-                  marginLeft: '-65%',
-                  filter: 'blur(6px)',
-                  opacity: 0.26,
-                }}
-              >
+            <div style={containerStyle}>
+              <div style={blurredLeftSideImageStyle}>
                 {leftToken ? (
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <img
-                      src={leftToken?.src}
-                      style={{
-                        maxWidth: '340px',
-                        maxHeight: '380px',
-                        display: 'block',
-                        objectFit: 'contain',
-                      }}
-                      alt="left token"
-                    />
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        marginTop: 8,
-                        justifyContent: 'flex-start',
-                        filter: 'blur(2px)',
-                      }}
-                    >
-                      <p
-                        style={{
-                          fontFamily: "'ABCDiatype-Regular'",
-                          fontSize: '14px',
-                          fontWeight: 400,
-                          lineHeight: '20px',
-                          margin: 0,
-                        }}
-                      >
-                        {leftToken?.name}
-                      </p>
-                      <p
-                        style={{
-                          fontFamily: "'ABCDiatype-Bold'",
-                          fontSize: '14px',
-                          fontWeight: 400,
-                          lineHeight: '20px',
-                          margin: 0,
-                        }}
-                      >
-                        {leftToken?.ownerName}
-                      </p>
+                  <div style={columnAltFlexStyle}>
+                    <img src={leftToken?.src} style={imageStyle} alt="left token" />
+                    <div style={imageDescriptionStyle}>
+                      <p style={textStyle}>{leftToken?.name}</p>
+                      <p style={boldTextStyle}>{leftToken?.ownerName}</p>
                     </div>
                   </div>
                 ) : null}
               </div>
 
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  position: 'absolute',
-                  width: '100%',
-
-                  height: '100%',
-                }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    width: '100%',
-                    alignItems: 'center',
-                    gap: '8px',
-                  }}
-                >
-                  <div
-                    style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
-                  >
-                    <img
-                      src={centerToken?.src}
-                      style={{
-                        maxWidth: '380px',
-                        maxHeight: '380px',
-                        display: 'block',
-                        objectFit: 'contain',
-                      }}
-                      alt="center token"
-                    />
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        marginTop: 8,
-                        alignItems: 'flex-start',
-                        justifyContent: 'flex-start',
-                      }}
-                    >
-                      <p
-                        style={{
-                          fontFamily: "'ABCDiatype-Regular'",
-                          fontSize: '14px',
-                          fontWeight: 'light',
-                          lineHeight: '20px',
-                          margin: 0,
-                        }}
-                      >
-                        {centerToken?.name}
-                      </p>
-                      <p
-                        style={{
-                          fontFamily: "'ABCDiatype-Bold'",
-                          fontSize: '14px',
-                          fontWeight: 400,
-                          lineHeight: '18px',
-                          margin: 0,
-                        }}
-                      >
-                        {centerToken?.ownerName}
-                      </p>
+              <div style={centeredImageContainerStyle}>
+                <div style={columnFlexStyle}>
+                  <div style={columnAltFlexStyle}>
+                    <img src={centerToken?.src} style={imageStyle} alt="center token" />
+                    <div style={imageDescriptionStyle}>
+                      <p style={textStyle}>{centerToken?.name}</p>
+                      <p style={boldTextStyle}>{centerToken?.ownerName}</p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div
-                style={{
-                  display: 'flex',
-                  position: 'relative',
-                  marginRight: '-65%',
-                  filter: 'blur(6px)',
-                  opacity: 0.26,
-                }}
-              >
+              <div style={blurredRightSideImageStyle}>
                 {rightToken ? (
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      width: '380px',
-                    }}
-                  >
-                    <img
-                      src={rightToken?.src}
-                      style={{
-                        maxWidth: '340px',
-                        maxHeight: '380px',
-                        display: 'block',
-                        objectFit: 'contain',
-                      }}
-                      alt="right token"
-                    />
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        marginTop: 8,
-                        justifyContent: 'flex-start',
-                        filter: 'blur(2px)',
-                      }}
-                    >
-                      <p
-                        style={{
-                          fontFamily: "'ABCDiatype-Regular'",
-                          fontSize: '14px',
-                          fontWeight: 400,
-                          lineHeight: '20px',
-                          margin: 0,
-                        }}
-                      >
-                        {rightToken?.name}
-                      </p>
-                      <p
-                        style={{
-                          fontFamily: "'ABCDiatype-Bold'",
-                          fontSize: '14px',
-                          fontWeight: 400,
-                          lineHeight: '20px',
-                          margin: 0,
-                        }}
-                      >
-                        {rightToken?.ownerName}
-                      </p>
+                  <div style={columnAltFlexStyle}>
+                    <img src={rightToken?.src} style={imageStyle} alt="right token" />
+                    <div style={imageDescriptionStyle}>
+                      <p style={textStyle}>{rightToken?.name}</p>
+                      <p style={boldTextStyle}>{rightToken?.ownerName}</p>
                     </div>
                   </div>
                 ) : null}
@@ -306,8 +154,8 @@ const handler = async (req: NextApiRequest) => {
             </div>
           ),
           {
-            width: 500,
-            height: 500,
+            width: WIDTH_OPENGRAPH_IMAGE,
+            height: HEIGHT_OPENGRAPH_IMAGE,
             fonts: [
               {
                 name: 'ABCDiatype-Regular',
@@ -326,200 +174,42 @@ const handler = async (req: NextApiRequest) => {
                 weight: 500,
               },
             ],
-          }
+          },
         );
       }
 
       return new ImageResponse(
         (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              width: '100%',
-              height: '100%',
-              minHeight: 200,
-              backgroundColor: '#ffffff',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                position: 'relative',
-                marginLeft: '-25%',
-                filter: 'blur(6px)',
-                opacity: 0.26,
-              }}
-            >
+          <div style={containerStyle}>
+            <div style={blurredLeftSideImageStyle}>
               {leftToken ? (
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <img
-                    width="500"
-                    height="500"
-                    src={leftToken?.src}
-                    style={{
-                      maxWidth: '500px',
-                      maxHeight: '500px',
-                      display: 'block',
-                      objectFit: 'contain',
-                    }}
-                    alt="left token"
-                  />
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'flex-start',
-                      filter: 'blur(2px)',
-                    }}
-                  >
-                    <p
-                      style={{
-                        fontFamily: "'ABCDiatype-Regular'",
-                        fontSize: '14px',
-                        fontWeight: 400,
-                        lineHeight: '20px',
-                        margin: 0,
-                      }}
-                    >
-                      {leftToken?.name}
-                    </p>
-                    <p
-                      style={{
-                        fontFamily: "'ABCDiatype-Bold'",
-                        fontSize: '14px',
-                        fontWeight: 400,
-                        lineHeight: '20px',
-                        margin: 0,
-                      }}
-                    >
-                      {leftToken?.ownerName}
-                    </p>
+                <div style={columnAltFlexStyle}>
+                  <img src={leftToken?.src} style={imageStyle} alt="left token" />
+                  <div style={imageDescriptionStyle}>
+                    <p style={textStyle}>{leftToken?.name}</p>
+                    <p style={boldTextStyle}>{leftToken?.ownerName}</p>
                   </div>
                 </div>
               ) : null}
             </div>
 
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-
-                position: 'absolute',
-                width: '100%',
-
-                height: '100%',
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '8px',
-                }}
-              >
-                <img
-                  width="500"
-                  height="500"
-                  src={centerToken?.src}
-                  style={{
-                    maxWidth: '500px',
-                    maxHeight: '500px',
-                    display: 'block',
-                    objectFit: 'contain',
-                  }}
-                  alt="center token"
-                />
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'flex-start',
-                  }}
-                >
-                  <p
-                    style={{
-                      fontFamily: "'ABCDiatype-Regular'",
-                      fontSize: '14px',
-                      fontWeight: 'light',
-                      lineHeight: '20px',
-                      margin: 0,
-                    }}
-                  >
-                    {centerToken?.name}
-                  </p>
-                  <p
-                    style={{
-                      fontFamily: "'ABCDiatype-Bold'",
-                      fontSize: '14px',
-                      fontWeight: 400,
-                      lineHeight: '20px',
-                      margin: 0,
-                    }}
-                  >
-                    {centerToken?.ownerName}
-                  </p>
+            <div style={centeredImageContainerStyle}>
+              <div style={columnFlexStyle}>
+                <img src={centerToken?.src} style={imageStyle} alt="center token" />
+                <div style={imageDescriptionStyle}>
+                  <p style={textStyle}>{centerToken?.name}</p>
+                  <p style={boldTextStyle}>{centerToken?.ownerName}</p>
                 </div>
               </div>
             </div>
 
-            <div
-              style={{
-                display: 'flex',
-                position: 'relative',
-                marginRight: '-25%',
-                filter: 'blur(6px)',
-                opacity: 0.26,
-              }}
-            >
+            <div style={blurredRightSideImageStyle}>
               {rightToken ? (
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <img
-                    width="500"
-                    height="500"
-                    src={rightToken?.src}
-                    style={{
-                      maxWidth: '500px',
-                      maxHeight: '500px',
-                      display: 'block',
-                      objectFit: 'contain',
-                    }}
-                    alt="right token"
-                  />
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'flex-start',
-                      filter: 'blur(2px)',
-                    }}
-                  >
-                    <p
-                      style={{
-                        fontFamily: "'ABCDiatype-Regular'",
-                        fontSize: '14px',
-                        fontWeight: 400,
-                        lineHeight: '20px',
-                        margin: 0,
-                      }}
-                    >
-                      {rightToken?.name}
-                    </p>
-                    <p
-                      style={{
-                        fontFamily: "'ABCDiatype-Bold'",
-                        fontSize: '14px',
-                        fontWeight: 400,
-                        lineHeight: '20px',
-                        margin: 0,
-                      }}
-                    >
-                      {rightToken?.ownerName}
-                    </p>
+                <div style={columnAltFlexStyle}>
+                  <img src={rightToken?.src} style={imageStyle} alt="right token" />
+                  <div style={imageDescriptionStyle}>
+                    <p style={textStyle}>{rightToken?.name}</p>
+                    <p style={boldTextStyle}>{rightToken?.ownerName}</p>
                   </div>
                 </div>
               ) : null}
@@ -547,7 +237,7 @@ const handler = async (req: NextApiRequest) => {
               weight: 500,
             },
           ],
-        }
+        },
       );
     }
   } catch (e) {

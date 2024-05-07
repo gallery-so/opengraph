@@ -1,4 +1,6 @@
-export const containerStyle = {
+import { CSSProperties } from 'react';
+
+export const containerStyle: CSSProperties = {
   display: 'flex',
   flexDirection: 'row',
   width: '100%',
@@ -9,7 +11,7 @@ export const containerStyle = {
   alignItems: 'center',
 };
 
-export const blurredLeftSideImageStyle = {
+export const blurredLeftSideImageStyle: CSSProperties = {
   display: 'flex',
   position: 'relative',
   marginLeft: '-25%',
@@ -17,7 +19,7 @@ export const blurredLeftSideImageStyle = {
   opacity: 0.26,
 };
 
-export const centeredImageContainerStyle = {
+export const centeredImageContainerStyle: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
@@ -27,7 +29,7 @@ export const centeredImageContainerStyle = {
   height: '100%',
 };
 
-export const blurredRightSideImageStyle = {
+export const blurredRightSideImageStyle: CSSProperties = {
   display: 'flex',
   position: 'relative',
   marginRight: '-25%',
@@ -35,14 +37,14 @@ export const blurredRightSideImageStyle = {
   opacity: 0.26,
 };
 
-export const imageDescriptionStyle = {
+export const imageDescriptionStyle: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'flex-start',
   filter: 'blur(2px)',
 };
 
-export const textStyle = {
+export const textStyle: CSSProperties = {
   fontFamily: "'ABCDiatype-Regular'",
   fontSize: '14px',
   fontWeight: 400,
@@ -50,7 +52,7 @@ export const textStyle = {
   margin: 0,
 };
 
-export const boldTextStyle = {
+export const boldTextStyle: CSSProperties = {
   fontFamily: "'ABCDiatype-Bold'",
   fontSize: '14px',
   fontWeight: 400,
@@ -58,20 +60,20 @@ export const boldTextStyle = {
   margin: 0,
 };
 
-export const imageStyle = {
+export const imageStyle: CSSProperties = {
   maxWidth: '500px',
   maxHeight: '500px',
   display: 'block',
   objectFit: 'contain',
 };
 
-export const columnFlexStyle = {
+export const columnFlexStyle: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   gap: '8px',
 };
 
-export const columnAltFlexStyle = {
+export const columnAltFlexStyle: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
 };

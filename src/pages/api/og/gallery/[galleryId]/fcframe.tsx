@@ -100,27 +100,20 @@ const handler = async (req: NextApiRequest) => {
 
     return new ImageResponse(
       (
-        <div style={containerStyle as CSSProperties}>
-          <div style={blurredLeftSideImageStyle as CSSProperties}>
+        <div style={containerStyle}>
+          <div style={blurredLeftSideImageStyle}>
             {leftToken ? (
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <img
-                  width="500"
-                  height="500"
-                  src={leftToken?.src}
-                  style={imageStyle as CSSProperties}
-                  alt="post"
-                />
-                <div style={imageDescriptionStyle as CSSProperties}>
-                  <p style={textStyle as CSSProperties}>{leftToken?.name}</p>
-                  <p style={boldTextStyle as CSSProperties}>{leftToken?.communityName}</p>
+                <img width="500" height="500" src={leftToken?.src} style={imageStyle} alt="post" />
+                <div style={imageDescriptionStyle}>
+                  <p style={textStyle}>{leftToken?.name}</p>
+                  <p style={boldTextStyle}>{leftToken?.communityName}</p>
                 </div>
               </div>
             ) : null}
           </div>
-
-          <div style={centeredImageContainerStyle as CSSProperties}>
-            <div style={columnFlexStyle as CSSProperties}>
+          <div style={centeredImageContainerStyle}>
+            <div style={columnFlexStyle}>
               <img
                 width="500"
                 height="500"
@@ -128,14 +121,14 @@ const handler = async (req: NextApiRequest) => {
                 style={imageStyle as CSSProperties}
                 alt="post"
               />
-              <div style={columnAltFlexStyle as CSSProperties}>
+              <div style={columnAltFlexStyle}>
                 <p style={textStyle}>{centerToken?.name}</p>
                 <p style={boldTextStyle}>{centerToken?.communityName}</p>
               </div>
             </div>
           </div>
 
-          <div style={blurredRightSideImageStyle as CSSProperties}>
+          <div style={blurredRightSideImageStyle}>
             {rightToken ? (
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <img
@@ -145,9 +138,9 @@ const handler = async (req: NextApiRequest) => {
                   style={imageStyle as CSSProperties}
                   alt="post"
                 />
-                <div style={imageDescriptionStyle as CSSProperties}>
-                  <p style={textStyle as CSSProperties}>{rightToken?.name}</p>
-                  <p style={boldTextStyle as CSSProperties}>{rightToken?.communityName}</p>
+                <div style={imageDescriptionStyle}>
+                  <p style={textStyle}>{rightToken?.name}</p>
+                  <p style={boldTextStyle}>{rightToken?.communityName}</p>
                 </div>
               </div>
             ) : null}

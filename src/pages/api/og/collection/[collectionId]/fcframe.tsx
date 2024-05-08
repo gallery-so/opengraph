@@ -12,7 +12,10 @@ import {
 import { framePostHandler } from '../../../../../utils/framePostHandler';
 import { getPreviewTokens } from '../../../../../utils/getPreviewTokens';
 import React from 'react';
-import { generateSplashImageResponse } from '../../../../../utils/splashScreen';
+import {
+  generateSplashImageResponse,
+  shouldShowSplashScreen,
+} from '../../../../../utils/splashScreen';
 import {
   containerStyle,
   blurredLeftSideImageStyle,
@@ -59,19 +62,16 @@ const handler = async (req: NextApiRequest) => {
       return fallbackImageResponse;
     }
 
-    const tokensToDisplay = getPreviewTokens(
-      collection.tokens.map((el) => el?.token),
-      `${Number(position) - 1}`,
-    );
+    let tokens = collection.tokens.map((el) => el?.token);
+    const tokensToDisplay = getPreviewTokens(tokens, `${Number(position) - 1}`);
 
     // if no position is explicitly provided, serve splash image
-    let showSplashScreen = !position;
-
+    let showSplashScreen = shouldShowSplashScreen({ position, carouselLength: tokens?.length + 1 });
     if (showSplashScreen) {
       return generateSplashImageResponse({
         titleText: collection.name,
         numSplashImages: 5,
-        tokens: collection.tokens.map((el) => el?.token),
+        tokens: tokens,
         showUsername: true,
       });
     }

@@ -17,6 +17,8 @@ export const getPreviewTokens = (allTokens: any[], position: string | null) => {
     }
   });
   const tokensLength = tokens.length ?? 0;
+  const carouselLength = tokensLength + 1;
+
   if (tokensLength === 1) {
     const current = tokens[0];
     return { left: null, current, right: null };
@@ -31,7 +33,7 @@ export const getPreviewTokens = (allTokens: any[], position: string | null) => {
   }
 
   // handle tokensLength === 2 separately
-  const mainPosition = Number(position) % tokensLength;
+  const mainPosition = Number(position) % carouselLength;
   if (tokensLength === 2) {
     if (mainPosition === 0) {
       const current = tokens[0];
@@ -44,15 +46,11 @@ export const getPreviewTokens = (allTokens: any[], position: string | null) => {
     }
   }
 
-  // if `position` is explicitly set to be the beginning, we'll want to include the
-  // last token in set as `left` in order to represent a wrap-around effect. we only
-  // do this if a position is set as we assume the user has manually clicked through
-  // the entire set.
+  // handle first position separately (left token will be null as splash screen comes before)
   if (mainPosition === 0) {
-    const left = tokens[tokensLength - 1];
     const current = tokens[0];
     const right = tokens[1];
-    return { left, current, right };
+    return { left: null, current, right };
   }
 
   // for any other position:
@@ -61,7 +59,12 @@ export const getPreviewTokens = (allTokens: any[], position: string | null) => {
   const current = tokens[mainPosition];
   // `right` may overflow beyond the length of the set if `current` is the last element.
   // in this case, `right` should simply be the first element to represent wrap-around.
-  const right = mainPosition + 1 >= tokens.length ? tokens[0] : tokens[mainPosition + 1];
+  let right = mainPosition + 1 >= tokens.length ? tokens[0] : tokens[mainPosition + 1];
+
+  // handle splash position separately (left token will be null as splash screen comes next)
+  if (mainPosition === tokensLength - 1) {
+    return { left, current, right: null };
+  }
 
   return { left, current, right };
 };

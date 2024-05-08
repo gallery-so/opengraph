@@ -12,7 +12,10 @@ import {
 import { ABCDiatypeRegular, ABCDiatypeBold, alpinaLight } from '../../../../../utils/fonts';
 import { framePostHandler } from '../../../../../utils/framePostHandler';
 import { getPreviewTokens } from '../../../../../utils/getPreviewTokens';
-import { generateSplashImageResponse } from '../../../../../utils/splashScreen';
+import {
+  generateSplashImageResponse,
+  shouldShowSplashScreen,
+} from '../../../../../utils/splashScreen';
 import {
   containerStyle,
   blurredLeftSideImageStyle,
@@ -68,9 +71,7 @@ const handler = async (req: NextApiRequest) => {
       .flatMap((collection) => collection?.tokens)
       .map((el) => el?.token);
 
-    // if no position is explicitly provided, serve splash image
-    let showSplashScreen = !position;
-
+    let showSplashScreen = shouldShowSplashScreen({ position, carouselLength: tokens?.length + 1 });
     if (showSplashScreen) {
       return generateSplashImageResponse({
         titleText: gallery.name,

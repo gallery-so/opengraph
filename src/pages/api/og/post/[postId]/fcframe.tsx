@@ -18,6 +18,19 @@ import {
 import { postIdQuery } from '../../../../../queries/postIdOpengraphQuery';
 import { NextApiRequest } from 'next';
 
+import {
+  containerStyle,
+  blurredLeftSideImageStyle,
+  blurredRightSideImageStyle,
+  centeredImageContainerStyle,
+  imageDescriptionStyle,
+  textStyle,
+  boldTextStyle,
+  imageStyle,
+  columnFlexStyle,
+  columnAltFlexStyle,
+} from '../../../../../styles';
+
 export const config = {
   runtime: 'edge',
 };
@@ -145,17 +158,7 @@ const handler = async (req: NextApiRequest) => {
 
     return new ImageResponse(
       (
-        <div
-          style={{
-            height: '100%',
-            width: '100%',
-            gap: 60,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: '#fff',
-          }}
-        >
+        <div style={containerStyle}>
           <svg
             style={{ width: '56.74px', height: '196px' }}
             viewBox="0 0 36 121"
@@ -175,23 +178,8 @@ const handler = async (req: NextApiRequest) => {
               justifyContent: 'center',
             }}
           >
-            <img
-              src={postImageUrl}
-              style={{
-                maxWidth: '450px',
-                height: '370px',
-                display: 'block',
-                objectFit: 'contain',
-              }}
-              alt="post"
-            />
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '8px',
-              }}
-            >
+            <img src={postImageUrl} style={imageStyle} alt="post" />
+            <div style={columnFlexStyle}>
               <div
                 style={{
                   display: 'flex',
@@ -228,42 +216,14 @@ const handler = async (req: NextApiRequest) => {
                     {firstLetter}
                   </div>
                 )}
-                <h1
-                  style={{
-                    fontSize: '32px',
-                    lineHeight: '36px',
-                    fontFamily: "'ABCDiatype-Bold'",
-                    letterSpacing: '-0.01em',
-                    margin: '0',
-                    paddingBottom: 4,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  {author?.username}
-                </h1>
+                <h1 style={boldTextStyle}>{author?.username}</h1>
               </div>
               <div
                 style={{
                   display: 'flex',
                 }}
               >
-                <p
-                  style={{
-                    fontFamily: "'ABCDiatype-Regular'",
-                    fontSize: '25px',
-                    fontWeight: 400,
-                    lineHeight: '32px',
-                    overflow: 'hidden',
-                    wordBreak: 'break-word',
-                    maxWidth: '350px',
-                    minWidth: '200px',
-                    margin: 0,
-                  }}
-                >
-                  {captionPlaintext}
-                </p>
+                <p style={textStyle}>{captionPlaintext}</p>
               </div>
             </div>
           </div>

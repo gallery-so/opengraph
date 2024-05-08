@@ -29,13 +29,7 @@ const handler = async (req: NextApiRequest) => {
       return fallbackImageResponse;
     }
 
-    const imageUrls = collection.tokens
-      ?.map((element) => {
-        return element?.token ? getPreviewUrl(element?.token?.definition?.media) : null;
-      })
-      .slice(0, 4);
-
-    if (!imageUrls) {
+    if (!collection?.tokens) {
       return fallbackImageResponse;
     }
 

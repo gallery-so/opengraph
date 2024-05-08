@@ -57,11 +57,10 @@ export const getPreviewTokens = (allTokens: any[], position: string | null) => {
   // `left` will safely never be a negative value since we handled the `mainPosition` 0 case above
   const left = tokens[mainPosition - 1];
   const current = tokens[mainPosition];
-  // `right` may overflow beyond the length of the set if `current` is the last element.
-  // in this case, `right` should simply be the first element to represent wrap-around.
-  let right = mainPosition + 1 >= tokens.length ? tokens[0] : tokens[mainPosition + 1];
+  const right = tokens[mainPosition + 1];
 
-  // handle splash position separately (left token will be null as splash screen comes next)
+  // `right` may overflow beyond the length of the set if `current` is the last element.
+  // handle last position separately (right token will be null as splash screen comes next)
   if (mainPosition === tokensLength - 1) {
     return { left, current, right: null };
   }

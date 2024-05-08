@@ -123,7 +123,7 @@ const handler = async (req: NextApiRequest) => {
               <div style={columnFlexStyle}>
                 <div style={columnAltFlexStyle}>
                   <img src={centerToken?.src} style={imageStyle} alt="center token" />
-                  <div style={imageDescriptionStyle}>
+                  <div style={columnAltFlexStyle}>
                     <p style={textStyle}>{centerToken?.name}</p>
                     <p style={boldTextStyle}>{centerToken?.ownerName}</p>
                   </div>
@@ -187,7 +187,7 @@ const handler = async (req: NextApiRequest) => {
           <div style={centeredImageContainerStyle}>
             <div style={columnFlexStyle}>
               <img src={centerToken?.src} style={imageStyle} alt="center token" />
-              <div style={imageDescriptionStyle}>
+              <div style={columnAltFlexStyle}>
                 <p style={textStyle}>{centerToken?.name}</p>
                 <p style={boldTextStyle}>{centerToken?.ownerName}</p>
               </div>

@@ -371,3 +371,15 @@ export async function generateSplashImageResponse({
     },
   );
 }
+
+type ShouldShowSplashScreenProps = {
+  position?: string;
+  carouselLength?: number;
+};
+
+export function shouldShowSplashScreen({
+  position,
+  carouselLength = 1,
+}: ShouldShowSplashScreenProps): boolean {
+  return !position || Number(position) % carouselLength === 0;
+}

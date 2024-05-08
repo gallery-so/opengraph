@@ -1,5 +1,6 @@
+import React from 'react';
+
 /* eslint-disable @next/next/no-img-element */
-import React, { CSSProperties } from 'react';
 import { NextApiRequest } from 'next';
 import { ImageResponse } from '@vercel/og';
 import { fetchGraphql } from '../../../../../fetch';
@@ -12,7 +13,10 @@ import {
 import { ABCDiatypeRegular, ABCDiatypeBold, alpinaLight } from '../../../../../utils/fonts';
 import { framePostHandler } from '../../../../../utils/framePostHandler';
 import { getPreviewTokens } from '../../../../../utils/getPreviewTokens';
-import { generateSplashImageResponse } from '../../../../../utils/splashScreen';
+import {
+  generateSplashImageResponse,
+  shouldShowSplashScreen,
+} from '../../../../../utils/splashScreen';
 import {
   containerStyle,
   blurredLeftSideImageStyle,
@@ -63,27 +67,12 @@ const handler = async (req: NextApiRequest) => {
     const ABCDiatypeBoldFontData = await ABCDiatypeBold;
     const alpinaLightFontData = await alpinaLight;
 
-    // TODO(Rohan): remove these once we can support these assets
-    // temp fix to get the WLTA winner gallery frames working
-    const tempIgnoreTokensWithIds = new Set([
-      '2bT2G4iiB0LfMVZ6k3YfdiIs8sU',
-      '2bT2FzE3iB59Zm5PTUTAhM9lor7',
-      '2blxlBBmty8MFX3qLevWqOXorJX',
-      '2bhcj7DcaxAROSHodJH99glBt17',
-      '2cPoZ0hrNJbaiNsMOvLkeHrfIFc',
-      '2bT2FzEWNvgShbVLFwWDMnZ36ud',
-      '2cPoYvcYW2xsDoSHhJn9YoMFjY2',
-    ]);
-
     const tokens = gallery.collections
       .filter((collection) => !collection?.hidden)
       .flatMap((collection) => collection?.tokens)
-      .map((el) => el?.token)
-      .filter((token) => !tempIgnoreTokensWithIds.has(token?.dbid));
+      .map((el) => el?.token);
 
-    // if no position is explicitly provided, serve splash image
-    let showSplashScreen = !position;
-
+    let showSplashScreen = shouldShowSplashScreen({ position, carouselLength: tokens?.length + 1 });
     if (showSplashScreen) {
       return generateSplashImageResponse({
         titleText: gallery.name,
@@ -100,54 +89,35 @@ const handler = async (req: NextApiRequest) => {
 
     return new ImageResponse(
       (
-        <div style={containerStyle as CSSProperties}>
-          <div style={blurredLeftSideImageStyle as CSSProperties}>
+        <div style={containerStyle}>
+          <div style={blurredLeftSideImageStyle}>
             {leftToken ? (
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <img
-                  width="500"
-                  height="500"
-                  src={leftToken?.src}
-                  style={imageStyle as CSSProperties}
-                  alt="post"
-                />
-                <div style={imageDescriptionStyle as CSSProperties}>
-                  <p style={textStyle as CSSProperties}>{leftToken?.name}</p>
-                  <p style={boldTextStyle as CSSProperties}>{leftToken?.communityName}</p>
+                <img width="500" height="500" src={leftToken?.src} style={imageStyle} alt="post" />
+                <div style={imageDescriptionStyle}>
+                  <p style={textStyle}>{leftToken?.name}</p>
+                  <p style={boldTextStyle}>{leftToken?.communityName}</p>
                 </div>
               </div>
             ) : null}
           </div>
-
-          <div style={centeredImageContainerStyle as CSSProperties}>
-            <div style={columnFlexStyle as CSSProperties}>
-              <img
-                width="500"
-                height="500"
-                src={centerToken?.src}
-                style={imageStyle as CSSProperties}
-                alt="post"
-              />
-              <div style={columnAltFlexStyle as CSSProperties}>
+          <div style={centeredImageContainerStyle}>
+            <div style={columnFlexStyle}>
+              <img width="500" height="500" src={centerToken?.src} style={imageStyle} alt="post" />
+              <div style={columnAltFlexStyle}>
                 <p style={textStyle}>{centerToken?.name}</p>
                 <p style={boldTextStyle}>{centerToken?.communityName}</p>
               </div>
             </div>
           </div>
 
-          <div style={blurredRightSideImageStyle as CSSProperties}>
+          <div style={blurredRightSideImageStyle}>
             {rightToken ? (
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <img
-                  width="500"
-                  height="500"
-                  src={rightToken?.src}
-                  style={imageStyle as CSSProperties}
-                  alt="post"
-                />
-                <div style={imageDescriptionStyle as CSSProperties}>
-                  <p style={textStyle as CSSProperties}>{rightToken?.name}</p>
-                  <p style={boldTextStyle as CSSProperties}>{rightToken?.communityName}</p>
+                <img width="500" height="500" src={rightToken?.src} style={imageStyle} alt="post" />
+                <div style={imageDescriptionStyle}>
+                  <p style={textStyle}>{rightToken?.name}</p>
+                  <p style={boldTextStyle}>{rightToken?.communityName}</p>
                 </div>
               </div>
             ) : null}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { NextApiRequest } from 'next';
 
-import { fetchGraphql, getPreviewUrl } from '../../../../fetch';
+import { fetchGraphql } from '../../../../fetch';
 import { fcframeCollectionIdOpengraphQuery } from '../../../../queries/fcframeCollectionIdOpengraphQuery';
 import { fallbackImageResponse } from '../../../../utils/fallback';
 import { generateSplashImageResponse } from '../../../../utils/splashScreen';
@@ -29,13 +29,7 @@ const handler = async (req: NextApiRequest) => {
       return fallbackImageResponse;
     }
 
-    const imageUrls = collection.tokens
-      ?.map((element) => {
-        return element?.token ? getPreviewUrl(element?.token?.definition?.media) : null;
-      })
-      .slice(0, 4);
-
-    if (!imageUrls) {
+    if (!collection?.tokens) {
       return fallbackImageResponse;
     }
 

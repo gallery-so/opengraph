@@ -153,7 +153,17 @@ const handler = async (req: NextApiRequest) => {
 
     return new ImageResponse(
       (
-        <div style={containerStyle}>
+        <div
+          style={{
+            height: '100%',
+            width: '100%',
+            gap: 60,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#fff',
+          }}
+        >
           <svg
             style={{ width: '56.74px', height: '196px' }}
             viewBox="0 0 36 121"

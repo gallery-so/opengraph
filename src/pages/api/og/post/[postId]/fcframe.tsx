@@ -1,9 +1,12 @@
-/* eslint-disable @next/next/no-img-element */
 import React from 'react';
+
+/* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from '@vercel/og';
+import { NextApiRequest } from 'next';
+import { FrameImageMetadata, FrameMetadataType, getFrameHtmlResponse } from '@coinbase/onchainkit';
+
 import { fetchGraphql, getPreviewUrl } from '../../../../../fetch';
 import { getTokenMintTarget } from '../../../../../utils/getTokenMintTarget';
-import { FrameImageMetadata, FrameMetadataType, getFrameHtmlResponse } from '@coinbase/onchainkit';
 import {
   WIDTH_OPENGRAPH_IMAGE,
   HEIGHT_OPENGRAPH_IMAGE,
@@ -14,21 +17,13 @@ import {
   CHAR_LENGTH_ONE_LINE,
   truncateAndStripMarkdown,
 } from '../../../../../utils/extractWordsWithinLimit';
-
 import { postIdQuery } from '../../../../../queries/postIdOpengraphQuery';
-import { NextApiRequest } from 'next';
-
 import {
   containerStyle,
-  blurredLeftSideImageStyle,
-  blurredRightSideImageStyle,
-  centeredImageContainerStyle,
-  imageDescriptionStyle,
   textStyle,
   boldTextStyle,
   imageStyle,
   columnFlexStyle,
-  columnAltFlexStyle,
 } from '../../../../../styles';
 
 export const config = {

@@ -1,5 +1,6 @@
+import React from 'react';
+
 /* eslint-disable @next/next/no-img-element */
-import React, { CSSProperties } from 'react';
 import { NextApiRequest } from 'next';
 import { ImageResponse } from '@vercel/og';
 import { fetchGraphql } from '../../../../../fetch';
@@ -102,13 +103,7 @@ const handler = async (req: NextApiRequest) => {
           </div>
           <div style={centeredImageContainerStyle}>
             <div style={columnFlexStyle}>
-              <img
-                width="500"
-                height="500"
-                src={centerToken?.src}
-                style={imageStyle as CSSProperties}
-                alt="post"
-              />
+              <img width="500" height="500" src={centerToken?.src} style={imageStyle} alt="post" />
               <div style={columnAltFlexStyle}>
                 <p style={textStyle}>{centerToken?.name}</p>
                 <p style={boldTextStyle}>{centerToken?.communityName}</p>
@@ -119,13 +114,7 @@ const handler = async (req: NextApiRequest) => {
           <div style={blurredRightSideImageStyle}>
             {rightToken ? (
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <img
-                  width="500"
-                  height="500"
-                  src={rightToken?.src}
-                  style={imageStyle as CSSProperties}
-                  alt="post"
-                />
+                <img width="500" height="500" src={rightToken?.src} style={imageStyle} alt="post" />
                 <div style={imageDescriptionStyle}>
                   <p style={textStyle}>{rightToken?.name}</p>
                   <p style={boldTextStyle}>{rightToken?.communityName}</p>

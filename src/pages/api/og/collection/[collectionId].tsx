@@ -1,7 +1,7 @@
 import React from 'react';
 import { NextApiRequest } from 'next';
 
-import { fetchGraphql, getPreviewUrl } from '../../../../fetch';
+import { fetchGraphql } from '../../../../fetch';
 import { fcframeCollectionIdOpengraphQuery } from '../../../../queries/fcframeCollectionIdOpengraphQuery';
 import { fallbackImageResponse } from '../../../../utils/fallback';
 import { generateSplashImageResponse } from '../../../../utils/splashScreen';

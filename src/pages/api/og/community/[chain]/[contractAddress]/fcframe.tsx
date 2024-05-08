@@ -1,5 +1,6 @@
-/* eslint-disable @next/next/no-img-element */
 import React from 'react';
+
+/* eslint-disable @next/next/no-img-element */
 import { NextApiRequest } from 'next';
 import {
   HEIGHT_OPENGRAPH_IMAGE,

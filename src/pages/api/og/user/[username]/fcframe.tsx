@@ -1,3 +1,5 @@
+import React from 'react';
+
 /* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from '@vercel/og';
 import { fetchGraphql } from '../../../../../fetch';
@@ -10,7 +12,6 @@ import {
 import { ABCDiatypeRegular, ABCDiatypeBold } from '../../../../../utils/fonts';
 import { framePostHandler } from '../../../../../utils/framePostHandler';
 import { getPreviewTokens } from '../../../../../utils/getPreviewTokens';
-import React from 'react';
 import { fcframeUsernameOpengraphQuery } from '../../../../../queries/fcframeUsernameOpengraphQuery';
 import {
   generateSplashImageResponse,

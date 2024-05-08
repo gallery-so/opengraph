@@ -1,3 +1,5 @@
+import React from 'react';
+
 /* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from '@vercel/og';
 import { fetchGraphql } from '../../../../../fetch';
@@ -11,7 +13,6 @@ import {
 } from '../../../../../utils/fallback';
 import { framePostHandler } from '../../../../../utils/framePostHandler';
 import { getPreviewTokens } from '../../../../../utils/getPreviewTokens';
-import React from 'react';
 import {
   generateSplashImageResponse,
   shouldShowSplashScreen,
@@ -65,7 +66,6 @@ const handler = async (req: NextApiRequest) => {
     let tokens = collection.tokens.map((el) => el?.token);
     const tokensToDisplay = getPreviewTokens(tokens, `${Number(position) - 1}`);
 
-    // if no position is explicitly provided, serve splash image
     let showSplashScreen = shouldShowSplashScreen({ position, carouselLength: tokens?.length + 1 });
     if (showSplashScreen) {
       return generateSplashImageResponse({

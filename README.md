@@ -1,37 +1,42 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Gallery OpenGraph
 
-## Getting Started
+Dynamic social-preview images for Gallery profiles, galleries, collections,
+communities, posts, and NFTs.
 
-First, run the development server:
+## Hosting
+
+Production runs as a dedicated Cloudflare Worker built with OpenNext. The
+public origin is `https://og.gallery.so`; Vercel is not part of the production
+path.
+
+Fonts and the fallback logo live in the private `gallery-token-media` R2 bucket
+and are served through `https://cdn.gallery.so/media/system/opengraph/`.
+
+## Development
 
 ```bash
-npm run dev
-# or
-yarn dev
-
-# or to silence the tracking logs locally
-yarn dev:quiet
+corepack yarn install
+corepack yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Build and preview in the same Workers runtime used in production:
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+```bash
+corepack yarn cf:build
+corepack yarn preview
+```
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+Deployments from `main` are handled by Cloudflare Git integration. For a manual
+deployment with Wrangler authentication already configured:
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+```bash
+corepack yarn cf:deploy
+```
 
-## Learn More
+The integration tests expect the built Worker on port 3000:
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+```bash
+corepack yarn cf:build
+corepack yarn exec wrangler dev --port 3000
+corepack yarn test --runInBand
+```

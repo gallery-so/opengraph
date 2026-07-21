@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { ImageResponse } from '@vercel/og';
+import { ImageResponse } from 'workers-og';
 import { fetchGraphql, getPreviewUrl } from '../../../../fetch';
 import {
   WIDTH_OPENGRAPH_IMAGE,
@@ -12,31 +12,25 @@ import { CHAR_LENGTH_ONE_LINE, truncateAndStripMarkdown } from '../../../../util
 import { postIdQuery } from '../../../../queries/postIdOpengraphQuery';
 import { NextApiRequest } from 'next';
 import React from 'react';
-
-export const config = {
-  runtime: 'edge',
-};
+import { getQueryParam } from '../../../../utils/request';
+import { toNextApiHandler } from '../../../../utils/nextApiResponse';
 
 const handler = async (req: NextApiRequest) => {
   try {
-    const url = new URL(req.url ?? '');
-    const postId = url.searchParams.get('postId');
+    const postId = getQueryParam(req, 'postId');
 
     if (!postId || typeof postId !== 'string') {
-      return fallbackImageResponse;
+      return fallbackImageResponse();
     }
-    console.log({ postId });
-
     const queryResponse = await fetchGraphql({
       queryText: postIdQuery,
       variables: { postId: postId },
     });
 
-    console.log({ queryResponse });
     const { post } = queryResponse.data;
 
     if (post?.__typename === 'ErrPostNotFound') {
-      return fallbackImageResponse;
+      return fallbackImageResponse();
     }
 
     const author = post.author;
@@ -56,7 +50,7 @@ const handler = async (req: NextApiRequest) => {
 
     const postToken = post.tokens?.[0];
     if (!postToken) {
-      return fallbackImageResponse;
+      return fallbackImageResponse();
     }
 
     let postImageUrl = '';
@@ -233,10 +227,9 @@ const handler = async (req: NextApiRequest) => {
         ],
       },
     );
-  } catch (e) {
-    console.log('error: ', e);
-    return fallbackImageResponse;
+  } catch {
+    return fallbackImageResponse();
   }
 };
 
-export default handler;
+export default toNextApiHandler(handler);

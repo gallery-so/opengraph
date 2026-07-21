@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { ImageResponse } from '@vercel/og';
+import { ImageResponse } from 'workers-og';
 import { fetchGraphql, getPreviewUrl } from '../../../../fetch';
 import { usernameOpengraphQuery } from '../../../../queries/usernameOpengraphQuery';
 import { NextApiRequest } from 'next';
@@ -10,20 +10,17 @@ import {
   fallbackImageResponse,
 } from '../../../../utils/fallback';
 import { ABCDiatypeRegular, ABCDiatypeBold, alpinaLight } from '../../../../utils/fonts';
+import { getQueryParam } from '../../../../utils/request';
+import { toNextApiHandler } from '../../../../utils/nextApiResponse';
 import { CHAR_LENGTH_TWO_LINE, truncateAndStripMarkdown } from '../../../../utils/extractWordsWithinLimit';
 import React from 'react';
 
-export const config = {
-  runtime: 'edge',
-};
-
 const handler = async (req: NextApiRequest) => {
   try {
-    const url = new URL(req.url ?? '');
-    const username = url.searchParams.get('username');
+    const username = getQueryParam(req, 'username');
 
     if (!username || typeof username !== 'string') {
-      return fallbackImageResponse;
+      return fallbackImageResponse();
     }
 
     const queryResponse = await fetchGraphql({
@@ -33,7 +30,7 @@ const handler = async (req: NextApiRequest) => {
 
     const { user } = queryResponse.data;
     if (!user || user.__typename !== 'GalleryUser') {
-      return fallbackImageResponse;
+      return fallbackImageResponse();
     }
 
     const description = truncateAndStripMarkdown(user?.bio ?? '', CHAR_LENGTH_TWO_LINE);
@@ -50,7 +47,7 @@ const handler = async (req: NextApiRequest) => {
       .slice(0, 4);
 
     if (!imageUrls) {
-      return fallbackImageResponse;
+      return fallbackImageResponse();
     }
 
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
@@ -183,10 +180,9 @@ const handler = async (req: NextApiRequest) => {
         ],
       },
     );
-  } catch (e) {
-    console.log('error: ', e);
-    return fallbackImageResponse;
+  } catch {
+    return fallbackImageResponse();
   }
 };
 
-export default handler;
+export default toNextApiHandler(handler);

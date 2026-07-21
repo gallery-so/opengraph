@@ -2,7 +2,7 @@ import React from 'react';
 
 /* eslint-disable @next/next/no-img-element */
 import { NextApiRequest } from 'next';
-import { ImageResponse } from '@vercel/og';
+import { ImageResponse } from 'workers-og';
 import { fetchGraphql } from '../../../../../fetch';
 import { fcframeGalleryIdOpengraphQuery } from '../../../../../queries/fcframeGalleryIdOpengraphQuery';
 import {
@@ -13,6 +13,8 @@ import {
 import { ABCDiatypeRegular, ABCDiatypeBold, alpinaLight } from '../../../../../utils/fonts';
 import { framePostHandler } from '../../../../../utils/framePostHandler';
 import { getPreviewTokens } from '../../../../../utils/getPreviewTokens';
+import { getQueryParam } from '../../../../../utils/request';
+import { toNextApiHandler } from '../../../../../utils/nextApiResponse';
 import {
   generateSplashImageResponse,
   shouldShowSplashScreen,
@@ -30,10 +32,6 @@ import {
   columnAltFlexStyle,
 } from '../../../../../styles';
 
-export const config = {
-  runtime: 'edge',
-};
-
 const handler = async (req: NextApiRequest) => {
   // handle POST, where we should return `fcframe` og tags to render the next frame with appropriate buttons
   if (req.method === 'POST') {
@@ -42,15 +40,12 @@ const handler = async (req: NextApiRequest) => {
 
   // handle GET, which should return the raw image for the frame
   try {
-    const url = new URL(req.url ?? '');
-    const galleryId = url.searchParams.get('galleryId');
-    const position = url.searchParams.get('position');
+    const galleryId = getQueryParam(req, 'galleryId');
+    const position = getQueryParam(req, 'position');
 
     if (!galleryId || typeof galleryId !== 'string') {
-      return fallbackImageResponse;
+      return fallbackImageResponse();
     }
-
-    console.log('fetching gallery', galleryId);
 
     const queryResponse = await fetchGraphql({
       queryText: fcframeGalleryIdOpengraphQuery,
@@ -60,7 +55,7 @@ const handler = async (req: NextApiRequest) => {
     const { gallery } = queryResponse.data;
 
     if (!gallery || gallery?.__typename !== 'Gallery') {
-      return fallbackImageResponse;
+      return fallbackImageResponse();
     }
 
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
@@ -147,10 +142,9 @@ const handler = async (req: NextApiRequest) => {
         ],
       },
     );
-  } catch (e) {
-    console.log('error: ', e);
-    return fallbackImageResponse;
+  } catch {
+    return fallbackImageResponse();
   }
 };
 
-export default handler;
+export default toNextApiHandler(handler);

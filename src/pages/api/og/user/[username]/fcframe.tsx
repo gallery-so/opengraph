@@ -1,7 +1,7 @@
 import React from 'react';
 
 /* eslint-disable @next/next/no-img-element */
-import { ImageResponse } from '@vercel/og';
+import { ImageResponse } from 'workers-og';
 import { fetchGraphql } from '../../../../../fetch';
 import { NextApiRequest } from 'next';
 import {
@@ -12,6 +12,8 @@ import {
 import { ABCDiatypeRegular, ABCDiatypeBold } from '../../../../../utils/fonts';
 import { framePostHandler } from '../../../../../utils/framePostHandler';
 import { getPreviewTokens } from '../../../../../utils/getPreviewTokens';
+import { getQueryParam } from '../../../../../utils/request';
+import { toNextApiHandler } from '../../../../../utils/nextApiResponse';
 import { fcframeUsernameOpengraphQuery } from '../../../../../queries/fcframeUsernameOpengraphQuery';
 import {
   generateSplashImageResponse,
@@ -30,10 +32,6 @@ import {
   columnAltFlexStyle,
 } from '../../../../../styles';
 
-export const config = {
-  runtime: 'edge',
-};
-
 const handler = async (req: NextApiRequest) => {
   // handle POST, where we should return `fcframe` og tags to render the next frame with appropriate buttons
   if (req.method === 'POST') {
@@ -42,15 +40,12 @@ const handler = async (req: NextApiRequest) => {
 
   // handle GET, which should return the raw image for the frame
   try {
-    const url = new URL(req.url ?? '');
-    const username = url.searchParams.get('username');
-    const position = url.searchParams.get('position');
+    const username = getQueryParam(req, 'username');
+    const position = getQueryParam(req, 'position');
 
     if (!username || typeof username !== 'string') {
-      return fallbackImageResponse;
+      return fallbackImageResponse();
     }
-
-    console.log('fetching user', username);
 
     const queryResponse = await fetchGraphql({
       queryText: fcframeUsernameOpengraphQuery,
@@ -60,7 +55,7 @@ const handler = async (req: NextApiRequest) => {
     const { user } = queryResponse.data;
 
     if (user?.__typename !== 'GalleryUser') {
-      return fallbackImageResponse;
+      return fallbackImageResponse();
     }
 
     const tokens = user.galleries
@@ -144,10 +139,9 @@ const handler = async (req: NextApiRequest) => {
         ],
       },
     );
-  } catch (e) {
-    console.log('error: ', e);
-    return fallbackImageResponse;
+  } catch {
+    return fallbackImageResponse();
   }
 };
 
-export default handler;
+export default toNextApiHandler(handler);

@@ -1,12 +1,14 @@
 import React from 'react';
 
 /* eslint-disable @next/next/no-img-element */
-import { ImageResponse } from '@vercel/og';
+import { ImageResponse } from 'workers-og';
 import { NextApiRequest } from 'next';
 import { FrameImageMetadata, FrameMetadataType, getFrameHtmlResponse } from '@coinbase/onchainkit';
 
 import { fetchGraphql, getPreviewUrl } from '../../../../../fetch';
 import { getTokenMintTarget } from '../../../../../utils/getTokenMintTarget';
+import { getAbsoluteRequestUrl, getQueryParam } from '../../../../../utils/request';
+import { toNextApiHandler } from '../../../../../utils/nextApiResponse';
 import {
   WIDTH_OPENGRAPH_IMAGE,
   HEIGHT_OPENGRAPH_IMAGE,
@@ -26,26 +28,19 @@ import {
   columnFlexStyle,
 } from '../../../../../styles';
 
-export const config = {
-  runtime: 'edge',
-};
-
 const handler = async (req: NextApiRequest) => {
   if (req.method === 'POST') {
-    const url = new URL(req.url ?? '');
-    const postId = url.searchParams.get('postId');
+    const url = getAbsoluteRequestUrl(req);
+    const postId = getQueryParam(req, 'postId');
 
     if (!postId || typeof postId !== 'string') {
       throw new Error('Error: post not found');
     }
-    console.log({ postId });
-
     const queryResponse = await fetchGraphql({
       queryText: postIdQuery,
       variables: { postId: postId },
     });
 
-    console.log({ queryResponse });
     const { post } = queryResponse.data;
 
     if (post?.__typename === 'ErrPostNotFound') {
@@ -98,24 +93,20 @@ const handler = async (req: NextApiRequest) => {
   }
 
   try {
-    const url = new URL(req.url ?? '');
-    const postId = url.searchParams.get('postId');
+    const postId = getQueryParam(req, 'postId');
 
     if (!postId || typeof postId !== 'string') {
-      return fallbackImageResponse;
+      return fallbackImageResponse();
     }
-    console.log({ postId });
-
     const queryResponse = await fetchGraphql({
       queryText: postIdQuery,
       variables: { postId: postId },
     });
 
-    console.log({ queryResponse });
     const { post } = queryResponse.data;
 
     if (post?.__typename === 'ErrPostNotFound') {
-      return fallbackImageResponse;
+      return fallbackImageResponse();
     }
 
     const author = post.author;
@@ -135,7 +126,7 @@ const handler = async (req: NextApiRequest) => {
 
     const postToken = post.tokens?.[0];
     if (!postToken) {
-      return fallbackImageResponse;
+      return fallbackImageResponse();
     }
 
     let postImageUrl = '';
@@ -268,10 +259,9 @@ const handler = async (req: NextApiRequest) => {
         ],
       },
     );
-  } catch (e) {
-    console.log('error: ', e);
-    return fallbackImageResponse;
+  } catch {
+    return fallbackImageResponse();
   }
 };
 
-export default handler;
+export default toNextApiHandler(handler);

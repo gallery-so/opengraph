@@ -5,18 +5,15 @@ import { fetchGraphql } from '../../../../fetch';
 import { fcframeGalleryIdOpengraphQuery } from '../../../../queries/fcframeGalleryIdOpengraphQuery';
 import { fallbackImageResponse } from '../../../../utils/fallback';
 import { generateSplashImageResponse } from '../../../../utils/splashScreen';
-
-export const config = {
-  runtime: 'edge',
-};
+import { getQueryParam } from '../../../../utils/request';
+import { toNextApiHandler } from '../../../../utils/nextApiResponse';
 
 const handler = async (req: NextApiRequest) => {
   try {
-    const url = new URL(req.url ?? '');
-    const galleryId = url.searchParams.get('galleryId');
+    const galleryId = getQueryParam(req, 'galleryId');
 
     if (!galleryId || typeof galleryId !== 'string') {
-      return fallbackImageResponse;
+      return fallbackImageResponse();
     }
 
     const queryResponse = await fetchGraphql({
@@ -26,7 +23,7 @@ const handler = async (req: NextApiRequest) => {
 
     const { gallery } = queryResponse.data;
     if (gallery?.__typename !== 'Gallery') {
-      return fallbackImageResponse;
+      return fallbackImageResponse();
     }
 
     const tokens = gallery.collections
@@ -40,10 +37,9 @@ const handler = async (req: NextApiRequest) => {
       tokens,
       showUsername: true,
     });
-  } catch (error) {
-    console.log('error', error);
-    return fallbackImageResponse;
+  } catch {
+    return fallbackImageResponse();
   }
 };
 
-export default handler;
+export default toNextApiHandler(handler);

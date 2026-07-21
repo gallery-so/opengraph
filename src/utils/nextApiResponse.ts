@@ -64,6 +64,7 @@ export function toNextApiHandler(handler: WebResponseHandler): NextApiHandler {
       res.send(Buffer.from(body));
     } catch (error) {
       if (req.method === 'GET') {
+        console.error('Failed to serialize OpenGraph image response', error);
         await sendFallbackImage(res);
         return;
       }

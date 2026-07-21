@@ -180,7 +180,8 @@ const handler = async (req: NextApiRequest) => {
         ],
       },
     );
-  } catch {
+  } catch (error) {
+    console.error('Failed to render user OpenGraph image', error);
     return fallbackImageResponse();
   }
 };

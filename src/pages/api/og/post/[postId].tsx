@@ -227,7 +227,8 @@ const handler = async (req: NextApiRequest) => {
         ],
       },
     );
-  } catch {
+  } catch (error) {
+    console.error('Failed to render post OpenGraph image', error);
     return fallbackImageResponse();
   }
 };

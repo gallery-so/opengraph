@@ -44,7 +44,7 @@ async function sendFallbackImage(res: NextApiResponse) {
   const body = await response.arrayBuffer();
   res.status(200);
   res.setHeader('Content-Type', 'image/png');
-  res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600');
+  res.setHeader('Cache-Control', 'no-store');
   res.send(Buffer.from(body));
 }
 

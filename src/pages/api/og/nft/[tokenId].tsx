@@ -70,6 +70,8 @@ const handler = async (req: NextApiRequest) => {
           >
             <img
               src={tokenImageUrl}
+              width="330"
+              height="265"
               style={{
                 maxWidth: '330px',
                 height: '265px',
@@ -143,6 +145,7 @@ const handler = async (req: NextApiRequest) => {
       {
         width: WIDTH_OPENGRAPH_IMAGE,
         height: HEIGHT_OPENGRAPH_IMAGE,
+        emoji: 'twemoji',
         fonts: [
           {
             name: 'ABCDiatype-Regular',

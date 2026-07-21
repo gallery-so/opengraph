@@ -54,3 +54,19 @@ export const getPreviewUrl = (media: any) => {
   const result = getPreviewUrls(media);
   return result?.large || result?.small || '';
 };
+
+export const getReachableImageUrls = async (urls: Array<string | null | undefined>, limit: number) => {
+  const candidates = urls.filter((url): url is string => Boolean(url)).slice(0, limit * 3);
+  const checkedUrls = await Promise.all(
+    candidates.map(async (url) => {
+      try {
+        const response = await fetch(url, { method: 'HEAD' });
+        return response.ok ? url : null;
+      } catch {
+        return null;
+      }
+    }),
+  );
+
+  return checkedUrls.filter((url): url is string => Boolean(url)).slice(0, limit);
+};

@@ -138,6 +138,7 @@ const handler = async (req: NextApiRequest) => {
       {
         width: WIDTH_OPENGRAPH_IMAGE,
         height: HEIGHT_OPENGRAPH_IMAGE,
+        emoji: 'twemoji',
         fonts: [
           {
             name: 'ABCDiatype-Regular',

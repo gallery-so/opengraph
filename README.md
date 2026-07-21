@@ -26,8 +26,9 @@ corepack yarn cf:build
 corepack yarn preview
 ```
 
-Deployments from `main` are handled by Cloudflare Git integration. For a manual
-deployment with Wrangler authentication already configured:
+Every commit merged to `main` is built and deployed by Cloudflare Git
+integration with `yarn cf:build` and `yarn cf:deploy`. For a manual deployment
+with Wrangler authentication already configured:
 
 ```bash
 corepack yarn cf:deploy

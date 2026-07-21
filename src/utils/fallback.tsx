@@ -12,6 +12,8 @@ export const fallbackImageResponse = () => new ImageResponse(
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src={fallbackUrl}
+      width={WIDTH_OPENGRAPH_IMAGE}
+      height={HEIGHT_OPENGRAPH_IMAGE}
       style={{
         width: WIDTH_OPENGRAPH_IMAGE,
         height: HEIGHT_OPENGRAPH_IMAGE,

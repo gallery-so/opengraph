@@ -295,6 +295,7 @@ export async function generateSplashImageResponse({
                 objectFit: 'contain',
               }}
               width={containerHeight}
+              height={containerHeight}
             />
           );
         })}
@@ -350,6 +351,7 @@ export async function generateSplashImageResponse({
     {
       width: WIDTH_OPENGRAPH_IMAGE,
       height: HEIGHT_OPENGRAPH_IMAGE,
+      emoji: 'twemoji',
       fonts: [
         {
           name: 'GT Alpina',

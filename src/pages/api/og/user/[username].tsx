@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from 'workers-og';
-import { fetchGraphql, getPreviewUrl } from '../../../../fetch';
+import { fetchGraphql, getPreviewUrl, getReachableImageUrls } from '../../../../fetch';
 import { usernameOpengraphQuery } from '../../../../queries/usernameOpengraphQuery';
 import { NextApiRequest } from 'next';
 
@@ -38,15 +38,20 @@ const handler = async (req: NextApiRequest) => {
       (gallery) => gallery?.collections?.some((collection) => collection?.tokens?.length),
     );
 
-    const imageUrls = nonEmptyGalleries?.[0]?.collections
-      ?.filter((collection) => !collection?.hidden)
-      .flatMap((collection) => collection?.tokens)
-      .map((galleryToken) => {
-        return galleryToken?.token ? getPreviewUrl(galleryToken.token.definition.media) : null;
-      })
-      .slice(0, 4);
+    const candidateImageUrls: Array<string | null> = [];
+    for (const collection of nonEmptyGalleries?.[0]?.collections ?? []) {
+      if (collection?.hidden) continue;
 
-    if (!imageUrls) {
+      for (const galleryToken of collection?.tokens ?? []) {
+        candidateImageUrls.push(
+          galleryToken?.token ? getPreviewUrl(galleryToken.token.definition.media) : null,
+        );
+      }
+    }
+
+    const imageUrls = await getReachableImageUrls(candidateImageUrls, 4);
+
+    if (imageUrls.length === 0) {
       return fallbackImageResponse();
     }
 
@@ -90,6 +95,8 @@ const handler = async (req: NextApiRequest) => {
                 <img
                   key={url}
                   src={url}
+                  width="250"
+                  height="190"
                   style={{
                     maxWidth: '250px',
                     height: '190px',
@@ -160,6 +167,7 @@ const handler = async (req: NextApiRequest) => {
       {
         width: WIDTH_OPENGRAPH_IMAGE,
         height: HEIGHT_OPENGRAPH_IMAGE,
+        emoji: 'twemoji',
         fonts: [
           {
             name: 'ABCDiatype-Regular',

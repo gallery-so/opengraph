@@ -101,6 +101,8 @@ const handler = async (req: NextApiRequest) => {
           >
             <img
               src={postImageUrl}
+              width="450"
+              height="370"
               style={{
                 maxWidth: '450px',
                 height: '370px',
@@ -207,6 +209,7 @@ const handler = async (req: NextApiRequest) => {
       {
         width: WIDTH_OPENGRAPH_IMAGE,
         height: HEIGHT_OPENGRAPH_IMAGE,
+        emoji: 'twemoji',
         fonts: [
           {
             name: 'ABCDiatype-Regular',

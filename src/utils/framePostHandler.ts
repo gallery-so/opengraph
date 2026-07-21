@@ -9,6 +9,7 @@ import { fcframeCollectionIdOpengraphQuery } from '../queries/fcframeCollectionI
 import { fcframeGalleryIdOpengraphQuery } from '../queries/fcframeGalleryIdOpengraphQuery';
 import { getPreviewTokens } from './getPreviewTokens';
 import { getTokenMintTarget } from './getTokenMintTarget';
+import { getAbsoluteRequestUrl, getQueryParam } from './request';
 
 type FrameType = 'CollectionFrame' | 'UserFrame' | 'CommunityFrame' | 'GalleryFrame' | null;
 
@@ -29,12 +30,10 @@ export async function framePostHandler({
   frameType,
   initialButtonLabel,
 }: FramePostHandlerProps) {
-  const url = new URL(req.url ?? '');
-  let position = url.searchParams.get('position');
+  const url = getAbsoluteRequestUrl(req);
+  let position = getQueryParam(req, 'position');
   const body = JSON.parse(await extractBody(req.body));
   const buttonIndex = body.untrustedData?.buttonIndex;
-
-  console.log({ body, position, buttonIndex });
 
   let hasPrevious = true;
   let buttonContent = '→';
@@ -74,14 +73,14 @@ export async function framePostHandler({
   }
 
   // we re-calculate the position to get the position used for the og image response
-  position = url.searchParams.get('position');
+  position = url.searchParams.get('position') ?? undefined;
 
   // use square aspect ratio for image if appropriate for token in carousel
   let squareAspectRatio = false;
   let mintTarget = null;
   if (frameType === 'CommunityFrame' && position) {
-    const chain = url.searchParams.get('chain');
-    const contractAddress = url.searchParams.get('contractAddress');
+    const chain = getQueryParam(req, 'chain');
+    const contractAddress = getQueryParam(req, 'contractAddress');
 
     if (!chain || typeof chain !== 'string') {
       throw new Error('Error: chain not found');
@@ -116,7 +115,7 @@ export async function framePostHandler({
     squareAspectRatio = determineAspectRatio(tokens, position, mainPosition === 0);
     mintTarget = getTokenMintTarget(tokens[Number(position) - 1]);
   } else if (frameType === 'UserFrame' && position) {
-    const username = url.searchParams.get('username');
+    const username = getQueryParam(req, 'username');
     if (!username || typeof username !== 'string') {
       throw new Error('Error: username not found');
     }
@@ -145,7 +144,7 @@ export async function framePostHandler({
     squareAspectRatio = determineAspectRatio(tokens, position);
     mintTarget = getTokenMintTarget(tokens[Number(position) - 1]);
   } else if (frameType === 'CollectionFrame' && position) {
-    const collectionId = url.searchParams.get('collectionId');
+    const collectionId = getQueryParam(req, 'collectionId');
 
     if (!collectionId || typeof collectionId !== 'string') {
       throw new Error('Error: collectionId not found');
@@ -166,7 +165,7 @@ export async function framePostHandler({
     squareAspectRatio = determineAspectRatio(tokens, position);
     mintTarget = getTokenMintTarget(tokens[Number(position) - 1]);
   } else if (frameType === 'GalleryFrame' && position) {
-    const galleryId = url.searchParams.get('galleryId');
+    const galleryId = getQueryParam(req, 'galleryId');
 
     if (!galleryId || typeof galleryId !== 'string') {
       throw new Error('Error: galleryId not found');

@@ -1,8 +1,8 @@
 import React from 'react';
-import { ImageResponse } from '@vercel/og';
+import { ImageResponse } from 'workers-og';
 import { getPreviewUrl } from '../fetch';
 import { truncateAndStripMarkdown } from './extractWordsWithinLimit';
-import { HEIGHT_OPENGRAPH_IMAGE, WIDTH_OPENGRAPH_IMAGE, fallbackImageResponse } from './fallback';
+import { HEIGHT_OPENGRAPH_IMAGE, WIDTH_OPENGRAPH_IMAGE } from './fallback';
 import { alpinaLight, alpinaLightItalic } from './fonts';
 
 const CHAR_LENGTH_CENTER_TITLE = 56;

@@ -9,10 +9,12 @@ import {
 } from '../../../../../../utils/fallback';
 import { fetchGraphql } from '../../../../../../fetch';
 import { fcframeContractCommunityOpengraphQuery } from '../../../../../../queries/fcframeContractCommunityOpengraphQuery';
-import { ImageResponse } from '@vercel/og';
+import { ImageResponse } from 'workers-og';
 import { ABCDiatypeBold, ABCDiatypeRegular, alpinaLight } from '../../../../../../utils/fonts';
 import { framePostHandler, isImageTall } from '../../../../../../utils/framePostHandler';
 import { getPreviewTokens } from '../../../../../../utils/getPreviewTokens';
+import { getQueryParam } from '../../../../../../utils/request';
+import { toNextApiHandler } from '../../../../../../utils/nextApiResponse';
 import {
   generateSplashImageResponse,
   shouldShowSplashScreen,
@@ -31,10 +33,6 @@ import {
   columnAltFlexStyle,
 } from '../../../../../../styles';
 
-export const config = {
-  runtime: 'edge',
-};
-
 // TODO: art blocks / prohibition support
 const handler = async (req: NextApiRequest) => {
   // handle POST, where we should return `fcframe` og tags to render the next frame with appropriate buttons
@@ -48,17 +46,16 @@ const handler = async (req: NextApiRequest) => {
 
   // handle GET, which should return the raw image for the frame
   try {
-    const url = new URL(req.url ?? '');
-    const chain = url.searchParams.get('chain');
-    const contractAddress = url.searchParams.get('contractAddress');
-    const position = url.searchParams.get('position');
+    const chain = getQueryParam(req, 'chain');
+    const contractAddress = getQueryParam(req, 'contractAddress');
+    const position = getQueryParam(req, 'position');
 
     if (!chain || typeof chain !== 'string') {
-      return fallbackImageResponse;
+      return fallbackImageResponse();
     }
 
     if (!contractAddress || typeof contractAddress !== 'string') {
-      return fallbackImageResponse;
+      return fallbackImageResponse();
     }
 
     const queryResponse = await fetchGraphql({
@@ -76,7 +73,7 @@ const handler = async (req: NextApiRequest) => {
     const { community } = queryResponse.data;
 
     if (community?.__typename !== 'Community') {
-      return fallbackImageResponse;
+      return fallbackImageResponse();
     }
 
     const ABCDiatypeRegularFontData = await ABCDiatypeRegular;
@@ -230,10 +227,9 @@ const handler = async (req: NextApiRequest) => {
         ],
       },
     );
-  } catch (e) {
-    console.log('error: ', e);
-    return fallbackImageResponse;
+  } catch {
+    return fallbackImageResponse();
   }
 };
 
-export default handler;
+export default toNextApiHandler(handler);

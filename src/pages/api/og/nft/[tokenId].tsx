@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { ImageResponse } from '@vercel/og';
+import { ImageResponse } from 'workers-og';
 import { fetchGraphql, getPreviewUrl } from '../../../../fetch';
 import { tokenIdOpengraphQuery } from '../../../../queries/tokenIdOpengraphQuery';
 import { NextApiRequest } from 'next';
@@ -14,18 +14,15 @@ import {
 } from '../../../../utils/fallback';
 import { ABCDiatypeRegular, alpinaLight, alpinaLightItalic } from '../../../../utils/fonts';
 import React from 'react';
-
-export const config = {
-  runtime: 'edge',
-};
+import { getQueryParam } from '../../../../utils/request';
+import { toNextApiHandler } from '../../../../utils/nextApiResponse';
 
 const handler = async (req: NextApiRequest) => {
   try {
-    const url = new URL(req.url ?? '');
-    const tokenId = url.searchParams.get('tokenId');
+    const tokenId = getQueryParam(req, 'tokenId');
 
     if (!tokenId || typeof tokenId !== 'string') {
-      return fallbackImageResponse;
+      return fallbackImageResponse();
     }
 
     const queryResponse = await fetchGraphql({
@@ -35,7 +32,7 @@ const handler = async (req: NextApiRequest) => {
 
     const { token } = queryResponse.data;
     if (token?.__typename !== 'Token') {
-      return fallbackImageResponse;
+      return fallbackImageResponse();
     }
 
     const tokenImageUrl = getPreviewUrl(token.definition.media);
@@ -167,10 +164,9 @@ const handler = async (req: NextApiRequest) => {
         ],
       },
     );
-  } catch (e) {
-    console.log('error: ', e);
-    return fallbackImageResponse;
+  } catch {
+    return fallbackImageResponse();
   }
 };
 
-export default handler;
+export default toNextApiHandler(handler);

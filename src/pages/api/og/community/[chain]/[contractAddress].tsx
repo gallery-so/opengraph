@@ -5,25 +5,22 @@ import { fallbackImageResponse } from '../../../../../utils/fallback';
 import { fetchGraphql } from '../../../../../fetch';
 import { fcframeContractCommunityOpengraphQuery } from '../../../../../queries/fcframeContractCommunityOpengraphQuery';
 import { generateSplashImageResponse } from '../../../../../utils/splashScreen';
-
-export const config = {
-  runtime: 'edge',
-};
+import { getQueryParam } from '../../../../../utils/request';
+import { toNextApiHandler } from '../../../../../utils/nextApiResponse';
 
 // TODO: art blocks / prohibition support
 const handler = async (req: NextApiRequest) => {
   // handle GET, which should return the raw image for the frame
   try {
-    const url = new URL(req.url ?? '');
-    const chain = url.searchParams.get('chain');
-    const contractAddress = url.searchParams.get('contractAddress');
+    const chain = getQueryParam(req, 'chain');
+    const contractAddress = getQueryParam(req, 'contractAddress');
 
     if (!chain || typeof chain !== 'string') {
-      return fallbackImageResponse;
+      return fallbackImageResponse();
     }
 
     if (!contractAddress || typeof contractAddress !== 'string') {
-      return fallbackImageResponse;
+      return fallbackImageResponse();
     }
 
     const queryResponse = await fetchGraphql({
@@ -41,7 +38,7 @@ const handler = async (req: NextApiRequest) => {
     const { community } = queryResponse.data;
 
     if (community?.__typename !== 'Community') {
-      return fallbackImageResponse;
+      return fallbackImageResponse();
     }
 
     const { name: communityName, tokensForFrame: tokens } = community;
@@ -51,10 +48,9 @@ const handler = async (req: NextApiRequest) => {
       numSplashImages: 4,
       tokens,
     });
-  } catch (e) {
-    console.log('error: ', e);
-    return fallbackImageResponse;
+  } catch {
+    return fallbackImageResponse();
   }
 };
 
-export default handler;
+export default toNextApiHandler(handler);
